@@ -1,0 +1,79 @@
+{
+  "id": "colors",
+  "name": "Colors",
+  "nameZh": "颜色",
+  "emoji": "🎨",
+  "color": "#A78BFA",
+  "words": [
+    {
+      "id": "red",
+      "english": "red",
+      "chinese": "红色",
+      "pinyin": "hóngsè",
+      "image": "/images/colors/red.png"
+    },
+    {
+      "id": "blue",
+      "english": "blue",
+      "chinese": "蓝色",
+      "pinyin": "lánsè",
+      "image": "/images/colors/blue.png"
+    },
+    {
+      "id": "yellow",
+      "english": "yellow",
+      "chinese": "黄色",
+      "pinyin": "huángsè",
+      "image": "/images/colors/yellow.png"
+    },
+    {
+      "id": "green",
+      "english": "green",
+      "chinese": "绿色",
+      "pinyin": "lǜsè",
+      "image": "/images/colors/green.png"
+    },
+    {
+      "id": "pink",
+      "english": "pink",
+      "chinese": "粉色",
+      "pinyin": "fěnsè",
+      "image": "/images/colors/pink.png"
+    },
+    {
+      "id": "purple",
+      "english": "purple",
+      "chinese": "紫色",
+      "pinyin": "zǐsè",
+      "image": "/images/colors/purple.png"
+    },
+    {
+      "id": "orange",
+      "english": "orange",
+      "chinese": "橙色",
+      "pinyin": "chéngsè",
+      "image": "/images/colors/orange.png"
+    },
+    {
+      "id": "white",
+      "english": "white",
+      "chinese": "白色",
+      "pinyin": "báisè",
+      "image": "/images/colors/white.png"
+    },
+    {
+      "id": "black",
+      "english": "black",
+      "chinese": "黑色",
+      "pinyin": "hēisè",
+      "image": "/images/colors/black.png"
+    },
+    {
+      "id": "brown",
+      "english": "brown",
+      "chinese": "棕色",
+      "pinyin": "zōngsè",
+      "image": "/images/colors/brown.png"
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "id": "greetings",
+  "name": "Greetings",
+  "nameZh": "问候",
+  "emoji": "👋",
+  "color": "#60A5FA",
+  "words": [
+    {
+      "id": "hello",
+      "english": "hello",
+      "chinese": "你好",
+      "pinyin": "nǐ hǎo",
+      "image": "/images/greetings/hello.png"
+    },
+    {
+      "id": "goodbye",
+      "english": "goodbye",
+      "chinese": "再见",
+      "pinyin": "zàijiàn",
+      "image": "/images/greetings/goodbye.png"
+    },
+    {
+      "id": "thank-you",
+      "english": "thank you",
+      "chinese": "谢谢",
+      "pinyin": "xièxie",
+      "image": "/images/greetings/thank-you.png"
+    },
+    {
+      "id": "yes",
+      "english": "yes",
+      "chinese": "是的",
+      "pinyin": "shìde",
+      "image": "/images/greetings/yes.png"
+    },
+    {
+      "id": "no",
+      "english": "no",
+      "chinese": "不",
+      "pinyin": "bù",
+      "image": "/images/greetings/no.png"
+    },
+    {
+      "id": "good-morning",
+      "english": "good morning",
+      "chinese": "早上好",
+      "pinyin": "zǎoshang hǎo",
+      "image": "/images/greetings/good-morning.png"
+    },
+    {
+      "id": "good-night",
+      "english": "good night",
+      "chinese": "晚安",
+      "pinyin": "wǎn'ān",
+      "image": "/images/greetings/good-night.png"
+    },
+    {
+      "id": "sorry",
+      "english": "sorry",
+      "chinese": "对不起",
+      "pinyin": "duìbuqǐ",
+      "image": "/images/greetings/sorry.png"
+    }
+  ]
+}

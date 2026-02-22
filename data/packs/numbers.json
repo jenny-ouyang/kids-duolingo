@@ -1,0 +1,79 @@
+{
+  "id": "numbers",
+  "name": "Numbers",
+  "nameZh": "数字",
+  "emoji": "🔢",
+  "color": "#34D399",
+  "words": [
+    {
+      "id": "one",
+      "english": "one",
+      "chinese": "一",
+      "pinyin": "yī",
+      "image": "/images/numbers/one.png"
+    },
+    {
+      "id": "two",
+      "english": "two",
+      "chinese": "二",
+      "pinyin": "èr",
+      "image": "/images/numbers/two.png"
+    },
+    {
+      "id": "three",
+      "english": "three",
+      "chinese": "三",
+      "pinyin": "sān",
+      "image": "/images/numbers/three.png"
+    },
+    {
+      "id": "four",
+      "english": "four",
+      "chinese": "四",
+      "pinyin": "sì",
+      "image": "/images/numbers/four.png"
+    },
+    {
+      "id": "five",
+      "english": "five",
+      "chinese": "五",
+      "pinyin": "wǔ",
+      "image": "/images/numbers/five.png"
+    },
+    {
+      "id": "six",
+      "english": "six",
+      "chinese": "六",
+      "pinyin": "liù",
+      "image": "/images/numbers/six.png"
+    },
+    {
+      "id": "seven",
+      "english": "seven",
+      "chinese": "七",
+      "pinyin": "qī",
+      "image": "/images/numbers/seven.png"
+    },
+    {
+      "id": "eight",
+      "english": "eight",
+      "chinese": "八",
+      "pinyin": "bā",
+      "image": "/images/numbers/eight.png"
+    },
+    {
+      "id": "nine",
+      "english": "nine",
+      "chinese": "九",
+      "pinyin": "jiǔ",
+      "image": "/images/numbers/nine.png"
+    },
+    {
+      "id": "ten",
+      "english": "ten",
+      "chinese": "十",
+      "pinyin": "shí",
+      "image": "/images/numbers/ten.png"
+    }
+  ]
+}

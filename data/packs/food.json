@@ -1,0 +1,65 @@
+{
+  "id": "food",
+  "name": "Food",
+  "nameZh": "食物",
+  "emoji": "🍎",
+  "color": "#FBBF24",
+  "words": [
+    {
+      "id": "apple",
+      "english": "apple",
+      "chinese": "苹果",
+      "pinyin": "píngguǒ",
+      "image": "/images/food/apple.png"
+    },
+    {
+      "id": "banana",
+      "english": "banana",
+      "chinese": "香蕉",
+      "pinyin": "xiāngjiāo",
+      "image": "/images/food/banana.png"
+    },
+    {
+      "id": "rice",
+      "english": "rice",
+      "chinese": "米饭",
+      "pinyin": "mǐfàn",
+      "image": "/images/food/rice.png"
+    },
+    {
+      "id": "noodles",
+      "english": "noodles",
+      "chinese": "面条",
+      "pinyin": "miàntiáo",
+      "image": "/images/food/noodles.png"
+    },
+    {
+      "id": "water",
+      "english": "water",
+      "chinese": "水",
+      "pinyin": "shuǐ",
+      "image": "/images/food/water.png"
+    },
+    {
+      "id": "milk",
+      "english": "milk",
+      "chinese": "牛奶",
+      "pinyin": "niúnǎi",
+      "image": "/images/food/milk.png"
+    },
+    {
+      "id": "egg",
+      "english": "egg",
+      "chinese": "鸡蛋",
+      "pinyin": "jīdàn",
+      "image": "/images/food/egg.png"
+    },
+    {
+      "id": "cake",
+      "english": "cake",
+      "chinese": "蛋糕",
+      "pinyin": "dàngāo",
+      "image": "/images/food/cake.png"
+    }
+  ]
+}

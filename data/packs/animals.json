@@ -1,0 +1,79 @@
+{
+  "id": "animals",
+  "name": "Animals",
+  "nameZh": "动物",
+  "emoji": "🐾",
+  "color": "#FF6B6B",
+  "words": [
+    {
+      "id": "cat",
+      "english": "cat",
+      "chinese": "猫",
+      "pinyin": "māo",
+      "image": "/images/animals/cat.png"
+    },
+    {
+      "id": "dog",
+      "english": "dog",
+      "chinese": "狗",
+      "pinyin": "gǒu",
+      "image": "/images/animals/dog.png"
+    },
+    {
+      "id": "fish",
+      "english": "fish",
+      "chinese": "鱼",
+      "pinyin": "yú",
+      "image": "/images/animals/fish.png"
+    },
+    {
+      "id": "bird",
+      "english": "bird",
+      "chinese": "鸟",
+      "pinyin": "niǎo",
+      "image": "/images/animals/bird.png"
+    },
+    {
+      "id": "rabbit",
+      "english": "rabbit",
+      "chinese": "兔子",
+      "pinyin": "tùzi",
+      "image": "/images/animals/rabbit.png"
+    },
+    {
+      "id": "duck",
+      "english": "duck",
+      "chinese": "鸭子",
+      "pinyin": "yāzi",
+      "image": "/images/animals/duck.png"
+    },
+    {
+      "id": "bear",
+      "english": "bear",
+      "chinese": "熊",
+      "pinyin": "xióng",
+      "image": "/images/animals/bear.png"
+    },
+    {
+      "id": "elephant",
+      "english": "elephant",
+      "chinese": "大象",
+      "pinyin": "dàxiàng",
+      "image": "/images/animals/elephant.png"
+    },
+    {
+      "id": "lion",
+      "english": "lion",
+      "chinese": "狮子",
+      "pinyin": "shīzi",
+      "image": "/images/animals/lion.png"
+    },
+    {
+      "id": "monkey",
+      "english": "monkey",
+      "chinese": "猴子",
+      "pinyin": "hóuzi",
+      "image": "/images/animals/monkey.png"
+    }
+  ]
+}

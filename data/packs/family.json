@@ -1,0 +1,58 @@
+{
+  "id": "family",
+  "name": "Family",
+  "nameZh": "家人",
+  "emoji": "👨‍👩‍👦",
+  "color": "#F472B6",
+  "words": [
+    {
+      "id": "mom",
+      "english": "mom",
+      "chinese": "妈妈",
+      "pinyin": "māma",
+      "image": "/images/family/mom.png"
+    },
+    {
+      "id": "dad",
+      "english": "dad",
+      "chinese": "爸爸",
+      "pinyin": "bàba",
+      "image": "/images/family/dad.png"
+    },
+    {
+      "id": "grandma",
+      "english": "grandma",
+      "chinese": "奶奶",
+      "pinyin": "nǎinai",
+      "image": "/images/family/grandma.png"
+    },
+    {
+      "id": "grandpa",
+      "english": "grandpa",
+      "chinese": "爷爷",
+      "pinyin": "yéye",
+      "image": "/images/family/grandpa.png"
+    },
+    {
+      "id": "brother",
+      "english": "brother",
+      "chinese": "哥哥",
+      "pinyin": "gēge",
+      "image": "/images/family/brother.png"
+    },
+    {
+      "id": "sister",
+      "english": "sister",
+      "chinese": "姐姐",
+      "pinyin": "jiějie",
+      "image": "/images/family/sister.png"
+    },
+    {
+      "id": "baby",
+      "english": "baby",
+      "chinese": "宝宝",
+      "pinyin": "bǎobao",
+      "image": "/images/family/baby.png"
+    }
+  ]
+}
