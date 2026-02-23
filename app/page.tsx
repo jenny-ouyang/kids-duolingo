@@ -11,6 +11,34 @@ const CLOUD_POSITIONS = [
   { top: '22%', left: '60%', scale: 0.7, delay: 0.6 },
 ]
 
+interface SubjectCardProps {
+  emoji: string
+  label: string
+  description: string
+  gradient: string
+  href: string
+  delay: number
+}
+
+function SubjectCard({ emoji, label, description, gradient, href, delay }: SubjectCardProps) {
+  const router = useRouter()
+  return (
+    <motion.button
+      initial={{ opacity: 0, y: 24 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay }}
+      whileHover={{ scale: 1.05 }}
+      whileTap={{ scale: 0.95 }}
+      onClick={() => router.push(href)}
+      className={`${gradient} rounded-[2rem] p-6 flex flex-col items-center gap-2 shadow-xl text-white w-full`}
+    >
+      <span className="text-6xl leading-none">{emoji}</span>
+      <span className="text-2xl font-extrabold drop-shadow">{label}</span>
+      <span className="text-sm font-semibold text-white/80">{description}</span>
+    </motion.button>
+  )
+}
+
 export default function HomePage() {
   const router = useRouter()
   const [totalHearts, setTotalHearts] = useState(0)
@@ -41,12 +69,12 @@ export default function HomePage() {
         </motion.div>
       ))}
 
-      <div className="flex flex-col items-center gap-8 z-10">
+      <div className="flex flex-col items-center gap-8 z-10 w-full max-w-sm">
         {/* Mascot */}
         <motion.div
           animate={{ y: [0, -12, 0] }}
           transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-[120px] leading-none select-none"
+          className="text-[100px] leading-none select-none"
         >
           🐼
         </motion.div>
@@ -61,8 +89,8 @@ export default function HomePage() {
           <h1 className="text-5xl font-extrabold text-blue-700 drop-shadow-sm">
             Hi, Julian! 👋
           </h1>
-          <p className="text-2xl text-blue-400 font-semibold mt-2">
-            Let&apos;s learn Chinese today!
+          <p className="text-xl text-blue-400 font-semibold mt-2">
+            What do you want to learn today?
           </p>
         </motion.div>
 
@@ -91,18 +119,25 @@ export default function HomePage() {
           </motion.div>
         )}
 
-        {/* Play button */}
-        <motion.button
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          whileHover={{ scale: 1.06 }}
-          whileTap={{ scale: 0.94 }}
-          onClick={() => router.push('/packs')}
-          className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-extrabold text-3xl rounded-[2rem] py-6 px-16 shadow-xl mt-2"
-        >
-          Play! 🎮
-        </motion.button>
+        {/* Subject cards */}
+        <div className="flex flex-col gap-4 w-full">
+          <SubjectCard
+            emoji="🈶"
+            label="Chinese"
+            description="Learn Mandarin words"
+            gradient="bg-gradient-to-br from-orange-400 to-red-500"
+            href="/packs"
+            delay={0.5}
+          />
+          <SubjectCard
+            emoji="➕"
+            label="Math"
+            description="Count and add numbers"
+            gradient="bg-gradient-to-br from-blue-500 to-purple-600"
+            href="/math/topics"
+            delay={0.65}
+          />
+        </div>
 
         {/* Parent link */}
         <motion.button
@@ -110,7 +145,7 @@ export default function HomePage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
           onClick={() => router.push('/parent')}
-          className="text-gray-400 text-sm underline underline-offset-2 mt-2"
+          className="text-gray-400 text-sm underline underline-offset-2"
         >
           Parent Dashboard
         </motion.button>

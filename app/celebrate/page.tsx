@@ -11,10 +11,14 @@ import { playCelebrationSound, playStarSound } from '@/lib/sounds'
 function CelebrationContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  const subject = searchParams.get('subject') ?? 'chinese'
   const packId = searchParams.get('pack') ?? 'animals'
   const correct = Number(searchParams.get('correct') ?? 0)
   const total = Number(searchParams.get('total') ?? 8)
   const heartsEarned = Number(searchParams.get('hearts') ?? 0)
+
+  const backHref = subject === 'math' ? '/math/topics' : '/packs'
+  const playAgainHref = subject === 'math' ? `/math/practice/${packId}` : `/practice/${packId}`
 
   const allCorrect = correct === total
   const stars = correct <= 2 ? 1 : correct <= 5 ? 2 : correct <= 7 ? 3 : 4
@@ -103,16 +107,16 @@ function CelebrationContent() {
           className="flex flex-col gap-3 mt-4 w-full max-w-xs"
         >
           <button
-            onClick={() => router.push(`/practice/${packId}`)}
+            onClick={() => router.push(playAgainHref)}
             className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-extrabold text-xl rounded-3xl py-4 px-8 shadow-lg hover:scale-105 active:scale-95 transition-transform"
           >
             Play Again 🔄
           </button>
           <button
-            onClick={() => router.push('/packs')}
+            onClick={() => router.push(backHref)}
             className="bg-white border-2 border-blue-300 text-blue-600 font-bold text-lg rounded-3xl py-3 px-8 hover:bg-blue-50 transition-colors"
           >
-            Pick Another Pack
+            {subject === 'math' ? 'Pick Another Topic' : 'Pick Another Pack'}
           </button>
         </motion.div>
       </motion.div>

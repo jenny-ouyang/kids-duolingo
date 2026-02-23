@@ -7,11 +7,57 @@ datasource db {
   provider = "postgresql"
 }
 
-model WordProgress {
+model Pack {
+  id              String            @id
+  subject         String            @default("chinese")
+  name            String
+  nameZh          String?
+  emoji           String
+  color           String
+  sortOrder       Int               @default(0)
+  words           Word[]
+  problems        MathProblem[]
+  chineseProgress ChineseProgress[]
+  mathProgress    MathProgress[]
+  answerEvents    AnswerEvent[]
+
+  @@index([subject])
+}
+
+model Word {
+  id              String            @id
+  packId          String
+  english         String
+  chinese         String
+  pinyin          String
+  image           String
+  sortOrder       Int               @default(0)
+  pack            Pack              @relation(fields: [packId], references: [id])
+  chineseProgress ChineseProgress[]
+}
+
+/// Math topics store problems here — one row per arithmetic fact
+model MathProblem {
+  id           String         @id
+  packId       String
+  operand1     Int
+  operator     String         // "+" | "-" | "count"
+  operand2     Int
+  answer       Int
+  emoji        String
+  sortOrder    Int            @default(0)
+  pack         Pack           @relation(fields: [packId], references: [id])
+  mathProgress MathProgress[]
+}
+
+/// Replaces WordProgress for Chinese — adds proper FK integrity
+model ChineseProgress {
   id          String   @id @default(cuid())
   childName   String   @default("julian")
   packId      String
+  pack        Pack     @relation(fields: [packId], references: [id])
   wordId      String
+  word        Word     @relation(fields: [wordId], references: [id])
   easiness    Float    @default(2.5)
   interval    Int      @default(1)
   repetitions Int      @default(0)
@@ -20,17 +66,37 @@ model WordProgress {
 
   @@unique([childName, packId, wordId])
   @@index([childName, packId])
+  @@map("WordProgress")
+}
+
+/// Math SM-2 progress — full FK to MathProblem
+model MathProgress {
+  id          String      @id @default(cuid())
+  childName   String      @default("julian")
+  packId      String
+  pack        Pack        @relation(fields: [packId], references: [id])
+  problemId   String
+  problem     MathProblem @relation(fields: [problemId], references: [id])
+  easiness    Float       @default(2.5)
+  interval    Int         @default(1)
+  repetitions Int         @default(0)
+  nextReview  DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([childName, packId, problemId])
+  @@index([childName, packId])
 }
 
 model AnswerEvent {
   id         String   @id @default(cuid())
   childName  String   @default("julian")
   packId     String
-  wordId     String
+  pack       Pack     @relation(fields: [packId], references: [id])
+  itemId     String   @map("wordId")
   correct    Boolean
   answeredAt DateTime @default(now())
 
-  @@index([childName, packId, wordId])
+  @@index([childName, packId, itemId])
   @@index([answeredAt])
 }
 
@@ -42,34 +108,13 @@ model ChildProfile {
   updatedAt     DateTime  @updatedAt
 }
 
-model Pack {
-  id        String @id
-  name      String
-  nameZh    String
-  emoji     String
-  color     String
-  sortOrder Int    @default(0)
-  words     Word[]
-}
-
-model Word {
-  id        String @id
-  packId    String
-  english   String
-  chinese   String
-  pinyin    String
-  image     String
-  sortOrder Int    @default(0)
-  pack      Pack   @relation(fields: [packId], references: [id])
-}
-
 /// Pre-generated exercise questions. AI runs once during setup; sessions just read from here.
 model GeneratedQuestion {
   id          String   @id @default(cuid())
   packId      String
-  wordId      String   // the correct-answer word
-  type        String   // 'audio_to_picture' | 'picture_to_chinese' | 'english_to_chinese'
-  distractors Json     // Word[] — snapshot of the 3 wrong-answer options
+  wordId      String
+  type        String
+  distractors Json
   createdAt   DateTime @default(now())
 
   @@index([packId, wordId])

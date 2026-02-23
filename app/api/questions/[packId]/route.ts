@@ -8,9 +8,8 @@ const SESSION_SIZE = 8
 /**
  * GET /api/questions/[packId]
  *
- * Returns a ready-to-play session: picks words due for review (SM-2 + recently wrong),
+ * Returns a ready-to-play Chinese session: picks words due for review (SM-2 + recently wrong),
  * loads their pre-generated questions from the DB, and shuffles options.
- * Zero AI calls at runtime.
  */
 export async function GET(
   _req: NextRequest,
@@ -19,13 +18,12 @@ export async function GET(
   const { packId } = params
 
   try {
-    // Load everything in parallel
-    const [pack, wordProgressRows, recentWrong] = await Promise.all([
+    const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
         where: { id: packId },
         include: { words: { orderBy: { sortOrder: 'asc' } } },
       }),
-      prisma.wordProgress.findMany({
+      prisma.chineseProgress.findMany({
         where: { childName: CHILD, packId },
         select: { wordId: true, repetitions: true, nextReview: true },
       }),
@@ -33,7 +31,7 @@ export async function GET(
         where: { childName: CHILD, packId, correct: false },
         orderBy: { answeredAt: 'desc' },
         take: 30,
-        select: { wordId: true },
+        select: { itemId: true },
       }),
     ])
 
@@ -41,22 +39,19 @@ export async function GET(
       return NextResponse.json({ error: 'Pack not found' }, { status: 404 })
     }
 
-    // Build progress map
     const progressMap: Record<string, { repetitions: number; nextReview: Date }> = {}
-    for (const p of wordProgressRows) {
+    for (const p of progressRows) {
       progressMap[p.wordId] = { repetitions: p.repetitions, nextReview: p.nextReview }
     }
 
-    // Deduplicate recent wrong words (priority order)
     const prioritySet = new Set<string>()
     for (const e of recentWrong) {
-      prioritySet.add(e.wordId)
+      prioritySet.add(e.itemId)
     }
 
     const now = new Date()
     const allWordIds = pack.words.map((w) => w.id)
 
-    // Select words: priority first → due for review → never seen → not yet due
     const priority  = allWordIds.filter((id) => prioritySet.has(id))
     const due       = allWordIds.filter((id) => !prioritySet.has(id) && progressMap[id] && progressMap[id].nextReview <= now)
     const neverSeen = allWordIds.filter((id) => !prioritySet.has(id) && !progressMap[id])
@@ -71,18 +66,15 @@ export async function GET(
       ...shuffle(notDue),
     ].slice(0, SESSION_SIZE)
 
-    // Load pre-generated questions for selected words
     const generatedRows = await prisma.generatedQuestion.findMany({
       where: { packId, wordId: { in: selectedIds } },
     })
 
-    // Build word lookup map
     const wordMap: Record<string, Word> = {}
     for (const w of pack.words) {
       wordMap[w.id] = { id: w.id, english: w.english, chinese: w.chinese, pinyin: w.pinyin, image: w.image }
     }
 
-    // For each selected word pick one question (cycle through types for variety)
     const questionsByWord: Record<string, typeof generatedRows> = {}
     for (const row of generatedRows) {
       if (!questionsByWord[row.wordId]) questionsByWord[row.wordId] = []
@@ -95,22 +87,20 @@ export async function GET(
 
       const rows = questionsByWord[wordId]
       if (!rows || rows.length === 0) {
-        // Fallback: build a question with random distractors if somehow missing
         const distractors = shuffle(Object.values(wordMap).filter((w) => w.id !== wordId)).slice(0, 3)
         const options = shuffle([word, ...distractors])
         return [{ word, options, correctId: wordId, type: 'audio_to_picture' }]
       }
 
-      // Pick one question per word, rotating through question types
       const row = rows[Math.floor(Math.random() * rows.length)]
       const distractors = (row.distractors as unknown as Word[]).map((d) => wordMap[d.id] ?? d)
       const options = shuffle([word, ...distractors])
       return [{ word, options, correctId: wordId, type: row.type }]
     })
 
-    // Also return the word progress so the client doesn't need a separate /api/progress call
+    const allProgress = await prisma.chineseProgress.findMany({ where: { childName: CHILD, packId } })
     const wordProgress: Record<string, { easiness: number; interval: number; repetitions: number; nextReview: string }> = {}
-    for (const p of await prisma.wordProgress.findMany({ where: { childName: CHILD, packId } })) {
+    for (const p of allProgress) {
       wordProgress[p.wordId] = {
         easiness: p.easiness,
         interval: p.interval,

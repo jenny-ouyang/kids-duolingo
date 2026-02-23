@@ -6,6 +6,29 @@ export interface Word {
   image: string
 }
 
+/** Shared SM-2 fields — updateSM2() is subject-agnostic and works on this */
+export interface BaseProgress {
+  easiness: number
+  interval: number
+  repetitions: number
+  nextReview: string
+}
+
+export interface MathProblem {
+  id: string
+  operand1: number
+  operator: '+' | '-' | 'count'
+  operand2: number
+  answer: number
+  emoji: string
+}
+
+export interface MathQuestion {
+  problem: MathProblem
+  options: number[]
+  correctAnswer: number
+}
+
 export interface Pack {
   id: string
   name: string
@@ -15,12 +38,8 @@ export interface Pack {
   words: Word[]
 }
 
-export interface WordProgress {
-  easiness: number
-  interval: number
-  repetitions: number
-  nextReview: string
-}
+/** Alias kept for backward compatibility with Chinese practice routes */
+export type WordProgress = BaseProgress
 
 export interface PackProgress {
   unlocked: boolean

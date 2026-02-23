@@ -6,7 +6,8 @@ const CHILD = 'julian'
 /**
  * POST /api/answers
  * Body: { packId, wordId, correct }
- * Records an answer event. Used to surface recently-wrong words in future sessions.
+ * Records an answer event. Used to surface recently-wrong items in future sessions.
+ * wordId is kept as the body field name for backward compat with existing Chinese practice page.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       data: {
         childName: CHILD,
         packId: body.packId,
-        wordId: body.wordId,
+        itemId: body.wordId,
         correct: body.correct,
       },
     })
@@ -34,8 +35,7 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/answers?packId=animals&limit=30
- * Returns the most recent wrong-answer wordIds for Julian in a pack.
- * Used to prioritize these words in the next session.
+ * Returns the most recent wrong-answer itemIds for Julian in a pack.
  */
 export async function GET(req: NextRequest) {
   const packId = req.nextUrl.searchParams.get('packId')
@@ -50,16 +50,15 @@ export async function GET(req: NextRequest) {
       where: { childName: CHILD, packId, correct: false },
       orderBy: { answeredAt: 'desc' },
       take: limit,
-      select: { wordId: true },
+      select: { itemId: true },
     })
 
-    // Deduplicate, keeping order (most recent wrong first)
     const seen = new Set<string>()
     const wordIds: string[] = []
     for (const e of events) {
-      if (!seen.has(e.wordId)) {
-        seen.add(e.wordId)
-        wordIds.push(e.wordId)
+      if (!seen.has(e.itemId)) {
+        seen.add(e.itemId)
+        wordIds.push(e.itemId)
       }
     }
 

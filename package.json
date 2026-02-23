@@ -11,7 +11,8 @@
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
     "db:seed": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/seed.ts",
-    "db:generate-questions": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/generate-questions.ts"
+    "db:generate-questions": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/generate-questions.ts",
+    "db:seed-math": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/seed-math.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.1",
