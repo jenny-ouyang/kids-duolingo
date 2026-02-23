@@ -1,9 +1,14 @@
 /**
- * Seeds math Pack + MathProblem rows into the database.
- * Safe to re-run — uses upsert.
+ * Seeds math Pack + MathProblem rows.
+ * Replaces any existing math topics cleanly before inserting.
  *
- * Run with:
- *   npx ts-node --skip-project --compiler-options '{"module":"commonjs"}' prisma/seed-math.ts
+ * Run with: npm run db:seed-math
+ *
+ * Four tiers of addition (1–100):
+ *   1. Single digits   — all 81 combinations (1+1 to 9+9, sums 2–18)
+ *   2. Multiples of 10 — all 45 combos (10+10 to 90+10, sums 20–100)
+ *   3. Mixed easy      — two-digit + single digit, sums up to 50 (~70 problems)
+ *   4. Mixed hard      — two-digit + two-digit, sums 51–100 (~70 problems)
  */
 
 import 'dotenv/config'
@@ -16,9 +21,8 @@ const adapter = new PrismaPg(pool)
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const prisma = new PrismaClient({ adapter } as any)
 
-// Emoji pool — cycles through for visual variety across problems
-const EMOJIS = ['🍎', '🌟', '🦋', '🐶', '🚂', '🌸', '🍪', '🐸', '🎈', '🐱']
-function emoji(i: number) { return EMOJIS[i % EMOJIS.length] }
+const EMOJIS = ['🍎', '🌟', '🦋', '🐶', '🚂', '🌸', '🍪', '🐸', '🎈', '🐱', '⚽', '🎯', '🦄', '🍕', '🎸']
+const emoji = (i: number) => EMOJIS[i % EMOJIS.length]
 
 function shuffle<T>(arr: T[]): T[] {
   const a = [...arr]
@@ -29,105 +33,169 @@ function shuffle<T>(arr: T[]): T[] {
   return a
 }
 
+interface ProblemDef {
+  id: string
+  operand1: number
+  operator: string
+  operand2: number
+  answer: number
+}
+
+// ── Topic 1: Single digits — ALL 81 combinations ────────────────────────────
+function buildSingleDigits(): ProblemDef[] {
+  const problems: ProblemDef[] = []
+  for (let a = 1; a <= 9; a++) {
+    for (let b = 1; b <= 9; b++) {
+      problems.push({ id: `${a}+${b}`, operand1: a, operator: '+', operand2: b, answer: a + b })
+    }
+  }
+  return problems
+}
+
+// ── Topic 2: Multiples of 10 — 45 combinations ──────────────────────────────
+function buildTensAddition(): ProblemDef[] {
+  const problems: ProblemDef[] = []
+  for (let a = 10; a <= 90; a += 10) {
+    for (let b = 10; b <= 100 - a; b += 10) {
+      problems.push({ id: `${a}+${b}`, operand1: a, operator: '+', operand2: b, answer: a + b })
+    }
+  }
+  return problems
+}
+
+// ── Topic 3: Mixed easy — two-digit + single digit, sums up to 50 ───────────
+// At least one operand is two-digit (10+), neither is a multiple of 10 alone.
+// Generates all valid pairs then shuffles.
+function buildMixedEasy(): ProblemDef[] {
+  const problems: ProblemDef[] = []
+  const seen = new Set<string>()
+
+  // Two-digit (11–49) + single digit (1–9), sum ≤ 50
+  for (let a = 11; a <= 49; a++) {
+    for (let b = 1; b <= 9; b++) {
+      if (a + b > 50) break
+      const id = `${a}+${b}`
+      if (!seen.has(id)) {
+        seen.add(id)
+        problems.push({ id, operand1: a, operator: '+', operand2: b, answer: a + b })
+      }
+    }
+  }
+
+  // Single digit (1–9) + two-digit (11–49), sum ≤ 50
+  for (let a = 1; a <= 9; a++) {
+    for (let b = 11; b <= 49; b++) {
+      if (a + b > 50) break
+      const id = `${a}+${b}`
+      if (!seen.has(id)) {
+        seen.add(id)
+        problems.push({ id, operand1: a, operator: '+', operand2: b, answer: a + b })
+      }
+    }
+  }
+
+  // Teen + teen (11–24 + 11–24), sum ≤ 50 — important for this level
+  for (let a = 11; a <= 24; a++) {
+    for (let b = 11; b <= 50 - a; b++) {
+      const id = `${a}+${b}`
+      if (!seen.has(id)) {
+        seen.add(id)
+        problems.push({ id, operand1: a, operator: '+', operand2: b, answer: a + b })
+      }
+    }
+  }
+
+  return shuffle(problems)
+}
+
+// ── Topic 4: Mixed hard — two-digit + two-digit, sums 51–100 ────────────────
+function buildMixedHard(): ProblemDef[] {
+  const problems: ProblemDef[] = []
+  const seen = new Set<string>()
+
+  for (let a = 1; a <= 99; a++) {
+    for (let b = Math.max(1, 51 - a); b <= 100 - a; b++) {
+      // Must include at least one two-digit number to be interesting
+      if (a <= 9 && b <= 9) continue
+      const id = `${a}+${b}`
+      if (!seen.has(id)) {
+        seen.add(id)
+        problems.push({ id, operand1: a, operator: '+', operand2: b, answer: a + b })
+      }
+    }
+  }
+
+  return shuffle(problems)
+}
+
 interface TopicDef {
   id: string
   name: string
   emoji: string
   color: string
   sortOrder: number
-  problems: Array<{
-    id: string
-    operand1: number
-    operator: string
-    operand2: number
-    answer: number
-    emoji: string
-    sortOrder: number
-  }>
-}
-
-// ── Topic: Counting 1–5 ────────────────────────────────────────────────────
-const countingProblems = [1, 2, 3, 4, 5].map((n, i) => ({
-  id: `count_${n}`,
-  operand1: n,
-  operator: 'count',
-  operand2: 0,
-  answer: n,
-  emoji: emoji(i),
-  sortOrder: i,
-}))
-
-// ── Topic: Adding to 5 (sum ≤ 5, both operands ≥ 1) ──────────────────────
-const add5Problems: TopicDef['problems'] = []
-let si = 0
-for (let a = 1; a <= 4; a++) {
-  for (let b = 1; b <= 5 - a; b++) {
-    add5Problems.push({
-      id: `${a}+${b}`,
-      operand1: a,
-      operator: '+',
-      operand2: b,
-      answer: a + b,
-      emoji: emoji(si++),
-      sortOrder: si - 1,
-    })
-  }
-}
-
-// ── Topic: Adding to 10 (sum 6–10, both operands 1–5) ────────────────────
-const add10Problems: TopicDef['problems'] = []
-let ai = 0
-for (let sum = 6; sum <= 10; sum++) {
-  for (let a = 1; a <= 5; a++) {
-    const b = sum - a
-    if (b >= 1 && b <= 5) {
-      add10Problems.push({
-        id: `${a}+${b}`,
-        operand1: a,
-        operator: '+',
-        operand2: b,
-        answer: sum,
-        emoji: emoji(ai++),
-        sortOrder: ai - 1,
-      })
-    }
-  }
+  problems: ProblemDef[]
 }
 
 const MATH_TOPICS: TopicDef[] = [
   {
-    id: 'math_counting',
-    name: 'Counting 1–5',
+    id: 'math_add_singles',
+    name: 'Single Digits',
     emoji: '🔢',
     color: '#7c3aed',
     sortOrder: 10,
-    problems: countingProblems,
+    problems: buildSingleDigits(),                  // 81 problems
   },
   {
-    id: 'math_add_5',
-    name: 'Adding to 5',
-    emoji: '➕',
-    color: '#2563eb',
-    sortOrder: 11,
-    problems: add5Problems,
-  },
-  {
-    id: 'math_add_10',
-    name: 'Adding to 10',
+    id: 'math_add_tens',
+    name: 'Adding Tens',
     emoji: '🔟',
     color: '#0891b2',
+    sortOrder: 11,
+    problems: buildTensAddition(),                  // 45 problems
+  },
+  {
+    id: 'math_add_mixed_easy',
+    name: 'Up to 50',
+    emoji: '➕',
+    color: '#2563eb',
     sortOrder: 12,
-    problems: shuffle(add10Problems).map((p, i) => ({ ...p, sortOrder: i })),
+    problems: buildMixedEasy(),                     // ~70 problems
+  },
+  {
+    id: 'math_add_mixed_hard',
+    name: 'Up to 100',
+    emoji: '💯',
+    color: '#dc2626',
+    sortOrder: 13,
+    problems: buildMixedHard(),                     // ~70 problems (sampled from large set)
   },
 ]
 
 async function main() {
-  console.log('Seeding math topics...')
+  console.log('Cleaning up old math data...')
+
+  // Fetch all existing math pack IDs
+  const existingMathPacks = await prisma.pack.findMany({
+    where: { subject: 'math' },
+    select: { id: true },
+  })
+  const existingIds = existingMathPacks.map((p) => p.id)
+
+  if (existingIds.length > 0) {
+    // Delete child records first (FK constraints)
+    await prisma.mathProgress.deleteMany({ where: { packId: { in: existingIds } } })
+    await prisma.answerEvent.deleteMany({ where: { packId: { in: existingIds } } })
+    await prisma.mathProblem.deleteMany({ where: { packId: { in: existingIds } } })
+    await prisma.pack.deleteMany({ where: { id: { in: existingIds } } })
+    console.log(`  Removed ${existingIds.length} old math topic(s).`)
+  }
+
+  console.log('\nSeeding new math topics...')
 
   for (const topic of MATH_TOPICS) {
-    await prisma.pack.upsert({
-      where: { id: topic.id },
-      create: {
+    await prisma.pack.create({
+      data: {
         id: topic.id,
         subject: 'math',
         name: topic.name,
@@ -135,44 +203,32 @@ async function main() {
         color: topic.color,
         sortOrder: topic.sortOrder,
       },
-      update: {
-        subject: 'math',
-        name: topic.name,
-        emoji: topic.emoji,
-        color: topic.color,
-        sortOrder: topic.sortOrder,
-      },
     })
 
-    for (const p of topic.problems) {
-      await prisma.mathProblem.upsert({
-        where: { id: p.id },
-        create: {
+    // Batch insert problems in chunks of 50 for performance
+    const chunkSize = 50
+    for (let i = 0; i < topic.problems.length; i += chunkSize) {
+      const chunk = topic.problems.slice(i, i + chunkSize)
+      await prisma.mathProblem.createMany({
+        data: chunk.map((p, j) => ({
           id: p.id,
           packId: topic.id,
           operand1: p.operand1,
           operator: p.operator,
           operand2: p.operand2,
           answer: p.answer,
-          emoji: p.emoji,
-          sortOrder: p.sortOrder,
-        },
-        update: {
-          packId: topic.id,
-          operand1: p.operand1,
-          operator: p.operator,
-          operand2: p.operand2,
-          answer: p.answer,
-          emoji: p.emoji,
-          sortOrder: p.sortOrder,
-        },
+          emoji: emoji(i + j),
+          sortOrder: i + j,
+        })),
+        skipDuplicates: true,
       })
     }
 
     console.log(`  ✓ ${topic.name} (${topic.problems.length} problems)`)
   }
 
-  console.log('Math seed complete.')
+  const total = MATH_TOPICS.reduce((s, t) => s + t.problems.length, 0)
+  console.log(`\nMath seed complete. ${total} problems across ${MATH_TOPICS.length} topics.`)
   await pool.end()
 }
 

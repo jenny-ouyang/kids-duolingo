@@ -10,21 +10,31 @@ function shuffle<T>(arr: T[]): T[] {
   return [...arr].sort(() => Math.random() - 0.5)
 }
 
-/** Generates 3 nearby wrong-answer numbers, avoiding negatives and zero */
+/**
+ * Generates 3 plausible wrong-answer numbers scaled to the answer's magnitude.
+ * Tight offsets for small answers, wider spread for larger ones so choices
+ * remain meaningfully different without being obviously wrong.
+ */
 function mathDistractors(answer: number): number[] {
-  const candidates = [-2, -1, 1, 2]
-    .map((d) => answer + d)
-    .filter((n) => n > 0 && n !== answer)
-  return shuffle(candidates).slice(0, 3)
+  let offsets: number[]
+  if (answer <= 10) {
+    offsets = [-2, -1, 1, 2, 3]
+  } else if (answer <= 20) {
+    offsets = [-3, -2, 2, 3, 4]
+  } else if (answer <= 50) {
+    offsets = [-5, -3, 3, 5, 7]
+  } else {
+    offsets = [-10, -5, 5, 10, 15]
+  }
+  return shuffle(offsets.map((d) => answer + d).filter((n) => n > 0 && n !== answer)).slice(0, 3)
 }
 
 /**
  * GET /api/math/questions/[topicId]
  *
- * Dynamically generates a math practice session:
- * - Loads MathProblem rows for this topic
- * - Applies SM-2 selection (same algorithm as Chinese)
- * - Builds MathQuestion objects with 4 answer choices
+ * Two-phase fetch for performance with large problem pools (hundreds–thousands of rows):
+ *   Phase 1 — lightweight: fetch only IDs + progress + recent wrong events
+ *   Phase 2 — targeted: fetch full data for only the 8 selected problems
  */
 export async function GET(
   _req: NextRequest,
@@ -33,10 +43,15 @@ export async function GET(
   const { topicId } = params
 
   try {
+    // Phase 1: IDs only (avoids loading thousands of full rows)
     const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
         where: { id: topicId },
-        include: { problems: { orderBy: { sortOrder: 'asc' } } },
+        select: {
+          id: true,
+          subject: true,
+          problems: { select: { id: true }, orderBy: { sortOrder: 'asc' } },
+        },
       }),
       prisma.mathProgress.findMany({
         where: { childName: CHILD, packId: topicId },
@@ -75,13 +90,17 @@ export async function GET(
       }
     }
 
-    // SM-2 selection — same function used for Chinese
+    // SM-2 selection — picks SESSION_SIZE IDs from the full pool
     const allProblemIds = pack.problems.map((p) => p.id)
     const selectedIds = pickWordsForSession(allProblemIds, progressMap, SESSION_SIZE, priorityIds)
 
-    // Build lookup map
+    // Phase 2: fetch full data only for the selected subset
+    const selectedProblems = await prisma.mathProblem.findMany({
+      where: { id: { in: selectedIds } },
+    })
+
     const problemMap: Record<string, MathProblem> = {}
-    for (const p of pack.problems) {
+    for (const p of selectedProblems) {
       problemMap[p.id] = {
         id: p.id,
         operand1: p.operand1,
@@ -92,7 +111,7 @@ export async function GET(
       }
     }
 
-    // Build questions with 4 answer choices
+    // Build questions in the SM-2-selected order, with 4 shuffled answer choices
     const questions: MathQuestion[] = selectedIds.flatMap((id) => {
       const problem = problemMap[id]
       if (!problem) return []
