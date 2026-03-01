@@ -14,18 +14,44 @@ interface PictureChoiceProps {
 type AnswerState = 'idle' | 'correct' | 'wrong'
 
 export const EMOJI_FALLBACKS: Record<string, string> = {
+  // Animals
   cat: '🐱', dog: '🐶', fish: '🐟', bird: '🐦', rabbit: '🐰',
   duck: '🦆', bear: '🐻', elephant: '🐘', lion: '🦁', monkey: '🐵',
+  // Colors
   red: '🔴', blue: '🔵', yellow: '🟡', green: '🟢', pink: '🩷',
   purple: '🟣', orange: '🟠', white: '⬜', black: '⬛', brown: '🟫',
+  // Numbers
   one: '1️⃣', two: '2️⃣', three: '3️⃣', four: '4️⃣', five: '5️⃣',
   six: '6️⃣', seven: '7️⃣', eight: '8️⃣', nine: '9️⃣', ten: '🔟',
+  // Food
   apple: '🍎', banana: '🍌', rice: '🍚', noodles: '🍜', water: '💧',
   milk: '🥛', egg: '🥚', cake: '🎂',
+  // Family
   mom: '👩', dad: '👨', grandma: '👵', grandpa: '👴',
-  brother: '👦', sister: '👧', baby: '👶',
+  'maternal-grandma': '👵', 'maternal-grandpa': '👴',
+  brother: '👦', 'younger-brother': '👦', sister: '👧', 'younger-sister': '👧',
+  baby: '👶', uncle: '👨‍🦱', aunt: '👩‍🦱', family: '👨‍👩‍👧‍👦',
+  // Greetings
   hello: '👋', goodbye: '✌️', 'thank-you': '🙏', yes: '✅',
   no: '❌', 'good-morning': '🌅', 'good-night': '🌙', sorry: '😔',
+  // Pronouns
+  'i-me': '🙋', you: '👉', 'he-him': '👦', 'she-her': '👧',
+  'we-us': '👨‍👩‍👧‍👦', 'you-all': '👥', 'they-them': '👫',
+  this: '👇', that: '👆', who: '🤔', what: '❓', where: '🗺️',
+  // Actions
+  eat: '😋', drink: '🥤', sleep: '😴', run: '🏃', walk: '🚶',
+  jump: '🤸', play: '🎮', read: '📖', write: '✍️', draw: '🎨',
+  sing: '🎤', dance: '💃', sit: '🪑', stand: '🧍', look: '👀',
+  listen: '👂', talk: '💬', go: '➡️', come: '🫶', want: '🙏',
+  have: '🤲', give: '🎁', help: '🤝', love: '❤️', like: '👍',
+  // Feelings
+  happy: '😊', sad: '😢', angry: '😠', scared: '😨', tired: '😫',
+  hungry: '🤤', thirsty: '🥵', sick: '🤒', 'cold-feeling': '🥶',
+  'hot-feeling': '🥵', excited: '🤩', okay: '🙂',
+  // Describing words
+  big: '🐘', small: '🐜', many: '🔢', few: '☝️', fast: '⚡',
+  slow: '🐢', good: '👍', not: '🚫', very: '💯', also: '➕',
+  together: '🤝', up: '⬆️', down: '⬇️', again: '🔄',
 }
 
 // ─── Option Card variants ────────────────────────────────────────────────────

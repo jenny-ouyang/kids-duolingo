@@ -1,12 +1,13 @@
 'use client'
 
-import { useEffect, Suspense } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import Confetti from '@/components/celebration/Confetti'
 import { speakChinese } from '@/lib/tts'
 import { playCelebrationSound, playStarSound } from '@/lib/sounds'
+import { getEncouragement, SessionData, Encouragement } from '@/lib/encouragement'
 
 function CelebrationContent() {
   const router = useRouter()
@@ -23,17 +24,43 @@ function CelebrationContent() {
   const allCorrect = correct === total
   const stars = correct <= 2 ? 1 : correct <= 5 ? 2 : correct <= 7 ? 3 : 4
 
-  useEffect(() => {
-    playCelebrationSound()
+  const [enc, setEnc] = useState<Encouragement | null>(null)
 
+  useEffect(() => {
+    let sessionData: SessionData = {
+      packId,
+      packName: packId,
+      subject,
+      correctWords: [],
+    }
+    try {
+      const raw = sessionStorage.getItem('lastSession')
+      if (raw) {
+        const parsed = JSON.parse(raw) as SessionData
+        sessionData = { ...sessionData, ...parsed }
+        sessionStorage.removeItem('lastSession')
+      }
+    } catch { /* sessionStorage unavailable */ }
+
+    const encouragement = getEncouragement({
+      ...sessionData,
+      correct,
+      total,
+      hearts: heartsEarned,
+    })
+    setEnc(encouragement)
+
+    playCelebrationSound()
     Array.from({ length: stars }).forEach((_, i) => {
       playStarSound(300 + i * 150)
     })
 
     setTimeout(() => {
-      speakChinese(allCorrect ? '太棒了！' : '很好！继续努力！')
+      speakChinese(encouragement.chinesePhrase)
     }, 1200)
-  }, [allCorrect, stars])
+  }, [packId, subject, correct, total, heartsEarned, stars])
+
+  if (!enc) return null
 
   const starRow = Array.from({ length: stars }, (_, i) => (
     <motion.span
@@ -55,37 +82,58 @@ function CelebrationContent() {
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200 }}
-        className="flex flex-col items-center gap-6 text-center"
+        className="flex flex-col items-center gap-5 text-center px-4"
       >
+        {/* Big animated emoji */}
         <motion.div
           animate={{ rotate: [0, -10, 10, -10, 0] }}
           transition={{ delay: 0.5, duration: 0.6 }}
           className="text-8xl"
         >
-          {allCorrect ? '🏆' : '🎉'}
+          {enc.emoji}
         </motion.div>
 
+        {/* Varied heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-4xl font-extrabold text-blue-700"
+          className="text-3xl sm:text-4xl font-extrabold text-blue-700"
         >
-          {allCorrect ? 'Perfect!' : 'Great job, Julian!'}
+          {enc.heading}
         </motion.h1>
 
+        {/* Chinese praise phrase — teaches through encouragement */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ delay: 0.5 }}
+          className="bg-white/80 rounded-2xl px-6 py-3 shadow-sm border border-blue-100"
+        >
+          <button
+            onClick={() => speakChinese(enc.chinesePhrase)}
+            className="flex flex-col items-center gap-1 cursor-pointer"
+          >
+            <span className="text-3xl font-bold text-blue-700">{enc.chinesePhrase}</span>
+            <span className="text-sm text-gray-400">{enc.chinesePinyin}</span>
+            <span className="text-sm text-gray-500 italic">{enc.chineseMeaning} 🔊</span>
+          </button>
+        </motion.div>
+
+        {/* Score */}
         <motion.p
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.5 }}
-          className="text-2xl font-semibold text-gray-500"
+          transition={{ delay: 0.6 }}
+          className="text-xl font-semibold text-gray-500"
         >
-          {correct} out of {total} ✨
+          {enc.subMessage}
         </motion.p>
 
+        {/* Stars */}
         <div className="flex gap-2">{starRow}</div>
 
-        {/* Hearts earned this session */}
+        {/* Hearts earned */}
         {heartsEarned > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
@@ -100,11 +148,44 @@ function CelebrationContent() {
           </motion.div>
         )}
 
+        {/* Word spotlight — highlights a specific word Julian mastered */}
+        {enc.spotlightWord && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.0 }}
+            className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl px-5 py-3 max-w-sm"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">💡</span>
+              <span className="font-bold text-amber-700">Word Spotlight</span>
+            </div>
+            <p className="text-gray-700 text-sm">{enc.spotlightWord.message}</p>
+          </motion.div>
+        )}
+
+        {/* Real-life mission */}
+        {enc.mission && (
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 1.2 }}
+            className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl px-5 py-3 max-w-sm"
+          >
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-xl">🎯</span>
+              <span className="font-bold text-emerald-700">Today&apos;s Mission</span>
+            </div>
+            <p className="text-gray-700 text-sm">{enc.mission}</p>
+          </motion.div>
+        )}
+
+        {/* Action buttons */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.9 }}
-          className="flex flex-col gap-3 mt-4 w-full max-w-xs"
+          transition={{ delay: 1.4 }}
+          className="flex flex-col gap-3 mt-2 w-full max-w-xs"
         >
           <button
             onClick={() => router.push(playAgainHref)}

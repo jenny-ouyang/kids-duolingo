@@ -33,6 +33,7 @@ export default function PracticeSession() {
   const [heartPulse, setHeartPulse] = useState(false)
 
   const wordProgressRef = useRef<Record<string, WordProgress>>({})
+  const correctWordsRef = useRef<{ english: string; chinese: string; pinyin: string }[]>([])
   const currentIndexRef = useRef(0)
   currentIndexRef.current = currentIndex
 
@@ -99,6 +100,11 @@ export default function PracticeSession() {
       setHeartsEarned(newHeartsEarned)
       setHeartPulse(true)
       setTimeout(() => setHeartPulse(false), 600)
+      correctWordsRef.current.push({
+        english: currentQuestion.word.english,
+        chinese: currentQuestion.word.chinese,
+        pinyin: currentQuestion.word.pinyin,
+      })
     }
 
     const newCorrectCount = correct ? correctCount + 1 : correctCount
@@ -114,8 +120,17 @@ export default function PracticeSession() {
           body: JSON.stringify({ heartsEarned: newHeartsEarned }),
         }).catch(console.error)
 
+        try {
+          sessionStorage.setItem('lastSession', JSON.stringify({
+            packId,
+            packName,
+            subject: 'chinese',
+            correctWords: correctWordsRef.current,
+          }))
+        } catch { /* sessionStorage unavailable */ }
+
         router.push(
-          `/celebrate?pack=${packId}&correct=${newCorrectCount}&total=${questions.length}&hearts=${newHeartsEarned}`
+          `/celebrate?subject=chinese&pack=${packId}&correct=${newCorrectCount}&total=${questions.length}&hearts=${newHeartsEarned}`
         )
       } else {
         setCurrentIndex((i) => i + 1)
