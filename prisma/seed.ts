@@ -35,7 +35,21 @@ interface PackData {
 }
 
 // Canonical sort order for packs
-const PACK_ORDER = ['animals', 'colors', 'numbers', 'food', 'family', 'greetings']
+const PACK_ORDER = [
+  'animals',
+  'colors',
+  'numbers',
+  'food',
+  'family',
+  'greetings',
+  'pronouns',
+  'feelings',
+  'body',
+  'home',
+  'nature',
+  'actions',
+  'words',
+]
 
 async function main() {
   const dataDir = path.join(__dirname, '..', 'data', 'packs')

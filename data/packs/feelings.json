@@ -1,0 +1,93 @@
+{
+  "id": "feelings",
+  "name": "Feelings",
+  "nameZh": "感受",
+  "emoji": "😊",
+  "color": "#FB923C",
+  "words": [
+    {
+      "id": "happy",
+      "english": "happy",
+      "chinese": "开心",
+      "pinyin": "kāixīn",
+      "image": "/images/feelings/happy.png"
+    },
+    {
+      "id": "sad",
+      "english": "sad",
+      "chinese": "难过",
+      "pinyin": "nánguò",
+      "image": "/images/feelings/sad.png"
+    },
+    {
+      "id": "angry",
+      "english": "angry",
+      "chinese": "生气",
+      "pinyin": "shēngqì",
+      "image": "/images/feelings/angry.png"
+    },
+    {
+      "id": "scared",
+      "english": "scared",
+      "chinese": "害怕",
+      "pinyin": "hàipà",
+      "image": "/images/feelings/scared.png"
+    },
+    {
+      "id": "tired",
+      "english": "tired",
+      "chinese": "累",
+      "pinyin": "lèi",
+      "image": "/images/feelings/tired.png"
+    },
+    {
+      "id": "hungry",
+      "english": "hungry",
+      "chinese": "饿",
+      "pinyin": "è",
+      "image": "/images/feelings/hungry.png"
+    },
+    {
+      "id": "thirsty",
+      "english": "thirsty",
+      "chinese": "渴",
+      "pinyin": "kě",
+      "image": "/images/feelings/thirsty.png"
+    },
+    {
+      "id": "sick",
+      "english": "sick",
+      "chinese": "生病",
+      "pinyin": "shēngbìng",
+      "image": "/images/feelings/sick.png"
+    },
+    {
+      "id": "cold-feeling",
+      "english": "cold (feeling)",
+      "chinese": "冷",
+      "pinyin": "lěng",
+      "image": "/images/feelings/cold-feeling.png"
+    },
+    {
+      "id": "hot-feeling",
+      "english": "hot (feeling)",
+      "chinese": "热",
+      "pinyin": "rè",
+      "image": "/images/feelings/hot-feeling.png"
+    },
+    {
+      "id": "excited",
+      "english": "excited",
+      "chinese": "兴奋",
+      "pinyin": "xīngfèn",
+      "image": "/images/feelings/excited.png"
+    },
+    {
+      "id": "okay",
+      "english": "okay / fine",
+      "chinese": "还好",
+      "pinyin": "hái hǎo",
+      "image": "/images/feelings/okay.png"
+    }
+  ]
+}

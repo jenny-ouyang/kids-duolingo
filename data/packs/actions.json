@@ -1,0 +1,184 @@
+{
+  "id": "actions",
+  "name": "Actions",
+  "nameZh": "动作",
+  "emoji": "🏃",
+  "color": "#F97316",
+  "words": [
+    {
+      "id": "eat",
+      "english": "eat",
+      "chinese": "吃",
+      "pinyin": "chī",
+      "image": "/images/actions/eat.png"
+    },
+    {
+      "id": "drink",
+      "english": "drink",
+      "chinese": "喝",
+      "pinyin": "hē",
+      "image": "/images/actions/drink.png"
+    },
+    {
+      "id": "sleep",
+      "english": "sleep",
+      "chinese": "睡觉",
+      "pinyin": "shuìjiào",
+      "image": "/images/actions/sleep.png"
+    },
+    {
+      "id": "run",
+      "english": "run",
+      "chinese": "跑",
+      "pinyin": "pǎo",
+      "image": "/images/actions/run.png"
+    },
+    {
+      "id": "walk",
+      "english": "walk",
+      "chinese": "走",
+      "pinyin": "zǒu",
+      "image": "/images/actions/walk.png"
+    },
+    {
+      "id": "jump",
+      "english": "jump",
+      "chinese": "跳",
+      "pinyin": "tiào",
+      "image": "/images/actions/jump.png"
+    },
+    {
+      "id": "play",
+      "english": "play",
+      "chinese": "玩",
+      "pinyin": "wán",
+      "image": "/images/actions/play.png"
+    },
+    {
+      "id": "read",
+      "english": "read",
+      "chinese": "读",
+      "pinyin": "dú",
+      "image": "/images/actions/read.png"
+    },
+    {
+      "id": "write",
+      "english": "write",
+      "chinese": "写",
+      "pinyin": "xiě",
+      "image": "/images/actions/write.png"
+    },
+    {
+      "id": "draw",
+      "english": "draw",
+      "chinese": "画",
+      "pinyin": "huà",
+      "image": "/images/actions/draw.png"
+    },
+    {
+      "id": "sing",
+      "english": "sing",
+      "chinese": "唱歌",
+      "pinyin": "chànggē",
+      "image": "/images/actions/sing.png"
+    },
+    {
+      "id": "dance",
+      "english": "dance",
+      "chinese": "跳舞",
+      "pinyin": "tiàowǔ",
+      "image": "/images/actions/dance.png"
+    },
+    {
+      "id": "sit",
+      "english": "sit",
+      "chinese": "坐",
+      "pinyin": "zuò",
+      "image": "/images/actions/sit.png"
+    },
+    {
+      "id": "stand",
+      "english": "stand",
+      "chinese": "站",
+      "pinyin": "zhàn",
+      "image": "/images/actions/stand.png"
+    },
+    {
+      "id": "look",
+      "english": "look / watch",
+      "chinese": "看",
+      "pinyin": "kàn",
+      "image": "/images/actions/look.png"
+    },
+    {
+      "id": "listen",
+      "english": "listen",
+      "chinese": "听",
+      "pinyin": "tīng",
+      "image": "/images/actions/listen.png"
+    },
+    {
+      "id": "talk",
+      "english": "talk / say",
+      "chinese": "说",
+      "pinyin": "shuō",
+      "image": "/images/actions/talk.png"
+    },
+    {
+      "id": "go",
+      "english": "go",
+      "chinese": "去",
+      "pinyin": "qù",
+      "image": "/images/actions/go.png"
+    },
+    {
+      "id": "come",
+      "english": "come",
+      "chinese": "来",
+      "pinyin": "lái",
+      "image": "/images/actions/come.png"
+    },
+    {
+      "id": "want",
+      "english": "want",
+      "chinese": "要",
+      "pinyin": "yào",
+      "image": "/images/actions/want.png"
+    },
+    {
+      "id": "have",
+      "english": "have",
+      "chinese": "有",
+      "pinyin": "yǒu",
+      "image": "/images/actions/have.png"
+    },
+    {
+      "id": "give",
+      "english": "give",
+      "chinese": "给",
+      "pinyin": "gěi",
+      "image": "/images/actions/give.png"
+    },
+    {
+      "id": "help",
+      "english": "help",
+      "chinese": "帮",
+      "pinyin": "bāng",
+      "image": "/images/actions/help.png"
+    },
+    {
+      "id": "love",
+      "english": "love",
+      "chinese": "爱",
+      "pinyin": "ài",
+      "image": "/images/actions/love.png"
+    },
+    {
+      "id": "like",
+      "english": "like",
+      "chinese": "喜欢",
+      "pinyin": "xǐhuān",
+      "image": "/images/actions/like.png"
+    }
+  ]
+}

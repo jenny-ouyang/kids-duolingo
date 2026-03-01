@@ -1,0 +1,38 @@
+---
+description: Rules for managing learning content packs (Word, MathProblem, etc.)
+alwaysApply: true
+---
+
+# Content Pack Rules
+
+## Never mutate an existing pack's content
+
+A child's mastery percentage is calculated as `problems practiced / total problems in pack`.
+Adding items to an existing pack dilutes the percentage — a child who was at 100% drops to 60%
+and feels cheated out of earned progress.
+
+**ALWAYS create a new pack when adding new content. NEVER add items to an existing pack.**
+
+```typescript
+// ❌ BAD — dilutes existing progress
+await prisma.mathProblem.createMany({
+  data: newProblems.map(p => ({ ...p, packId: 'math_add_singles' })) // existing pack!
+})
+
+// ✅ GOOD — new content gets its own pack
+await prisma.pack.create({ data: { id: 'math_add_singles_v2', subject: 'math', ... } })
+await prisma.mathProblem.createMany({
+  data: newProblems.map(p => ({ ...p, packId: 'math_add_singles_v2' }))
+})
+```
+
+This rule applies to ALL content types: `Word` (Chinese), `MathProblem`, and any future subject tables.
+
+## Deleting or replacing packs
+
+Deleting a pack is fine when replacing the entire topic set (e.g., a full seed reset).
+Always delete child records first to respect FK constraints:
+1. `MathProgress` / `ChineseProgress`
+2. `AnswerEvent` (where `packId` matches)
+3. `MathProblem` / `Word`
+4. `Pack`

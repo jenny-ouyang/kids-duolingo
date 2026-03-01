@@ -1,0 +1,107 @@
+{
+  "id": "body",
+  "name": "My Body",
+  "nameZh": "身体",
+  "emoji": "🧍",
+  "color": "#2DD4BF",
+  "words": [
+    {
+      "id": "head",
+      "english": "head",
+      "chinese": "头",
+      "pinyin": "tóu",
+      "image": "/images/body/head.png"
+    },
+    {
+      "id": "face",
+      "english": "face",
+      "chinese": "脸",
+      "pinyin": "liǎn",
+      "image": "/images/body/face.png"
+    },
+    {
+      "id": "eye",
+      "english": "eye",
+      "chinese": "眼睛",
+      "pinyin": "yǎnjing",
+      "image": "/images/body/eye.png"
+    },
+    {
+      "id": "nose",
+      "english": "nose",
+      "chinese": "鼻子",
+      "pinyin": "bízi",
+      "image": "/images/body/nose.png"
+    },
+    {
+      "id": "mouth",
+      "english": "mouth",
+      "chinese": "嘴巴",
+      "pinyin": "zuǐba",
+      "image": "/images/body/mouth.png"
+    },
+    {
+      "id": "ear",
+      "english": "ear",
+      "chinese": "耳朵",
+      "pinyin": "ěrduo",
+      "image": "/images/body/ear.png"
+    },
+    {
+      "id": "hair",
+      "english": "hair",
+      "chinese": "头发",
+      "pinyin": "tóufa",
+      "image": "/images/body/hair.png"
+    },
+    {
+      "id": "hand",
+      "english": "hand",
+      "chinese": "手",
+      "pinyin": "shǒu",
+      "image": "/images/body/hand.png"
+    },
+    {
+      "id": "finger",
+      "english": "finger",
+      "chinese": "手指",
+      "pinyin": "shǒuzhǐ",
+      "image": "/images/body/finger.png"
+    },
+    {
+      "id": "foot",
+      "english": "foot",
+      "chinese": "脚",
+      "pinyin": "jiǎo",
+      "image": "/images/body/foot.png"
+    },
+    {
+      "id": "leg",
+      "english": "leg",
+      "chinese": "腿",
+      "pinyin": "tuǐ",
+      "image": "/images/body/leg.png"
+    },
+    {
+      "id": "arm",
+      "english": "arm",
+      "chinese": "胳膊",
+      "pinyin": "gēbo",
+      "image": "/images/body/arm.png"
+    },
+    {
+      "id": "tummy",
+      "english": "tummy",
+      "chinese": "肚子",
+      "pinyin": "dùzi",
+      "image": "/images/body/tummy.png"
+    },
+    {
+      "id": "tooth",
+      "english": "tooth",
+      "chinese": "牙齿",
+      "pinyin": "yáchǐ",
+      "image": "/images/body/tooth.png"
+    }
+  ]
+}

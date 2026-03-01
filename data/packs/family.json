@@ -21,31 +21,59 @@
     },
     {
       "id": "grandma",
-      "english": "grandma",
+      "english": "grandma (dad's side)",
       "chinese": "奶奶",
       "pinyin": "nǎinai",
       "image": "/images/family/grandma.png"
     },
     {
       "id": "grandpa",
-      "english": "grandpa",
+      "english": "grandpa (dad's side)",
       "chinese": "爷爷",
       "pinyin": "yéye",
       "image": "/images/family/grandpa.png"
     },
     {
+      "id": "maternal-grandma",
+      "english": "grandma (mom's side)",
+      "chinese": "外婆",
+      "pinyin": "wàipó",
+      "image": "/images/family/maternal-grandma.png"
+    },
+    {
+      "id": "maternal-grandpa",
+      "english": "grandpa (mom's side)",
+      "chinese": "外公",
+      "pinyin": "wàigōng",
+      "image": "/images/family/maternal-grandpa.png"
+    },
+    {
       "id": "brother",
-      "english": "brother",
+      "english": "older brother",
       "chinese": "哥哥",
       "pinyin": "gēge",
       "image": "/images/family/brother.png"
     },
     {
+      "id": "younger-brother",
+      "english": "younger brother",
+      "chinese": "弟弟",
+      "pinyin": "dìdi",
+      "image": "/images/family/younger-brother.png"
+    },
+    {
       "id": "sister",
-      "english": "sister",
+      "english": "older sister",
       "chinese": "姐姐",
       "pinyin": "jiějie",
       "image": "/images/family/sister.png"
+    },
+    {
+      "id": "younger-sister",
+      "english": "younger sister",
+      "chinese": "妹妹",
+      "pinyin": "mèimei",
+      "image": "/images/family/younger-sister.png"
     },
     {
       "id": "baby",
@@ -53,6 +81,27 @@
       "chinese": "宝宝",
       "pinyin": "bǎobao",
       "image": "/images/family/baby.png"
+    },
+    {
+      "id": "uncle",
+      "english": "uncle",
+      "chinese": "叔叔",
+      "pinyin": "shūshu",
+      "image": "/images/family/uncle.png"
+    },
+    {
+      "id": "aunt",
+      "english": "aunt",
+      "chinese": "阿姨",
+      "pinyin": "āyí",
+      "image": "/images/family/aunt.png"
+    },
+    {
+      "id": "family",
+      "english": "family",
+      "chinese": "家人",
+      "pinyin": "jiārén",
+      "image": "/images/family/family.png"
     }
   ]
 }

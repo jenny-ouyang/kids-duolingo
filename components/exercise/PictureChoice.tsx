@@ -40,6 +40,8 @@ function PictureCard({
     state === 'wrong' ? 'border-red-300 bg-red-50' :
     'border-white/80 bg-white hover:border-blue-300 hover:bg-blue-50 active:scale-95'
 
+  const emojiIcon = EMOJI_FALLBACKS[word.id]
+
   return (
     <motion.button
       onClick={onClick}
@@ -48,8 +50,16 @@ function PictureCard({
       className={`relative rounded-3xl border-4 p-4 flex flex-col items-center justify-center gap-2 shadow-md transition-all duration-200 cursor-pointer select-none ${highlight}`}
       style={{ minHeight: 130 }}
     >
-      <div className="text-6xl leading-none">{EMOJI_FALLBACKS[word.id] ?? '❓'}</div>
-      <span className="text-sm font-semibold text-gray-500 capitalize">{word.english}</span>
+      {emojiIcon ? (
+        <>
+          <div className="text-6xl leading-none">{emojiIcon}</div>
+          <span className="text-sm font-semibold text-gray-500 capitalize">{word.english}</span>
+        </>
+      ) : (
+        <span className="text-3xl font-extrabold text-gray-700 capitalize text-center leading-tight px-1">
+          {word.english}
+        </span>
+      )}
       <AnimatePresence>
         {state !== 'idle' && isCorrect && (
           <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-3 -right-3 text-2xl">⭐</motion.div>
@@ -107,10 +117,17 @@ function AudioPrompt({ word }: { word: Word }) {
 }
 
 function PicturePrompt({ word }: { word: Word }) {
+  const emojiIcon = EMOJI_FALLBACKS[word.id]
   return (
     <div className="text-center flex flex-col items-center gap-2">
       <p className="text-xl font-bold text-gray-600">What is this in Chinese?</p>
-      <div className="text-8xl leading-none">{EMOJI_FALLBACKS[word.id] ?? '❓'}</div>
+      {emojiIcon ? (
+        <div className="text-8xl leading-none">{emojiIcon}</div>
+      ) : (
+        <div className="bg-white rounded-2xl px-8 py-4 shadow-md border-2 border-blue-200">
+          <span className="text-4xl font-extrabold text-blue-700 capitalize">{word.english}</span>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,0 +1,121 @@
+{
+  "id": "nature",
+  "name": "Nature",
+  "nameZh": "自然",
+  "emoji": "🌿",
+  "color": "#22C55E",
+  "words": [
+    {
+      "id": "sun",
+      "english": "sun",
+      "chinese": "太阳",
+      "pinyin": "tàiyáng",
+      "image": "/images/nature/sun.png"
+    },
+    {
+      "id": "moon",
+      "english": "moon",
+      "chinese": "月亮",
+      "pinyin": "yuèliàng",
+      "image": "/images/nature/moon.png"
+    },
+    {
+      "id": "star",
+      "english": "star",
+      "chinese": "星星",
+      "pinyin": "xīngxīng",
+      "image": "/images/nature/star.png"
+    },
+    {
+      "id": "sky",
+      "english": "sky",
+      "chinese": "天空",
+      "pinyin": "tiānkōng",
+      "image": "/images/nature/sky.png"
+    },
+    {
+      "id": "cloud",
+      "english": "cloud",
+      "chinese": "云",
+      "pinyin": "yún",
+      "image": "/images/nature/cloud.png"
+    },
+    {
+      "id": "rain",
+      "english": "rain",
+      "chinese": "雨",
+      "pinyin": "yǔ",
+      "image": "/images/nature/rain.png"
+    },
+    {
+      "id": "wind",
+      "english": "wind",
+      "chinese": "风",
+      "pinyin": "fēng",
+      "image": "/images/nature/wind.png"
+    },
+    {
+      "id": "snow",
+      "english": "snow",
+      "chinese": "雪",
+      "pinyin": "xuě",
+      "image": "/images/nature/snow.png"
+    },
+    {
+      "id": "tree",
+      "english": "tree",
+      "chinese": "树",
+      "pinyin": "shù",
+      "image": "/images/nature/tree.png"
+    },
+    {
+      "id": "flower",
+      "english": "flower",
+      "chinese": "花",
+      "pinyin": "huā",
+      "image": "/images/nature/flower.png"
+    },
+    {
+      "id": "grass",
+      "english": "grass",
+      "chinese": "草",
+      "pinyin": "cǎo",
+      "image": "/images/nature/grass.png"
+    },
+    {
+      "id": "mountain",
+      "english": "mountain",
+      "chinese": "山",
+      "pinyin": "shān",
+      "image": "/images/nature/mountain.png"
+    },
+    {
+      "id": "river",
+      "english": "river",
+      "chinese": "河",
+      "pinyin": "hé",
+      "image": "/images/nature/river.png"
+    },
+    {
+      "id": "sea",
+      "english": "sea / ocean",
+      "chinese": "海",
+      "pinyin": "hǎi",
+      "image": "/images/nature/sea.png"
+    },
+    {
+      "id": "stone",
+      "english": "stone / rock",
+      "chinese": "石头",
+      "pinyin": "shítou",
+      "image": "/images/nature/stone.png"
+    },
+    {
+      "id": "ground",
+      "english": "ground / earth",
+      "chinese": "地",
+      "pinyin": "dì",
+      "image": "/images/nature/ground.png"
+    }
+  ]
+}

@@ -1,0 +1,107 @@
+{
+  "id": "words",
+  "name": "Describing",
+  "nameZh": "用语",
+  "emoji": "💬",
+  "color": "#06B6D4",
+  "words": [
+    {
+      "id": "big",
+      "english": "big",
+      "chinese": "大",
+      "pinyin": "dà",
+      "image": "/images/words/big.png"
+    },
+    {
+      "id": "small",
+      "english": "small",
+      "chinese": "小",
+      "pinyin": "xiǎo",
+      "image": "/images/words/small.png"
+    },
+    {
+      "id": "many",
+      "english": "many / a lot",
+      "chinese": "多",
+      "pinyin": "duō",
+      "image": "/images/words/many.png"
+    },
+    {
+      "id": "few",
+      "english": "few / a little",
+      "chinese": "少",
+      "pinyin": "shǎo",
+      "image": "/images/words/few.png"
+    },
+    {
+      "id": "fast",
+      "english": "fast / quick",
+      "chinese": "快",
+      "pinyin": "kuài",
+      "image": "/images/words/fast.png"
+    },
+    {
+      "id": "slow",
+      "english": "slow",
+      "chinese": "慢",
+      "pinyin": "màn",
+      "image": "/images/words/slow.png"
+    },
+    {
+      "id": "good",
+      "english": "good",
+      "chinese": "好",
+      "pinyin": "hǎo",
+      "image": "/images/words/good.png"
+    },
+    {
+      "id": "not",
+      "english": "not / no",
+      "chinese": "不",
+      "pinyin": "bù",
+      "image": "/images/words/not.png"
+    },
+    {
+      "id": "very",
+      "english": "very",
+      "chinese": "很",
+      "pinyin": "hěn",
+      "image": "/images/words/very.png"
+    },
+    {
+      "id": "also",
+      "english": "also / too",
+      "chinese": "也",
+      "pinyin": "yě",
+      "image": "/images/words/also.png"
+    },
+    {
+      "id": "together",
+      "english": "together",
+      "chinese": "一起",
+      "pinyin": "yīqǐ",
+      "image": "/images/words/together.png"
+    },
+    {
+      "id": "up",
+      "english": "up / above",
+      "chinese": "上",
+      "pinyin": "shàng",
+      "image": "/images/words/up.png"
+    },
+    {
+      "id": "down",
+      "english": "down / below",
+      "chinese": "下",
+      "pinyin": "xià",
+      "image": "/images/words/down.png"
+    },
+    {
+      "id": "again",
+      "english": "again",
+      "chinese": "再",
+      "pinyin": "zài",
+      "image": "/images/words/again.png"
+    }
+  ]
+}

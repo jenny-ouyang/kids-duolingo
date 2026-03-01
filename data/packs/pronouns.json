@@ -1,0 +1,93 @@
+{
+  "id": "pronouns",
+  "name": "Me & Others",
+  "nameZh": "代词",
+  "emoji": "🙋",
+  "color": "#818CF8",
+  "words": [
+    {
+      "id": "i-me",
+      "english": "I / me",
+      "chinese": "我",
+      "pinyin": "wǒ",
+      "image": "/images/pronouns/i-me.png"
+    },
+    {
+      "id": "you",
+      "english": "you",
+      "chinese": "你",
+      "pinyin": "nǐ",
+      "image": "/images/pronouns/you.png"
+    },
+    {
+      "id": "he-him",
+      "english": "he / him",
+      "chinese": "他",
+      "pinyin": "tā",
+      "image": "/images/pronouns/he-him.png"
+    },
+    {
+      "id": "she-her",
+      "english": "she / her",
+      "chinese": "她",
+      "pinyin": "tā",
+      "image": "/images/pronouns/she-her.png"
+    },
+    {
+      "id": "we-us",
+      "english": "we / us",
+      "chinese": "我们",
+      "pinyin": "wǒmen",
+      "image": "/images/pronouns/we-us.png"
+    },
+    {
+      "id": "you-all",
+      "english": "you all",
+      "chinese": "你们",
+      "pinyin": "nǐmen",
+      "image": "/images/pronouns/you-all.png"
+    },
+    {
+      "id": "they-them",
+      "english": "they / them",
+      "chinese": "他们",
+      "pinyin": "tāmen",
+      "image": "/images/pronouns/they-them.png"
+    },
+    {
+      "id": "this",
+      "english": "this",
+      "chinese": "这",
+      "pinyin": "zhè",
+      "image": "/images/pronouns/this.png"
+    },
+    {
+      "id": "that",
+      "english": "that",
+      "chinese": "那",
+      "pinyin": "nà",
+      "image": "/images/pronouns/that.png"
+    },
+    {
+      "id": "who",
+      "english": "who?",
+      "chinese": "谁",
+      "pinyin": "shéi",
+      "image": "/images/pronouns/who.png"
+    },
+    {
+      "id": "what",
+      "english": "what?",
+      "chinese": "什么",
+      "pinyin": "shénme",
+      "image": "/images/pronouns/what.png"
+    },
+    {
+      "id": "where",
+      "english": "where?",
+      "chinese": "哪里",
+      "pinyin": "nǎlǐ",
+      "image": "/images/pronouns/where.png"
+    }
+  ]
+}

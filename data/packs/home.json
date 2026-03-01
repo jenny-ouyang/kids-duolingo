@@ -1,0 +1,149 @@
+{
+  "id": "home",
+  "name": "At Home",
+  "nameZh": "家里",
+  "emoji": "🏠",
+  "color": "#A78BFA",
+  "words": [
+    {
+      "id": "chair",
+      "english": "chair",
+      "chinese": "椅子",
+      "pinyin": "yǐzi",
+      "image": "/images/home/chair.png"
+    },
+    {
+      "id": "table",
+      "english": "table",
+      "chinese": "桌子",
+      "pinyin": "zhuōzi",
+      "image": "/images/home/table.png"
+    },
+    {
+      "id": "bed",
+      "english": "bed",
+      "chinese": "床",
+      "pinyin": "chuáng",
+      "image": "/images/home/bed.png"
+    },
+    {
+      "id": "sofa",
+      "english": "sofa",
+      "chinese": "沙发",
+      "pinyin": "shāfā",
+      "image": "/images/home/sofa.png"
+    },
+    {
+      "id": "door",
+      "english": "door",
+      "chinese": "门",
+      "pinyin": "mén",
+      "image": "/images/home/door.png"
+    },
+    {
+      "id": "window",
+      "english": "window",
+      "chinese": "窗户",
+      "pinyin": "chuānghu",
+      "image": "/images/home/window.png"
+    },
+    {
+      "id": "stairs",
+      "english": "stairs",
+      "chinese": "楼梯",
+      "pinyin": "lóutī",
+      "image": "/images/home/stairs.png"
+    },
+    {
+      "id": "lamp",
+      "english": "light / lamp",
+      "chinese": "灯",
+      "pinyin": "dēng",
+      "image": "/images/home/lamp.png"
+    },
+    {
+      "id": "floor",
+      "english": "floor",
+      "chinese": "地板",
+      "pinyin": "dìbǎn",
+      "image": "/images/home/floor.png"
+    },
+    {
+      "id": "cup",
+      "english": "cup",
+      "chinese": "杯子",
+      "pinyin": "bēizi",
+      "image": "/images/home/cup.png"
+    },
+    {
+      "id": "bowl",
+      "english": "bowl",
+      "chinese": "碗",
+      "pinyin": "wǎn",
+      "image": "/images/home/bowl.png"
+    },
+    {
+      "id": "chopsticks",
+      "english": "chopsticks",
+      "chinese": "筷子",
+      "pinyin": "kuàizi",
+      "image": "/images/home/chopsticks.png"
+    },
+    {
+      "id": "spoon",
+      "english": "spoon",
+      "chinese": "勺子",
+      "pinyin": "sháozi",
+      "image": "/images/home/spoon.png"
+    },
+    {
+      "id": "fridge",
+      "english": "fridge",
+      "chinese": "冰箱",
+      "pinyin": "bīngxiāng",
+      "image": "/images/home/fridge.png"
+    },
+    {
+      "id": "tv",
+      "english": "TV",
+      "chinese": "电视",
+      "pinyin": "diànshì",
+      "image": "/images/home/tv.png"
+    },
+    {
+      "id": "phone",
+      "english": "phone",
+      "chinese": "手机",
+      "pinyin": "shǒujī",
+      "image": "/images/home/phone.png"
+    },
+    {
+      "id": "bag",
+      "english": "bag / backpack",
+      "chinese": "书包",
+      "pinyin": "shūbāo",
+      "image": "/images/home/bag.png"
+    },
+    {
+      "id": "toy",
+      "english": "toy",
+      "chinese": "玩具",
+      "pinyin": "wánjù",
+      "image": "/images/home/toy.png"
+    },
+    {
+      "id": "ball",
+      "english": "ball",
+      "chinese": "球",
+      "pinyin": "qiú",
+      "image": "/images/home/ball.png"
+    },
+    {
+      "id": "mirror",
+      "english": "mirror",
+      "chinese": "镜子",
+      "pinyin": "jìngzi",
+      "image": "/images/home/mirror.png"
+    }
+  ]
+}
