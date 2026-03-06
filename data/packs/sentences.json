@@ -1,0 +1,129 @@
+{
+  "id": "sentences",
+  "name": "Simple Sentences",
+  "nameZh": "简单句子",
+  "emoji": "💬",
+  "color": "#A78BFA",
+  "sentences": [
+    {
+      "id": "i-love-you",
+      "english": "I love you",
+      "chinese": "我爱你",
+      "pinyin": "wǒ ài nǐ"
+    },
+    {
+      "id": "this-is-mom",
+      "english": "This is mom",
+      "chinese": "这是妈妈",
+      "pinyin": "zhè shì māma"
+    },
+    {
+      "id": "this-is-dad",
+      "english": "This is dad",
+      "chinese": "这是爸爸",
+      "pinyin": "zhè shì bàba"
+    },
+    {
+      "id": "i-want-water",
+      "english": "I want water",
+      "chinese": "我要水",
+      "pinyin": "wǒ yào shuǐ"
+    },
+    {
+      "id": "i-am-happy",
+      "english": "I am happy",
+      "chinese": "我很高兴",
+      "pinyin": "wǒ hěn gāoxìng"
+    },
+    {
+      "id": "it-is-red",
+      "english": "It is red",
+      "chinese": "是红色的",
+      "pinyin": "shì hóngsè de"
+    },
+    {
+      "id": "dog-is-big",
+      "english": "The dog is big",
+      "chinese": "狗很大",
+      "pinyin": "gǒu hěn dà"
+    },
+    {
+      "id": "cat-is-small",
+      "english": "The cat is small",
+      "chinese": "猫很小",
+      "pinyin": "māo hěn xiǎo"
+    },
+    {
+      "id": "i-like-apples",
+      "english": "I like apples",
+      "chinese": "我喜欢苹果",
+      "pinyin": "wǒ xǐhuan píngguǒ"
+    },
+    {
+      "id": "come-here",
+      "english": "Come here",
+      "chinese": "过来",
+      "pinyin": "guòlái"
+    },
+    {
+      "id": "lets-go",
+      "english": "Let's go",
+      "chinese": "我们走吧",
+      "pinyin": "wǒmen zǒu ba"
+    },
+    {
+      "id": "i-am-hungry",
+      "english": "I am hungry",
+      "chinese": "我饿了",
+      "pinyin": "wǒ è le"
+    },
+    {
+      "id": "i-am-thirsty",
+      "english": "I am thirsty",
+      "chinese": "我渴了",
+      "pinyin": "wǒ kě le"
+    },
+    {
+      "id": "where-is-it",
+      "english": "Where is it?",
+      "chinese": "在哪里？",
+      "pinyin": "zài nǎlǐ?"
+    },
+    {
+      "id": "give-me",
+      "english": "Give me",
+      "chinese": "给我",
+      "pinyin": "gěi wǒ"
+    },
+    {
+      "id": "i-am-tired",
+      "english": "I am tired",
+      "chinese": "我累了",
+      "pinyin": "wǒ lèi le"
+    },
+    {
+      "id": "i-want-more",
+      "english": "I want more",
+      "chinese": "我还要",
+      "pinyin": "wǒ hái yào"
+    },
+    {
+      "id": "this-is-mine",
+      "english": "This is mine",
+      "chinese": "这是我的",
+      "pinyin": "zhè shì wǒ de"
+    },
+    {
+      "id": "help-me",
+      "english": "Help me",
+      "chinese": "帮帮我",
+      "pinyin": "bāng bāng wǒ"
+    },
+    {
+      "id": "very-good",
+      "english": "Very good",
+      "chinese": "很好",
+      "pinyin": "hěn hǎo"
+    }
+  ]
+}

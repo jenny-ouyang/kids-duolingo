@@ -8,18 +8,20 @@ datasource db {
 }
 
 model Pack {
-  id              String            @id
-  subject         String            @default("chinese")
-  name            String
-  nameZh          String?
-  emoji           String
-  color           String
-  sortOrder       Int               @default(0)
-  words           Word[]
-  problems        MathProblem[]
-  chineseProgress ChineseProgress[]
-  mathProgress    MathProgress[]
-  answerEvents    AnswerEvent[]
+  id               String             @id
+  subject          String             @default("chinese")
+  name             String
+  nameZh           String?
+  emoji            String
+  color            String
+  sortOrder        Int                @default(0)
+  words            Word[]
+  sentences        Sentence[]
+  problems         MathProblem[]
+  chineseProgress  ChineseProgress[]
+  sentenceProgress SentenceProgress[]
+  mathProgress     MathProgress[]
+  answerEvents     AnswerEvent[]
 
   @@index([subject])
 }
@@ -34,6 +36,18 @@ model Word {
   sortOrder       Int               @default(0)
   pack            Pack              @relation(fields: [packId], references: [id])
   chineseProgress ChineseProgress[]
+}
+
+/// Sentence practice for building basic language skills
+model Sentence {
+  id               String             @id
+  packId           String
+  english          String
+  chinese          String
+  pinyin           String
+  sortOrder        Int                @default(0)
+  pack             Pack               @relation(fields: [packId], references: [id])
+  sentenceProgress SentenceProgress[]
 }
 
 /// Math topics store problems here — one row per arithmetic fact
@@ -67,6 +81,24 @@ model ChineseProgress {
   @@unique([childName, packId, wordId])
   @@index([childName, packId])
   @@map("WordProgress")
+}
+
+/// Sentence practice progress — SM-2 spaced repetition for sentences
+model SentenceProgress {
+  id          String   @id @default(cuid())
+  childName   String   @default("julian")
+  packId      String
+  pack        Pack     @relation(fields: [packId], references: [id])
+  sentenceId  String
+  sentence    Sentence @relation(fields: [sentenceId], references: [id])
+  easiness    Float    @default(2.5)
+  interval    Int      @default(1)
+  repetitions Int      @default(0)
+  nextReview  DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([childName, packId, sentenceId])
+  @@index([childName, packId])
 }
 
 /// Math SM-2 progress — full FK to MathProblem

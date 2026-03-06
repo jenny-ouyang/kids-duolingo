@@ -25,13 +25,21 @@ interface WordData {
   image: string
 }
 
+interface SentenceData {
+  id: string
+  english: string
+  chinese: string
+  pinyin: string
+}
+
 interface PackData {
   id: string
   name: string
   nameZh: string
   emoji: string
   color: string
-  words: WordData[]
+  words?: WordData[]
+  sentences?: SentenceData[]
 }
 
 // Canonical sort order for packs
@@ -49,6 +57,7 @@ const PACK_ORDER = [
   'nature',
   'actions',
   'words',
+  'sentences',
 ]
 
 async function main() {
@@ -91,31 +100,64 @@ async function main() {
       },
     })
 
-    for (let wi = 0; wi < pack.words.length; wi++) {
-      const word = pack.words[wi]
-      await prisma.word.upsert({
-        where: { id: word.id },
-        create: {
-          id: word.id,
-          packId: pack.id,
-          english: word.english,
-          chinese: word.chinese,
-          pinyin: word.pinyin,
-          image: word.image,
-          sortOrder: wi,
-        },
-        update: {
-          packId: pack.id,
-          english: word.english,
-          chinese: word.chinese,
-          pinyin: word.pinyin,
-          image: word.image,
-          sortOrder: wi,
-        },
-      })
+    // Seed words if present
+    if (pack.words && pack.words.length > 0) {
+      for (let wi = 0; wi < pack.words.length; wi++) {
+        const word = pack.words[wi]
+        await prisma.word.upsert({
+          where: { id: word.id },
+          create: {
+            id: word.id,
+            packId: pack.id,
+            english: word.english,
+            chinese: word.chinese,
+            pinyin: word.pinyin,
+            image: word.image,
+            sortOrder: wi,
+          },
+          update: {
+            packId: pack.id,
+            english: word.english,
+            chinese: word.chinese,
+            pinyin: word.pinyin,
+            image: word.image,
+            sortOrder: wi,
+          },
+        })
+      }
     }
 
-    console.log(`  ✓ ${pack.name} (${pack.words.length} words)`)
+    // Seed sentences if present
+    if (pack.sentences && pack.sentences.length > 0) {
+      for (let si = 0; si < pack.sentences.length; si++) {
+        const sentence = pack.sentences[si]
+        await prisma.sentence.upsert({
+          where: { id: sentence.id },
+          create: {
+            id: sentence.id,
+            packId: pack.id,
+            english: sentence.english,
+            chinese: sentence.chinese,
+            pinyin: sentence.pinyin,
+            sortOrder: si,
+          },
+          update: {
+            packId: pack.id,
+            english: sentence.english,
+            chinese: sentence.chinese,
+            pinyin: sentence.pinyin,
+            sortOrder: si,
+          },
+        })
+      }
+    }
+
+    const wordCount = pack.words?.length || 0
+    const sentenceCount = pack.sentences?.length || 0
+    const items = []
+    if (wordCount > 0) items.push(`${wordCount} words`)
+    if (sentenceCount > 0) items.push(`${sentenceCount} sentences`)
+    console.log(`  ✓ ${pack.name} (${items.join(', ')})`)
   }
 
   console.log('Seed complete.')
