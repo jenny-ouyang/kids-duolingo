@@ -56,10 +56,28 @@ export type QuestionType =
   | 'audio_to_picture'    // Hear Chinese → tap the right picture
   | 'picture_to_chinese'  // See a picture → tap the right Chinese character
   | 'english_to_chinese'  // See English word → tap the right Chinese character
+  | 'tap_to_build'        // See English sentence → tap tiles in order
+
+export type WordQuestionType = 'audio_to_picture' | 'picture_to_chinese' | 'english_to_chinese'
 
 export interface ExerciseQuestion {
   word: Word
   options: Word[]
   correctId: string
-  type: QuestionType
+  type: WordQuestionType
+}
+
+/** A short Chinese sentence broken into tap-able word tiles */
+export interface Sentence {
+  id: string
+  english: string
+  chinese: string[]  // tiles in correct order
+  pinyin: string
+  emoji?: string
+}
+
+export interface SentenceQuestion {
+  sentence: Sentence
+  tiles: string[]    // shuffled copy of sentence.chinese
+  type: 'tap_to_build'
 }

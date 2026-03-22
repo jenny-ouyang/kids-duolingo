@@ -6,7 +6,8 @@ import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import PictureChoice from '@/components/exercise/PictureChoice'
-import { ExerciseQuestion, WordProgress } from '@/lib/types'
+import SentenceBuild from '@/components/exercise/SentenceBuild'
+import { ExerciseQuestion, SentenceQuestion, WordProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
 
 const MAX_HEARTS = 5
@@ -16,6 +17,7 @@ interface SessionResponse {
   wordProgress: Record<string, WordProgress>
 }
 
+
 export default function PracticeSession() {
   const router = useRouter()
   const params = useParams()
@@ -23,7 +25,7 @@ export default function PracticeSession() {
 
   const [packName, setPackName] = useState('')
   const [packEmoji, setPackEmoji] = useState('📦')
-  const [questions, setQuestions] = useState<ExerciseQuestion[]>([])
+  const [questions, setQuestions] = useState<Array<ExerciseQuestion | SentenceQuestion>>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -39,17 +41,27 @@ export default function PracticeSession() {
 
   const loadSession = useCallback(async () => {
     try {
-      // One request gets everything: pack info, pre-generated questions, word progress.
-      // Zero AI calls.
-      const [sessionRes, packRes] = await Promise.all([
+      // Fetch word questions, pack info, and sentence questions in parallel.
+      // Zero AI calls — all data is pre-generated or read from JSON.
+      const [sessionRes, packRes, sentenceRes] = await Promise.all([
         fetch(`/api/questions/${packId}`),
         fetch(`/api/packs/${packId}`),
+        fetch(`/api/sentences/${packId}`),
       ])
 
       if (!sessionRes.ok) throw new Error('Could not load session')
       const session: SessionResponse = await sessionRes.json()
       wordProgressRef.current = session.wordProgress ?? {}
-      setQuestions(session.questions)
+
+      // Take 6 word questions + up to 2 sentence questions = 8 total
+      const wordQuestions = session.questions.slice(0, 6)
+      const sentenceData = sentenceRes.ok ? await sentenceRes.json() : { sentences: [] }
+      const sentenceQuestions: SentenceQuestion[] = sentenceData.sentences ?? []
+
+      // Splice sentences at positions 4 and 8 (0-indexed: 3 and 7)
+      const merged: Array<ExerciseQuestion | SentenceQuestion> = [...wordQuestions]
+      sentenceQuestions.forEach((sq, i) => merged.splice(3 + i * 4, 0, sq))
+      setQuestions(merged)
 
       if (packRes.ok) {
         const packData = await packRes.json()
@@ -73,25 +85,27 @@ export default function PracticeSession() {
     setTransitioning(true)
 
     const currentQuestion = questions[currentIndex]
-    const wordId = currentQuestion.word.id
+    const itemId = currentQuestion.type === 'tap_to_build'
+      ? currentQuestion.sentence.id
+      : currentQuestion.word.id
 
-    const existing = wordProgressRef.current[wordId] ?? {
+    const existing = wordProgressRef.current[itemId] ?? {
       easiness: 2.5, interval: 1, repetitions: 0, nextReview: new Date().toISOString()
     }
     const updated = updateSM2(existing, correct ? 3 : 1)
-    wordProgressRef.current[wordId] = updated
+    wordProgressRef.current[itemId] = updated
 
     // Save to DB — fire-and-forget, never blocks the UI
     fetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ packId, wordId, ...updated }),
+      body: JSON.stringify({ packId, wordId: itemId, ...updated }),
     }).catch(console.error)
 
     fetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ packId, wordId, correct }),
+      body: JSON.stringify({ packId, wordId: itemId, correct }),
     }).catch(console.error)
 
     let newHeartsEarned = heartsEarned
@@ -100,11 +114,19 @@ export default function PracticeSession() {
       setHeartsEarned(newHeartsEarned)
       setHeartPulse(true)
       setTimeout(() => setHeartPulse(false), 600)
-      correctWordsRef.current.push({
-        english: currentQuestion.word.english,
-        chinese: currentQuestion.word.chinese,
-        pinyin: currentQuestion.word.pinyin,
-      })
+      if (currentQuestion.type === 'tap_to_build') {
+        correctWordsRef.current.push({
+          english: currentQuestion.sentence.english,
+          chinese: currentQuestion.sentence.chinese.join(''),
+          pinyin: currentQuestion.sentence.pinyin,
+        })
+      } else {
+        correctWordsRef.current.push({
+          english: currentQuestion.word.english,
+          chinese: currentQuestion.word.chinese,
+          pinyin: currentQuestion.word.pinyin,
+        })
+      }
     }
 
     const newCorrectCount = correct ? correctCount + 1 : correctCount
@@ -211,7 +233,11 @@ export default function PracticeSession() {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <PictureChoice question={currentQuestion} onAnswer={handleAnswer} />
+              {currentQuestion.type === 'tap_to_build' ? (
+                <SentenceBuild question={currentQuestion} onAnswer={handleAnswer} />
+              ) : (
+                <PictureChoice question={currentQuestion} onAnswer={handleAnswer} />
+              )}
             </motion.div>
           </AnimatePresence>
         </ExerciseShell>

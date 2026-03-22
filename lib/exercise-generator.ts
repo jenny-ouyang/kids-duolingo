@@ -1,13 +1,13 @@
-import { Word, ExerciseQuestion, QuestionType } from './types'
+import { Word, ExerciseQuestion, WordQuestionType } from './types'
 
-const QUESTION_TYPES: QuestionType[] = [
+const QUESTION_TYPES: WordQuestionType[] = [
   'audio_to_picture',
   'audio_to_picture',   // weighted 2x — best for pronunciation
   'picture_to_chinese',
   'english_to_chinese',
 ]
 
-function pickType(): QuestionType {
+function pickType(): WordQuestionType {
   return QUESTION_TYPES[Math.floor(Math.random() * QUESTION_TYPES.length)]
 }
 
