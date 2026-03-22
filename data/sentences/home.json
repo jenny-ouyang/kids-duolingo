@@ -1,0 +1,33 @@
+{
+  "packId": "home",
+  "sentences": [
+    {
+      "id": "home_sit_chair",
+      "english": "I sit on the chair.",
+      "chinese": ["我", "坐", "椅子"],
+      "pinyin": "wǒ zuò yǐzi",
+      "emoji": "🪑"
+    },
+    {
+      "id": "home_phone_on_table",
+      "english": "The phone is on the table.",
+      "chinese": ["手机", "在", "桌子", "上"],
+      "pinyin": "shǒujī zài zhuōzi shàng",
+      "emoji": "📱"
+    },
+    {
+      "id": "home_sofa_big",
+      "english": "The sofa is very big.",
+      "chinese": ["沙发", "很", "大"],
+      "pinyin": "shāfā hěn dà",
+      "emoji": "🛋️"
+    },
+    {
+      "id": "home_cup_on_table",
+      "english": "The cup is on the table.",
+      "chinese": ["杯子", "在", "桌子", "上"],
+      "pinyin": "bēizi zài zhuōzi shàng",
+      "emoji": "🥤"
+    }
+  ]
+}

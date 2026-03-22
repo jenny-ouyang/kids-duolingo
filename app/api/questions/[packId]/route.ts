@@ -41,7 +41,10 @@ export async function GET(
 
     const progressMap: Record<string, { repetitions: number; nextReview: Date }> = {}
     for (const p of progressRows) {
-      progressMap[p.wordId] = { repetitions: p.repetitions, nextReview: p.nextReview }
+      const safeDate = p.nextReview instanceof Date && !isNaN(p.nextReview.getTime())
+        ? p.nextReview
+        : new Date()
+      progressMap[p.wordId] = { repetitions: p.repetitions, nextReview: safeDate }
     }
 
     const prioritySet = new Set<string>()
@@ -105,7 +108,9 @@ export async function GET(
         easiness: p.easiness,
         interval: p.interval,
         repetitions: p.repetitions,
-        nextReview: p.nextReview.toISOString(),
+        nextReview: p.nextReview instanceof Date && !isNaN(p.nextReview.getTime())
+          ? p.nextReview.toISOString()
+          : new Date().toISOString(),
       }
     }
 
