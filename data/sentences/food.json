@@ -1,0 +1,33 @@
+{
+  "packId": "food",
+  "sentences": [
+    {
+      "id": "food_eat_apple",
+      "english": "I eat an apple.",
+      "chinese": ["我", "吃", "苹果"],
+      "pinyin": "wǒ chī píngguǒ",
+      "emoji": "🍎"
+    },
+    {
+      "id": "food_drink_milk",
+      "english": "I drink milk.",
+      "chinese": ["我", "喝", "牛奶"],
+      "pinyin": "wǒ hē niúnǎi",
+      "emoji": "🥛"
+    },
+    {
+      "id": "food_like_cake",
+      "english": "I like cake.",
+      "chinese": ["我", "喜欢", "蛋糕"],
+      "pinyin": "wǒ xǐhuān dàngāo",
+      "emoji": "🍰"
+    },
+    {
+      "id": "food_want_banana",
+      "english": "I want to eat a banana.",
+      "chinese": ["我", "想", "吃", "香蕉"],
+      "pinyin": "wǒ xiǎng chī xiāngjiāo",
+      "emoji": "🍌"
+    }
+  ]
+}

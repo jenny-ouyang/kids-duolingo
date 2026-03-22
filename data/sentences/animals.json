@@ -1,0 +1,33 @@
+{
+  "packId": "animals",
+  "sentences": [
+    {
+      "id": "animals_cat_drinks",
+      "english": "The cat drinks water.",
+      "chinese": ["猫", "喝", "水"],
+      "pinyin": "māo hē shuǐ",
+      "emoji": "🐱"
+    },
+    {
+      "id": "animals_elephant_sings",
+      "english": "The elephant sings.",
+      "chinese": ["大象", "唱", "歌"],
+      "pinyin": "dàxiàng chàng gē",
+      "emoji": "🐘"
+    },
+    {
+      "id": "animals_dog_eats_fish",
+      "english": "The dog eats fish.",
+      "chinese": ["狗", "吃", "鱼"],
+      "pinyin": "gǒu chī yú",
+      "emoji": "🐶"
+    },
+    {
+      "id": "animals_rabbit_cute",
+      "english": "The rabbit is cute.",
+      "chinese": ["兔子", "很", "可爱"],
+      "pinyin": "tùzi hěn kě'ài",
+      "emoji": "🐰"
+    }
+  ]
+}

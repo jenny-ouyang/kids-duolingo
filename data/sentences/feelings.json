@@ -1,0 +1,26 @@
+{
+  "packId": "feelings",
+  "sentences": [
+    {
+      "id": "feelings_happy",
+      "english": "I am happy.",
+      "chinese": ["我", "很", "开心"],
+      "pinyin": "wǒ hěn kāixīn",
+      "emoji": "😊"
+    },
+    {
+      "id": "feelings_tired",
+      "english": "I am tired.",
+      "chinese": ["我", "很", "累"],
+      "pinyin": "wǒ hěn lèi",
+      "emoji": "😴"
+    },
+    {
+      "id": "feelings_hungry",
+      "english": "I am hungry.",
+      "chinese": ["我", "很", "饿"],
+      "pinyin": "wǒ hěn è",
+      "emoji": "🤤"
+    }
+  ]
+}

@@ -1,0 +1,33 @@
+{
+  "packId": "family",
+  "sentences": [
+    {
+      "id": "family_love_mom",
+      "english": "I love mom.",
+      "chinese": ["我", "爱", "妈妈"],
+      "pinyin": "wǒ ài māma",
+      "emoji": "❤️"
+    },
+    {
+      "id": "family_love_dad",
+      "english": "I love dad.",
+      "chinese": ["我", "爱", "爸爸"],
+      "pinyin": "wǒ ài bàba",
+      "emoji": "❤️"
+    },
+    {
+      "id": "family_dad_tall",
+      "english": "Dad is tall.",
+      "chinese": ["爸爸", "很", "高"],
+      "pinyin": "bàba hěn gāo",
+      "emoji": "👨"
+    },
+    {
+      "id": "family_mom_beautiful",
+      "english": "Mom is beautiful.",
+      "chinese": ["妈妈", "很", "漂亮"],
+      "pinyin": "māma hěn piàoliang",
+      "emoji": "👩"
+    }
+  ]
+}
