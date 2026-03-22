@@ -8,15 +8,15 @@
     {
       "id": "eat",
       "english": "eat",
-      "chinese": "吃",
-      "pinyin": "chī",
+      "chinese": "吃饭",
+      "pinyin": "chīfàn",
       "image": "/images/actions/eat.png"
     },
     {
       "id": "drink",
       "english": "drink",
-      "chinese": "喝",
-      "pinyin": "hē",
+      "chinese": "喝水",
+      "pinyin": "hēshuǐ",
       "image": "/images/actions/drink.png"
     },
     {
@@ -29,50 +29,50 @@
     {
       "id": "run",
       "english": "run",
-      "chinese": "跑",
-      "pinyin": "pǎo",
+      "chinese": "跑步",
+      "pinyin": "pǎobù",
       "image": "/images/actions/run.png"
     },
     {
       "id": "walk",
       "english": "walk",
-      "chinese": "走",
-      "pinyin": "zǒu",
+      "chinese": "走路",
+      "pinyin": "zǒulù",
       "image": "/images/actions/walk.png"
     },
     {
       "id": "jump",
       "english": "jump",
-      "chinese": "跳",
-      "pinyin": "tiào",
+      "chinese": "蹦跳",
+      "pinyin": "bèngtiào",
       "image": "/images/actions/jump.png"
     },
     {
       "id": "play",
       "english": "play",
-      "chinese": "玩",
-      "pinyin": "wán",
+      "chinese": "玩耍",
+      "pinyin": "wánshuǎ",
       "image": "/images/actions/play.png"
     },
     {
       "id": "read",
       "english": "read",
-      "chinese": "读",
-      "pinyin": "dú",
+      "chinese": "读书",
+      "pinyin": "dúshū",
       "image": "/images/actions/read.png"
     },
     {
       "id": "write",
       "english": "write",
-      "chinese": "写",
-      "pinyin": "xiě",
+      "chinese": "写字",
+      "pinyin": "xiězì",
       "image": "/images/actions/write.png"
     },
     {
       "id": "draw",
       "english": "draw",
-      "chinese": "画",
-      "pinyin": "huà",
+      "chinese": "画画",
+      "pinyin": "huàhuà",
       "image": "/images/actions/draw.png"
     },
     {
@@ -92,85 +92,85 @@
     {
       "id": "sit",
       "english": "sit",
-      "chinese": "坐",
-      "pinyin": "zuò",
+      "chinese": "坐下",
+      "pinyin": "zuòxià",
       "image": "/images/actions/sit.png"
     },
     {
       "id": "stand",
       "english": "stand",
-      "chinese": "站",
-      "pinyin": "zhàn",
+      "chinese": "站立",
+      "pinyin": "zhànlì",
       "image": "/images/actions/stand.png"
     },
     {
       "id": "look",
       "english": "look / watch",
-      "chinese": "看",
-      "pinyin": "kàn",
+      "chinese": "看看",
+      "pinyin": "kànkan",
       "image": "/images/actions/look.png"
     },
     {
       "id": "listen",
       "english": "listen",
-      "chinese": "听",
-      "pinyin": "tīng",
+      "chinese": "听歌",
+      "pinyin": "tīnggē",
       "image": "/images/actions/listen.png"
     },
     {
       "id": "talk",
       "english": "talk / say",
-      "chinese": "说",
-      "pinyin": "shuō",
+      "chinese": "说话",
+      "pinyin": "shuōhuà",
       "image": "/images/actions/talk.png"
     },
     {
       "id": "go",
       "english": "go",
-      "chinese": "去",
-      "pinyin": "qù",
+      "chinese": "出去",
+      "pinyin": "chūqù",
       "image": "/images/actions/go.png"
     },
     {
       "id": "come",
       "english": "come",
-      "chinese": "来",
-      "pinyin": "lái",
+      "chinese": "过来",
+      "pinyin": "guòlái",
       "image": "/images/actions/come.png"
     },
     {
       "id": "want",
       "english": "want",
-      "chinese": "要",
-      "pinyin": "yào",
+      "chinese": "想要",
+      "pinyin": "xiǎngyào",
       "image": "/images/actions/want.png"
     },
     {
       "id": "have",
       "english": "have",
-      "chinese": "有",
-      "pinyin": "yǒu",
+      "chinese": "拥有",
+      "pinyin": "yōngyǒu",
       "image": "/images/actions/have.png"
     },
     {
       "id": "give",
       "english": "give",
-      "chinese": "给",
-      "pinyin": "gěi",
+      "chinese": "给你",
+      "pinyin": "gěinǐ",
       "image": "/images/actions/give.png"
     },
     {
       "id": "help",
       "english": "help",
-      "chinese": "帮",
-      "pinyin": "bāng",
+      "chinese": "帮助",
+      "pinyin": "bāngzhù",
       "image": "/images/actions/help.png"
     },
     {
       "id": "love",
       "english": "love",
-      "chinese": "爱",
-      "pinyin": "ài",
+      "chinese": "爱心",
+      "pinyin": "àixīn",
       "image": "/images/actions/love.png"
     },
     {

@@ -22,8 +22,8 @@
     {
       "id": "bed",
       "english": "bed",
-      "chinese": "床",
-      "pinyin": "chuáng",
+      "chinese": "大床",
+      "pinyin": "dàchuáng",
       "image": "/images/home/bed.png"
     },
     {
@@ -36,8 +36,8 @@
     {
       "id": "door",
       "english": "door",
-      "chinese": "门",
-      "pinyin": "mén",
+      "chinese": "大门",
+      "pinyin": "dàmén",
       "image": "/images/home/door.png"
     },
     {
@@ -57,8 +57,8 @@
     {
       "id": "lamp",
       "english": "light / lamp",
-      "chinese": "灯",
-      "pinyin": "dēng",
+      "chinese": "台灯",
+      "pinyin": "táidēng",
       "image": "/images/home/lamp.png"
     },
     {
@@ -78,8 +78,8 @@
     {
       "id": "bowl",
       "english": "bowl",
-      "chinese": "碗",
-      "pinyin": "wǎn",
+      "chinese": "饭碗",
+      "pinyin": "fànwǎn",
       "image": "/images/home/bowl.png"
     },
     {
@@ -134,8 +134,8 @@
     {
       "id": "ball",
       "english": "ball",
-      "chinese": "球",
-      "pinyin": "qiú",
+      "chinese": "皮球",
+      "pinyin": "píqiú",
       "image": "/images/home/ball.png"
     },
     {

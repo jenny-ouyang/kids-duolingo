@@ -8,29 +8,29 @@
     {
       "id": "cat",
       "english": "cat",
-      "chinese": "猫",
-      "pinyin": "māo",
+      "chinese": "猫咪",
+      "pinyin": "māomī",
       "image": "/images/animals/cat.png"
     },
     {
       "id": "dog",
       "english": "dog",
-      "chinese": "狗",
-      "pinyin": "gǒu",
+      "chinese": "狗狗",
+      "pinyin": "gǒugou",
       "image": "/images/animals/dog.png"
     },
     {
       "id": "fish",
       "english": "fish",
-      "chinese": "鱼",
-      "pinyin": "yú",
+      "chinese": "金鱼",
+      "pinyin": "jīnyú",
       "image": "/images/animals/fish.png"
     },
     {
       "id": "bird",
       "english": "bird",
-      "chinese": "鸟",
-      "pinyin": "niǎo",
+      "chinese": "小鸟",
+      "pinyin": "xiǎoniǎo",
       "image": "/images/animals/bird.png"
     },
     {
@@ -50,8 +50,8 @@
     {
       "id": "bear",
       "english": "bear",
-      "chinese": "熊",
-      "pinyin": "xióng",
+      "chinese": "大熊",
+      "pinyin": "dàxióng",
       "image": "/images/animals/bear.png"
     },
     {

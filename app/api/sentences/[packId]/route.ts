@@ -1,11 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { readFileSync } from 'fs'
-import { join } from 'path'
 import { Sentence, SentenceQuestion } from '@/lib/types'
+
+// Static imports — bundled by webpack at build time, works on Vercel serverless
+import animalsData from '@/data/sentences/animals.json'
+import foodData from '@/data/sentences/food.json'
+import familyData from '@/data/sentences/family.json'
+import feelingsData from '@/data/sentences/feelings.json'
+import homeData from '@/data/sentences/home.json'
 
 interface SentenceFile {
   packId: string
   sentences: Sentence[]
+}
+
+const SENTENCE_PACKS: Record<string, SentenceFile> = {
+  animals: animalsData as SentenceFile,
+  food: foodData as SentenceFile,
+  family: familyData as SentenceFile,
+  feelings: feelingsData as SentenceFile,
+  home: homeData as SentenceFile,
 }
 
 function shuffle<T>(arr: T[]): T[] {
@@ -20,7 +33,6 @@ function shuffle<T>(arr: T[]): T[] {
 /**
  * GET /api/sentences/[packId]
  * Returns up to 2 shuffled sentence questions for the given pack.
- * Reads from data/sentences/[packId].json — no DB required.
  * Returns { sentences: [] } gracefully for packs without sentence data.
  */
 export async function GET(
@@ -29,28 +41,19 @@ export async function GET(
 ) {
   const { packId } = await params
 
-  // Guard against path traversal — pack IDs are only lowercase letters, numbers, and hyphens
-  if (!/^[a-z0-9-]+$/.test(packId)) {
+  const data = SENTENCE_PACKS[packId]
+  if (!data) {
     return NextResponse.json({ sentences: [] })
   }
 
-  try {
-    const filePath = join(process.cwd(), 'data', 'sentences', `${packId}.json`)
-    const raw = readFileSync(filePath, 'utf-8')
-    const data: SentenceFile = JSON.parse(raw)
+  const shuffledSentences = shuffle(data.sentences)
+  const selected = shuffledSentences.slice(0, 2)
 
-    const shuffledSentences = shuffle(data.sentences)
-    const selected = shuffledSentences.slice(0, 2)
+  const questions: SentenceQuestion[] = selected.map((sentence) => ({
+    sentence,
+    tiles: shuffle(sentence.chinese),
+    type: 'tap_to_build',
+  }))
 
-    const questions: SentenceQuestion[] = selected.map((sentence) => ({
-      sentence,
-      tiles: shuffle(sentence.chinese),
-      type: 'tap_to_build',
-    }))
-
-    return NextResponse.json({ sentences: questions })
-  } catch {
-    // No sentence file for this pack — return empty gracefully
-    return NextResponse.json({ sentences: [] })
-  }
+  return NextResponse.json({ sentences: questions })
 }

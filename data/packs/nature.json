@@ -36,71 +36,71 @@
     {
       "id": "cloud",
       "english": "cloud",
-      "chinese": "云",
-      "pinyin": "yún",
+      "chinese": "云朵",
+      "pinyin": "yúnduǒ",
       "image": "/images/nature/cloud.png"
     },
     {
       "id": "rain",
       "english": "rain",
-      "chinese": "雨",
-      "pinyin": "yǔ",
+      "chinese": "下雨",
+      "pinyin": "xiàyǔ",
       "image": "/images/nature/rain.png"
     },
     {
       "id": "wind",
       "english": "wind",
-      "chinese": "风",
-      "pinyin": "fēng",
+      "chinese": "大风",
+      "pinyin": "dàfēng",
       "image": "/images/nature/wind.png"
     },
     {
       "id": "snow",
       "english": "snow",
-      "chinese": "雪",
-      "pinyin": "xuě",
+      "chinese": "雪花",
+      "pinyin": "xuěhuā",
       "image": "/images/nature/snow.png"
     },
     {
       "id": "tree",
       "english": "tree",
-      "chinese": "树",
-      "pinyin": "shù",
+      "chinese": "大树",
+      "pinyin": "dàshù",
       "image": "/images/nature/tree.png"
     },
     {
       "id": "flower",
       "english": "flower",
-      "chinese": "花",
-      "pinyin": "huā",
+      "chinese": "花朵",
+      "pinyin": "huāduǒ",
       "image": "/images/nature/flower.png"
     },
     {
       "id": "grass",
       "english": "grass",
-      "chinese": "草",
-      "pinyin": "cǎo",
+      "chinese": "小草",
+      "pinyin": "xiǎocǎo",
       "image": "/images/nature/grass.png"
     },
     {
       "id": "mountain",
       "english": "mountain",
-      "chinese": "山",
-      "pinyin": "shān",
+      "chinese": "大山",
+      "pinyin": "dàshān",
       "image": "/images/nature/mountain.png"
     },
     {
       "id": "river",
       "english": "river",
-      "chinese": "河",
-      "pinyin": "hé",
+      "chinese": "河流",
+      "pinyin": "héliú",
       "image": "/images/nature/river.png"
     },
     {
       "id": "sea",
       "english": "sea / ocean",
-      "chinese": "海",
-      "pinyin": "hǎi",
+      "chinese": "大海",
+      "pinyin": "dàhǎi",
       "image": "/images/nature/sea.png"
     },
     {
@@ -113,8 +113,8 @@
     {
       "id": "ground",
       "english": "ground / earth",
-      "chinese": "地",
-      "pinyin": "dì",
+      "chinese": "大地",
+      "pinyin": "dàdì",
       "image": "/images/nature/ground.png"
     }
   ]

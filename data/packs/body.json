@@ -8,15 +8,15 @@
     {
       "id": "head",
       "english": "head",
-      "chinese": "头",
-      "pinyin": "tóu",
+      "chinese": "脑袋",
+      "pinyin": "nǎodài",
       "image": "/images/body/head.png"
     },
     {
       "id": "face",
       "english": "face",
-      "chinese": "脸",
-      "pinyin": "liǎn",
+      "chinese": "脸蛋",
+      "pinyin": "liǎndàn",
       "image": "/images/body/face.png"
     },
     {
@@ -57,8 +57,8 @@
     {
       "id": "hand",
       "english": "hand",
-      "chinese": "手",
-      "pinyin": "shǒu",
+      "chinese": "手掌",
+      "pinyin": "shǒuzhǎng",
       "image": "/images/body/hand.png"
     },
     {
@@ -71,15 +71,15 @@
     {
       "id": "foot",
       "english": "foot",
-      "chinese": "脚",
-      "pinyin": "jiǎo",
+      "chinese": "脚掌",
+      "pinyin": "jiǎozhǎng",
       "image": "/images/body/foot.png"
     },
     {
       "id": "leg",
       "english": "leg",
-      "chinese": "腿",
-      "pinyin": "tuǐ",
+      "chinese": "大腿",
+      "pinyin": "dàtuǐ",
       "image": "/images/body/leg.png"
     },
     {

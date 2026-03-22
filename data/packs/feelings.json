@@ -36,22 +36,22 @@
     {
       "id": "tired",
       "english": "tired",
-      "chinese": "累",
-      "pinyin": "lèi",
+      "chinese": "好累",
+      "pinyin": "hǎolèi",
       "image": "/images/feelings/tired.png"
     },
     {
       "id": "hungry",
       "english": "hungry",
-      "chinese": "饿",
-      "pinyin": "è",
+      "chinese": "好饿",
+      "pinyin": "hǎoè",
       "image": "/images/feelings/hungry.png"
     },
     {
       "id": "thirsty",
       "english": "thirsty",
-      "chinese": "渴",
-      "pinyin": "kě",
+      "chinese": "口渴",
+      "pinyin": "kǒukě",
       "image": "/images/feelings/thirsty.png"
     },
     {
@@ -64,15 +64,15 @@
     {
       "id": "cold-feeling",
       "english": "cold (feeling)",
-      "chinese": "冷",
-      "pinyin": "lěng",
+      "chinese": "好冷",
+      "pinyin": "hǎolěng",
       "image": "/images/feelings/cold-feeling.png"
     },
     {
       "id": "hot-feeling",
       "english": "hot (feeling)",
-      "chinese": "热",
-      "pinyin": "rè",
+      "chinese": "好热",
+      "pinyin": "hǎorè",
       "image": "/images/feelings/hot-feeling.png"
     },
     {
