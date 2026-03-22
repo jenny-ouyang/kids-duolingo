@@ -60,16 +60,18 @@ export async function GET(req: NextRequest) {
       }
     }
 
-    const result = packs.map((pack) => ({
-      id: pack.id,
-      subject: pack.subject,
-      name: pack.name,
-      nameZh: pack.nameZh ?? '',
-      emoji: pack.emoji,
-      color: pack.color,
-      wordCount: subject === 'chinese' ? pack.words.length : pack.problems.length,
-      masteryPct: masteryByPack[pack.id] ?? 0,
-    }))
+    const result = packs
+      .map((pack) => ({
+        id: pack.id,
+        subject: pack.subject,
+        name: pack.name,
+        nameZh: pack.nameZh ?? '',
+        emoji: pack.emoji,
+        color: pack.color,
+        wordCount: subject === 'chinese' ? pack.words.length : pack.problems.length,
+        masteryPct: masteryByPack[pack.id] ?? 0,
+      }))
+      .filter((pack) => pack.wordCount > 0)
 
     return NextResponse.json(result)
   } catch (err) {
