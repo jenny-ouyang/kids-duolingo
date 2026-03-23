@@ -133,14 +133,14 @@ export default function PacksPage() {
                   transition={{ delay: i * 0.06 }}
                   whileHover={{ scale: 1.04 }}
                   whileTap={{ scale: 0.96 }}
-                  onClick={() => router.push(`/practice/${pack.id}`)}
+                  onClick={() => router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/${pack.id}`)}
                   className="relative rounded-3xl p-5 flex flex-col items-start gap-2 shadow-lg text-left overflow-hidden"
                   style={{ background: pack.color }}
                 >
                   <span className="text-5xl">{pack.emoji}</span>
                   <span className="text-xl font-extrabold text-white drop-shadow">{pack.name}</span>
                   <span className="text-sm font-semibold text-white/80">{pack.nameZh}</span>
-                  <span className="text-xs text-white/70">{pack.wordCount} words</span>
+                  <span className="text-xs text-white/70">{pack.id === 'sentences' ? `${pack.wordCount} sentences` : `${pack.wordCount} words`}</span>
                   <MasteryRing percent={pack.masteryPct} />
                 </motion.button>
               ))

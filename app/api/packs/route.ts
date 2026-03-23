@@ -15,7 +15,11 @@ export async function GET(req: NextRequest) {
   try {
     const packs = await prisma.pack.findMany({
       where: { subject },
-      include: { words: { orderBy: { sortOrder: 'asc' } }, problems: { orderBy: { sortOrder: 'asc' } } },
+      include: {
+        words: { orderBy: { sortOrder: 'asc' } },
+        problems: { orderBy: { sortOrder: 'asc' } },
+        sentences: { orderBy: { sortOrder: 'asc' } },
+      },
       orderBy: { sortOrder: 'asc' },
     })
 
@@ -68,7 +72,9 @@ export async function GET(req: NextRequest) {
         nameZh: pack.nameZh ?? '',
         emoji: pack.emoji,
         color: pack.color,
-        wordCount: subject === 'chinese' ? pack.words.length : pack.problems.length,
+        wordCount: subject === 'chinese'
+          ? (pack.sentences.length > 0 && pack.words.length === 0 ? pack.sentences.length : pack.words.length)
+          : pack.problems.length,
         masteryPct: masteryByPack[pack.id] ?? 0,
       }))
       .filter((pack) => pack.wordCount > 0)

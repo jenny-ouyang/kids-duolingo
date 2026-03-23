@@ -1,97 +1,50 @@
 'use client'
 
 import { useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
-import PictureChoice from '@/components/exercise/PictureChoice'
-import { ExerciseQuestion, WordProgress } from '@/lib/types'
-import { updateSM2 } from '@/lib/spaced-repetition'
+import SentenceBuild from '@/components/exercise/SentenceBuild'
+import { SentenceQuestion } from '@/lib/types'
 
 const MAX_HEARTS = 5
 
-interface SessionResponse {
-  questions: ExerciseQuestion[]
-  wordProgress: Record<string, WordProgress>
-}
-
-
-export default function PracticeSession() {
+export default function SentencesPractice() {
   const router = useRouter()
-  const params = useParams()
-  const packId = params.packId as string
 
-  const [packName, setPackName] = useState('')
-  const [packEmoji, setPackEmoji] = useState('📦')
-  const [questions, setQuestions] = useState<ExerciseQuestion[]>([])
+  const [questions, setQuestions] = useState<SentenceQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
-
   const [heartsEarned, setHeartsEarned] = useState(0)
   const [heartPulse, setHeartPulse] = useState(false)
 
-  const wordProgressRef = useRef<Record<string, WordProgress>>({})
   const correctWordsRef = useRef<{ english: string; chinese: string; pinyin: string }[]>([])
-  const currentIndexRef = useRef(0)
-  currentIndexRef.current = currentIndex
 
   const loadSession = useCallback(async () => {
     try {
-      const [sessionRes, packRes] = await Promise.all([
-        fetch(`/api/questions/${packId}`),
-        fetch(`/api/packs/${packId}`),
-      ])
-
-      if (!sessionRes.ok) throw new Error('Could not load session')
-      const session: SessionResponse = await sessionRes.json()
-      wordProgressRef.current = session.wordProgress ?? {}
-      setQuestions(session.questions)
-
-      if (packRes.ok) {
-        const packData = await packRes.json()
-        setPackName(packData.name ?? '')
-        setPackEmoji(packData.emoji ?? '📦')
-      }
-
+      const res = await fetch('/api/sentences/all')
+      if (!res.ok) throw new Error('Could not load sentences')
+      const data = await res.json()
+      setQuestions(data.sentences ?? [])
       setLoading(false)
     } catch (err) {
       console.error(err)
       setLoading(false)
     }
-  }, [packId])
+  }, [])
 
   useEffect(() => {
     loadSession()
   }, [loadSession])
 
-  async function handleAnswer(correct: boolean) {
-    if (questions.length === 0 || transitioning) return
+  function handleAnswer(correct: boolean) {
+    if (transitioning) return
     setTransitioning(true)
 
     const currentQuestion = questions[currentIndex]
-    const itemId = currentQuestion.word.id
-
-    const existing = wordProgressRef.current[itemId] ?? {
-      easiness: 2.5, interval: 1, repetitions: 0, nextReview: new Date().toISOString()
-    }
-    const updated = updateSM2(existing, correct ? 3 : 1)
-    wordProgressRef.current[itemId] = updated
-
-    // Save to DB — fire-and-forget, never blocks the UI
-    fetch('/api/progress', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ packId, wordId: itemId, ...updated }),
-    }).catch(console.error)
-
-    fetch('/api/answers', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ packId, wordId: itemId, correct }),
-    }).catch(console.error)
 
     let newHeartsEarned = heartsEarned
     if (correct) {
@@ -100,36 +53,28 @@ export default function PracticeSession() {
       setHeartPulse(true)
       setTimeout(() => setHeartPulse(false), 600)
       correctWordsRef.current.push({
-        english: currentQuestion.word.english,
-        chinese: currentQuestion.word.chinese,
-        pinyin: currentQuestion.word.pinyin,
+        english: currentQuestion.sentence.english,
+        chinese: currentQuestion.sentence.chinese.join(''),
+        pinyin: currentQuestion.sentence.pinyin,
       })
     }
 
     const newCorrectCount = correct ? correctCount + 1 : correctCount
-    if (correct) setCorrectCount(newCorrectCount)
-
-    const isLast = currentIndex >= questions.length - 1
+    setCorrectCount(newCorrectCount)
 
     setTimeout(() => {
-      if (isLast) {
-        fetch('/api/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ heartsEarned: newHeartsEarned }),
-        }).catch(console.error)
-
+      if (currentIndex + 1 >= questions.length) {
         try {
           sessionStorage.setItem('lastSession', JSON.stringify({
-            packId,
-            packName,
+            packId: 'sentences',
+            packName: 'Simple Sentences',
             subject: 'chinese',
             correctWords: correctWordsRef.current,
           }))
         } catch { /* sessionStorage unavailable */ }
 
         router.push(
-          `/celebrate?subject=chinese&pack=${packId}&correct=${newCorrectCount}&total=${questions.length}&hearts=${newHeartsEarned}`
+          `/celebrate?subject=chinese&pack=sentences&correct=${newCorrectCount}&total=${questions.length}&hearts=${newHeartsEarned}`
         )
       } else {
         setCurrentIndex((i) => i + 1)
@@ -146,9 +91,8 @@ export default function PracticeSession() {
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           className="text-6xl"
         >
-          🌟
+          💬
         </motion.div>
-        <p className="text-2xl font-bold text-blue-500 mt-4">Getting ready...</p>
       </KidLayout>
     )
   }
@@ -156,11 +100,8 @@ export default function PracticeSession() {
   if (questions.length === 0) {
     return (
       <KidLayout>
-        <p className="text-2xl font-bold text-red-400">Oops! Could not load this pack.</p>
-        <button
-          onClick={() => router.push('/packs')}
-          className="mt-6 bg-blue-500 text-white rounded-2xl px-8 py-4 text-xl font-bold"
-        >
+        <p className="text-xl text-gray-500">No sentences available.</p>
+        <button onClick={() => router.push('/packs')} className="mt-6 bg-blue-500 text-white rounded-2xl px-8 py-4 text-xl font-bold">
           Go Back
         </button>
       </KidLayout>
@@ -181,12 +122,11 @@ export default function PracticeSession() {
               ←
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">{packEmoji}</span>
-              <span className="text-xl font-bold text-gray-600">{packName}</span>
+              <span className="text-2xl">💬</span>
+              <span className="text-xl font-bold text-gray-600">Simple Sentences</span>
             </div>
           </div>
 
-          {/* Hearts row */}
           <div className="flex items-center gap-1">
             {Array.from({ length: MAX_HEARTS }).map((_, i) => (
               <motion.span
@@ -210,7 +150,7 @@ export default function PracticeSession() {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <PictureChoice question={currentQuestion} onAnswer={handleAnswer} />
+              <SentenceBuild question={currentQuestion} onAnswer={handleAnswer} />
             </motion.div>
           </AnimatePresence>
         </ExerciseShell>
