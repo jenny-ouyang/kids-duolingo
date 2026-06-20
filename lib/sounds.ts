@@ -2,9 +2,39 @@
  * All sounds generated via Web Audio API — no files needed.
  */
 
+// One shared AudioContext for the whole app. Creating a new one per sound
+// (the old behavior) is fatal: browsers cap a tab at ~6 contexts, after which
+// `new AudioContext()` throws and every later sound goes silent. A new context
+// also starts *suspended* until a user gesture, so per-call contexts never get
+// resumed. One singleton, resumed on every use, fixes both.
+let sharedCtx: AudioContext | null = null
+
 function getCtx(): AudioContext | null {
   if (typeof window === 'undefined') return null
-  return new (window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext)()
+  if (!sharedCtx) {
+    const Ctor =
+      window.AudioContext ||
+      (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext
+    if (!Ctor) return null
+    sharedCtx = new Ctor()
+  }
+  if (sharedCtx.state === 'suspended') {
+    void sharedCtx.resume().catch(() => {})
+  }
+  return sharedCtx
+}
+
+/**
+ * Prime/resume the shared AudioContext. Call this from the first real user
+ * gesture (tap/click/key) so every later sound — including ones that fire with
+ * no gesture, like the celebration screen on mount — plays instead of being
+ * blocked by the browser autoplay policy. Safe to call repeatedly.
+ */
+export function unlockAudio(): void {
+  const ctx = getCtx()
+  if (ctx && ctx.state === 'suspended') {
+    void ctx.resume().catch(() => {})
+  }
 }
 
 function playNote(

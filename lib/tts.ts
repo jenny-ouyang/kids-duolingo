@@ -68,6 +68,27 @@ export function preloadVoices(): void {
   }
 }
 
+let speechPrimed = false
+
+/**
+ * Unlock speech synthesis on iOS/Safari, which silently blocks any speech not
+ * started inside a user gesture. Speaking one near-silent utterance during the
+ * first real gesture primes the engine so later calls — including the ones
+ * fired from setTimeout after an answer — actually speak. Runs once.
+ */
+export function primeSpeech(): void {
+  if (typeof window === 'undefined' || !window.speechSynthesis || speechPrimed) return
+  speechPrimed = true
+  try {
+    window.speechSynthesis.resume()
+    const u = new SpeechSynthesisUtterance(' ')
+    u.volume = 0
+    window.speechSynthesis.speak(u)
+  } catch {
+    // ignore — priming is best-effort
+  }
+}
+
 export function stopSpeech(): void {
   if (typeof window === 'undefined' || !window.speechSynthesis) return
   window.speechSynthesis.cancel()
