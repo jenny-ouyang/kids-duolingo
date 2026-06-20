@@ -58,7 +58,7 @@ Method: wrapped `AudioContext` with an AnalyserNode (peak 0–255) + `speechSynt
 Conclusion: audio engine works and is now robust (one context, resumed, primed). Any remaining desktop silence is environmental.
 
 ## Resolution
-**Status:** 🔧 Code hardened + verified. The audio code is proven to produce a real signal on-device; the user's desktop silence is environmental. NOT marked fully resolved — the exit condition is the USER confirming by ear that they now hear sound (an AnalyserNode measures signal generated, not audibility past the OS output). Also: the fix is committed but NOT deployed, so if the user is on the Vercel URL it hasn't reached them yet.
+**Status:** 🔧 Code hardened + verified. The audio code is proven to produce a real signal on-device; the user's desktop silence is environmental. NOT marked fully resolved — the exit condition is the USER confirming by ear that they now hear sound (an AnalyserNode measures signal generated, not audibility past the OS output). The fix is committed (e94231d) and deployed to production (Vercel deploy `dpl_9MpMbJLS…` reached READY), so the hardening is live; only the user's by-ear confirmation of the desktop symptom remains.
 **Fix:** One shared `AudioContext` (resumed on use), primed together with speech on the first user gesture (`VoicePreloader`), iOS speech unlocked via a silent utterance (`primeSpeech`).
 **Root cause (two parts):**
 - (a) Real robustness bugs in the audio code (per-call AudioContext; timer-fired speech) — fixed. These caused silence on iPad/Safari, long sessions (>6 sounds), and the mount-fired celebration screen.
