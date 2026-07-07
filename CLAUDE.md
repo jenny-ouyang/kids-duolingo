@@ -2,6 +2,19 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Status (updated: 2026-07-06)
+
+**Staleness:** DORMANT since 2026-06-20 (last commit). Cadence over the last 90 days: 2 commits (both on 2026-06-20 — the audio-hardening fix and the "production READY" doc marker). Development is paused, not abandoned; the codebase is intact and deployed.
+
+**Current phase:** Feature-complete for the current scope (Chinese vocab + Math + Sentences). Last work was fixing total-silence audio on iOS/Safari (see `docs/2026-06-20-no-sound-total-silence.md`).
+
+**Deployment claim (unverified from repo alone):** The final commit message reads "docs: mark audio fix deployed (production READY)" as of 2026-06-20. Whether the Vercel deployment is currently live and the audio fix is confirmed in production is NOT verifiable from the repo — see Open questions.
+
+### Active work
+- [x] Audio hardening — shared AudioContext + first-gesture unlock + iOS speech priming (commit e94231d, 2026-06-20)
+- [x] Sentence practice — tap-to-build exercises, dedicated Sentences pack + route (commits through cba0113, 2026-06-20)
+- [ ] Confirm production deploy of the audio fix (last commit only marks it in docs; verify on Vercel)
+
 ## What This Is
 
 A kid-friendly Chinese + Math learning app (Duolingo-style) built with Next.js 14, Prisma, and Supabase. Core philosophy: **no punishment**—wrong answers show the correct answer and encourage retries. Sessions are 8 questions, end with a celebration screen.
@@ -104,3 +117,12 @@ Supabase project: `odwoxbxkvmjjqvjyynko` (this app's production DB).
 Note: `.env` also references a different Supabase project (`fhdjzktrpcsjleargmrb`) used for an unrelated ai-memory-agent — don't confuse the two.
 
 Deployed on Vercel (`.vercel/` config present).
+
+## Recent changes
+
+- 2026-06-20: Audio hardening (shared AudioContext, first-gesture unlock, iOS speech priming) + Sentence practice feature (tap-to-build, dedicated pack + route). Investigation trail for the audio work is in `docs/2026-06-20-no-sound-total-silence.md`.
+
+## Open questions
+
+- Is the audio fix actually live in production? The last commit only *marks* it deployed in docs — confirm on the Vercel deployment before trusting "production READY".
+- Is active development resuming, or is this parked? No commits since 2026-06-20.
