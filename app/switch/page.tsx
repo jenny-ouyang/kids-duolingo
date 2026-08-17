@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { setActiveChild } from '@/lib/child-cookie'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
 interface ChildSummary {
   id: string
@@ -29,17 +30,25 @@ export default function SwitchPage() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    fetch('/api/children')
-      .then((r) => (r.ok ? r.json() : []))
-      .then((data: ChildSummary[]) => {
-        if (Array.isArray(data)) setChildren(data)
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false))
-  }, [])
+    let cancelled = false
+    fetchJsonWithAuthRetry<ChildSummary[]>('/api/children').then(({ status, data }) => {
+      if (cancelled) return
+      if (status === 403) {
+        // Authed but no child yet — first visit, go set one up
+        router.replace('/welcome')
+        return
+      }
+      if (Array.isArray(data)) setChildren(data)
+      setLoading(false)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
-  function pickChild(id: string) {
-    setActiveChild(id)
+  async function pickChild(id: string) {
+    // Await so the server-set httpOnly cookie is in place before navigating
+    await setActiveChild(id)
     router.push('/')
   }
 

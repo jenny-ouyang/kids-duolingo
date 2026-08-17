@@ -37,6 +37,20 @@ async function main() {
   const sql = (name: string) =>
     readFileSync(join(__dirname, '..', 'prisma', 'migrations', name, 'migration.sql'), 'utf8')
 
+  // Already fully migrated? (contract dropped childName) → only ensure bookkeeping.
+  const contracted = await pool.query(
+    `SELECT NOT EXISTS (SELECT 1 FROM information_schema.columns
+       WHERE table_name = 'WordProgress' AND column_name = 'childName') AS done`
+  )
+  if (contracted.rows[0].done) {
+    console.log('✓ already contracted — skipping to migration bookkeeping')
+    await pool.end()
+    for (const name of [EXPAND, CONTRACT]) {
+      execSync(`npx prisma migrate resolve --applied ${name}`, { stdio: 'inherit' })
+    }
+    return
+  }
+
   // ---- Step 1: expand (additive, idempotent) ----
   console.log('→ expand…')
   await pool.query(sql(EXPAND))
@@ -57,6 +71,19 @@ async function main() {
   let childId: string
   if (existing.rows.length > 0) {
     childId = existing.rows[0].id
+    // The child may have been created via the app's onboarding (runbook step B
+    // suggests signing in once) — still merge the legacy ChildProfile hearts/streak
+    // instead of silently discarding them before the contract drop.
+    await pool.query(
+      `UPDATE "Child" c SET
+         "totalHearts"   = GREATEST(c."totalHearts", cp."totalHearts"),
+         "streak"        = GREATEST(c."streak", cp."streak"),
+         "lastPracticed" = GREATEST(COALESCE(c."lastPracticed", cp."lastPracticed"), cp."lastPracticed"),
+         "updatedAt"     = now()
+       FROM "ChildProfile" cp
+       WHERE cp."name" = 'julian' AND c."id" = $1`,
+      [childId]
+    )
   } else {
     childId = randomUUID()
     // Copy hearts/streak from the legacy ChildProfile row (if it still exists)
@@ -87,6 +114,10 @@ async function main() {
        (SELECT count(*) FROM "AnswerEvent" WHERE "childId" IS NULL) AS n`
   )
   if (Number(nulls.rows[0].n) !== 0) throw new Error(`${nulls.rows[0].n} rows still unmapped — aborting before contract`)
+
+  // Hearts/streak are now copied into Child — clear ChildProfile so the contract
+  // guard can prove nothing gets destroyed by DROP TABLE.
+  await pool.query(`DELETE FROM "ChildProfile"`)
 
   // ---- Step 3: contract (guarded in SQL as well) ----
   console.log('→ contract…')

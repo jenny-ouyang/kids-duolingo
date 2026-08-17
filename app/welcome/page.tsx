@@ -44,7 +44,8 @@ export default function WelcomePage() {
         setWaitingForAuth(false)
         if (res.ok) {
           const child = (await res.json()) as { id: string }
-          setActiveChild(child.id)
+          // Await so the server-set httpOnly cookie is in place before navigating
+          await setActiveChild(child.id)
           router.push('/')
           return
         }

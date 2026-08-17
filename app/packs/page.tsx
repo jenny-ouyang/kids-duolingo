@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
 interface PackMeta {
   id: string
@@ -47,23 +48,48 @@ function MasteryRing({ percent }: { percent: number }) {
 export default function PacksPage() {
   const router = useRouter()
   const [packs, setPacks] = useState<PackMeta[]>([])
-  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [tab, setTab] = useState<'learning' | 'mastered'>('learning')
 
   useEffect(() => {
-    fetch('/api/packs')
-      .then((r) => r.json())
-      .then((data: PackMeta[]) => {
-        if (Array.isArray(data)) setPacks(data)
-      })
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [])
+    let cancelled = false
+    fetchJsonWithAuthRetry<PackMeta[]>('/api/packs').then(({ ok, status, data }) => {
+      if (cancelled) return
+      if (status === 403) {
+        // Authed but no child yet — first visit, go set one up
+        router.replace('/welcome')
+        return
+      }
+      if (!ok || !Array.isArray(data)) {
+        setStatus('error')
+        return
+      }
+      setPacks(data)
+      setStatus('ready')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
-  if (loading) {
+  if (status === 'loading') {
     return (
       <KidLayout>
         <div className="text-6xl animate-spin">🌟</div>
+      </KidLayout>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <KidLayout>
+        <p className="text-2xl font-bold text-red-400">Oops! Could not load the packs.</p>
+        <button
+          onClick={() => router.push('/')}
+          className="mt-6 bg-blue-500 text-white rounded-2xl px-8 py-4 text-xl font-bold"
+        >
+          Go Back
+        </button>
       </KidLayout>
     )
   }

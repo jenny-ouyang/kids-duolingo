@@ -8,6 +8,7 @@ import ExerciseShell from '@/components/exercise/ExerciseShell'
 import CountAndChoose from '@/components/exercise/CountAndChoose'
 import { MathQuestion, BaseProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
 const MAX_HEARTS = 5
 
@@ -37,19 +38,18 @@ export default function MathPracticeSession() {
   const loadSession = useCallback(async () => {
     try {
       const [sessionRes, packRes] = await Promise.all([
-        fetch(`/api/math/questions/${topicId}`),
-        fetch(`/api/packs/${topicId}`),
+        fetchJsonWithAuthRetry<MathSessionResponse>(`/api/math/questions/${topicId}`),
+        fetchJsonWithAuthRetry<{ name?: string; emoji?: string }>(`/api/packs/${topicId}`),
       ])
 
-      if (!sessionRes.ok) throw new Error('Could not load session')
-      const session: MathSessionResponse = await sessionRes.json()
+      if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
+      const session = sessionRes.data
       progressRef.current = session.progress ?? {}
-      setQuestions(session.questions)
+      setQuestions(session.questions ?? [])
 
-      if (packRes.ok) {
-        const packData = await packRes.json()
-        setTopicName(packData.name ?? '')
-        setTopicEmoji(packData.emoji ?? '➕')
+      if (packRes.ok && packRes.data) {
+        setTopicName(packRes.data.name ?? '')
+        setTopicEmoji(packRes.data.emoji ?? '➕')
       }
 
       setLoading(false)
@@ -107,7 +107,7 @@ export default function MathPracticeSession() {
         fetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ heartsEarned: newHeartsEarned }),
+          body: JSON.stringify({ heartsEarned: newHeartsEarned, tzOffsetMinutes: new Date().getTimezoneOffset() }),
         }).catch(console.error)
 
         router.push(

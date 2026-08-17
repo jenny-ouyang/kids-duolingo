@@ -2,7 +2,12 @@ import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { createSupabaseServer } from '@/lib/supabase-server'
+import { Prisma } from '@/lib/generated/prisma'
 import type { Child } from '@/lib/generated/prisma'
+
+function isUniqueViolation(err: unknown): boolean {
+  return err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002'
+}
 
 /** Cookie holding the active child's id. A hint only — ownership is verified on every request. */
 export const CHILD_COOKIE = 'kd_child'
@@ -29,17 +34,28 @@ export async function getAuthContext(): Promise<{ userId: string }> {
   if (!user) throw new AuthError(401, 'unauthenticated')
 
   const isGuest = user.is_anonymous ?? !user.email
-  const existing = await prisma.account.findUnique({ where: { id: user.id } })
-  if (!existing) {
-    await prisma.account.create({
-      data: { id: user.id, email: user.email ?? null, isGuest },
-    })
-  } else if (existing.isGuest && !isGuest) {
+  // Upsert (atomic) — concurrent first requests from a new user must not race on create.
+  const existing = await prisma.account.upsert({
+    where: { id: user.id },
+    create: { id: user.id, email: user.email ?? null, isGuest },
+    update: {},
+  })
+  if (existing.isGuest && !isGuest) {
     // Guest just claimed the account (magic link / OAuth) — record it.
-    await prisma.account.update({
-      where: { id: user.id },
-      data: { email: user.email ?? existing.email, isGuest: false },
-    })
+    try {
+      await prisma.account.update({
+        where: { id: user.id },
+        data: { email: user.email ?? existing.email, isGuest: false },
+      })
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err
+      // Email already on another Account row — still flip isGuest so this
+      // branch doesn't re-fire (and fail) on every subsequent request.
+      await prisma.account.update({
+        where: { id: user.id },
+        data: { isGuest: false },
+      })
+    }
   }
 
   return { userId: user.id }

@@ -4,6 +4,7 @@ import { useCallback, useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 import type { User } from '@supabase/supabase-js'
 
 const GATE_KEY = 'kd_parent_gate'
@@ -141,6 +142,7 @@ function AvatarPicker({
 function ChildrenSection() {
   const [children, setChildren] = useState<ChildRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [loadFailed, setLoadFailed] = useState(false)
 
   // Add form
   const [showAdd, setShowAdd] = useState(false)
@@ -158,13 +160,14 @@ function ChildrenSection() {
   const [deleteText, setDeleteText] = useState('')
 
   const fetchChildren = useCallback(async () => {
-    try {
-      const res = await fetch('/api/children')
-      if (!res.ok) throw new Error('failed')
-      setChildren((await res.json()) as ChildRow[])
-      setError(null)
-    } catch {
-      setError("Couldn't load your children. Please try again.")
+    const { ok, data } = await fetchJsonWithAuthRetry<ChildRow[]>('/api/children')
+    if (ok && Array.isArray(data)) {
+      setChildren(data)
+      setLoadFailed(false)
+    } else {
+      // Fall back to an empty list so the add-child UI still renders
+      setChildren((prev) => prev ?? [])
+      setLoadFailed(true)
     }
   }, [])
 
@@ -268,6 +271,18 @@ function ChildrenSection() {
         )}
       </div>
 
+      {loadFailed && (
+        <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-red-600 text-sm flex items-center justify-between gap-3">
+          <span>Couldn&apos;t load your children.</span>
+          <button
+            onClick={fetchChildren}
+            className="font-semibold underline underline-offset-2 flex-shrink-0"
+          >
+            Try again
+          </button>
+        </div>
+      )}
+
       {error && (
         <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-red-600 text-sm">
           {error}
@@ -319,11 +334,11 @@ function ChildrenSection() {
         )}
       </AnimatePresence>
 
-      {children === null && !error && (
+      {children === null && (
         <div className="text-gray-400 text-sm">Loading…</div>
       )}
 
-      {children !== null && children.length === 0 && (
+      {children !== null && children.length === 0 && !loadFailed && (
         <p className="text-gray-500 text-sm">
           No children yet. Add one to get started.
         </p>

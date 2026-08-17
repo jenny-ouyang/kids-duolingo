@@ -8,6 +8,7 @@ import ExerciseShell from '@/components/exercise/ExerciseShell'
 import PictureChoice from '@/components/exercise/PictureChoice'
 import { ExerciseQuestion, WordProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
 const MAX_HEARTS = 5
 
@@ -41,19 +42,18 @@ export default function PracticeSession() {
   const loadSession = useCallback(async () => {
     try {
       const [sessionRes, packRes] = await Promise.all([
-        fetch(`/api/questions/${packId}`),
-        fetch(`/api/packs/${packId}`),
+        fetchJsonWithAuthRetry<SessionResponse>(`/api/questions/${packId}`),
+        fetchJsonWithAuthRetry<{ name?: string; emoji?: string }>(`/api/packs/${packId}`),
       ])
 
-      if (!sessionRes.ok) throw new Error('Could not load session')
-      const session: SessionResponse = await sessionRes.json()
+      if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
+      const session = sessionRes.data
       wordProgressRef.current = session.wordProgress ?? {}
-      setQuestions(session.questions)
+      setQuestions(session.questions ?? [])
 
-      if (packRes.ok) {
-        const packData = await packRes.json()
-        setPackName(packData.name ?? '')
-        setPackEmoji(packData.emoji ?? '📦')
+      if (packRes.ok && packRes.data) {
+        setPackName(packRes.data.name ?? '')
+        setPackEmoji(packRes.data.emoji ?? '📦')
       }
 
       setLoading(false)
@@ -116,7 +116,7 @@ export default function PracticeSession() {
         fetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ heartsEarned: newHeartsEarned }),
+          body: JSON.stringify({ heartsEarned: newHeartsEarned, tzOffsetMinutes: new Date().getTimezoneOffset() }),
         }).catch(console.error)
 
         try {

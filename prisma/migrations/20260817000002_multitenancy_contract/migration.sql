@@ -4,6 +4,7 @@
 
 DO $$
 DECLARE n integer;
+DECLARE profiles integer;
 BEGIN
   SELECT count(*) INTO n FROM (
     SELECT 1 FROM "WordProgress"     WHERE "childId" IS NULL
@@ -13,6 +14,16 @@ BEGIN
   ) t;
   IF n > 0 THEN
     RAISE EXCEPTION 'Backfill incomplete: % rows with NULL childId. Run scripts/migrate-multitenancy.ts first.', n;
+  END IF;
+
+  -- ChildProfile may hold hearts/streak even when the progress tables are empty.
+  -- The backfill copies its rows into Child and then clears it; any remaining row
+  -- means data would be destroyed by the DROP below.
+  IF EXISTS (SELECT 1 FROM information_schema.tables WHERE table_name = 'ChildProfile') THEN
+    SELECT count(*) INTO profiles FROM "ChildProfile";
+    IF profiles > 0 THEN
+      RAISE EXCEPTION 'ChildProfile still has % uncopied row(s). Run scripts/migrate-multitenancy.ts first.', profiles;
+    END IF;
   END IF;
 END $$;
 

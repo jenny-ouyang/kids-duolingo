@@ -36,15 +36,22 @@ export async function POST(req: NextRequest) {
     const { child } = await requireChild()
     const body = await req.json() as {
       heartsEarned: number
+      tzOffsetMinutes?: number
     }
 
     const now = new Date()
 
-    // Streak logic: increment if practiced today or yesterday, reset otherwise
+    // Streak compares CALENDAR days (in the child's timezone when the client sends
+    // its offset, UTC otherwise) — elapsed-hours math broke evening→morning streaks.
+    const tz = typeof body.tzOffsetMinutes === 'number' && Math.abs(body.tzOffsetMinutes) <= 14 * 60
+      ? body.tzOffsetMinutes
+      : 0
+    const dayNumber = (d: Date) => Math.floor((d.getTime() - tz * 60_000) / 86_400_000)
+
     let newStreak = 1
     if (child.lastPracticed) {
-      const diffDays = Math.floor((now.getTime() - child.lastPracticed.getTime()) / (1000 * 60 * 60 * 24))
-      if (diffDays === 0) newStreak = child.streak           // same day — keep streak
+      const diffDays = dayNumber(now) - dayNumber(child.lastPracticed)
+      if (diffDays === 0) newStreak = child.streak           // same calendar day — keep streak
       else if (diffDays === 1) newStreak = child.streak + 1  // consecutive day
       else newStreak = 1                                     // gap — reset
     }

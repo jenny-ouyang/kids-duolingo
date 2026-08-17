@@ -4,7 +4,7 @@
 -- an anon/authenticated JWT, any un-RLS'd public table would be readable AND writable
 -- with just the public anon key.
 --
--- Run in the Supabase SQL editor (or: npm run db:lockdown). Idempotent.
+-- Run in the Supabase SQL editor. Idempotent.
 -- Also recommended (dashboard, Settings → API): disable the Data API entirely —
 -- nothing uses PostgREST (the n8n keepalive uses direct Postgres + the Next API).
 

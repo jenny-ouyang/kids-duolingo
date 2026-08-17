@@ -35,6 +35,9 @@ npm run db:generate-questions    # Pre-generate exercise questions into DB
 npm run db:migrate-multitenancy  # One-shot guarded expand→backfill→contract migration (see docs/plans/deploy-runbook.md)
 ```
 
+⚠️ The two `20260817*_multitenancy_*` migrations must NOT be applied via `npm run db:migrate` /
+`prisma migrate deploy` — the backfill has to run between them. Use `db:migrate-multitenancy` only.
+
 No test suite exists. TypeScript + `npm run lint` are the primary quality checks.
 
 ## Architecture

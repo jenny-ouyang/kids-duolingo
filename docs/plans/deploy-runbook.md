@@ -24,6 +24,13 @@ Project: `odwoxbxkvmjjqvjyynko` (kids-duolingo — NOT the ai-memory one).
 2. Copy its UUID into local `.env` as `JENNY_USER_ID`, plus `JENNY_EMAIL`.
 
 ## C. Run the data migration (scripted, idempotent)
+
+> ⚠️ Do NOT run `npm run db:migrate` / `prisma migrate deploy` directly for this change —
+> it would apply expand+contract back-to-back with no backfill. The contract SQL's guard
+> aborts safely, but leaves a failed migration row that needs `prisma migrate resolve`.
+> Use only the script below; it sequences expand → backfill → contract and does the
+> bookkeeping itself.
+
 ```bash
 npm run db:migrate-multitenancy
 ```

@@ -37,10 +37,17 @@ CREATE TABLE IF NOT EXISTS "SentenceProgress" (
     CONSTRAINT "SentenceProgress_pkey" PRIMARY KEY ("id")
 );
 
-CREATE UNIQUE INDEX IF NOT EXISTS "SentenceProgress_childName_packId_sentenceId_key"
-  ON "SentenceProgress"("childName", "packId", "sentenceId");
-CREATE INDEX IF NOT EXISTS "SentenceProgress_childName_packId_idx"
-  ON "SentenceProgress"("childName", "packId");
+-- Guarded: after the contract migration drops childName, a re-run of this file must
+-- not fail on an index referencing the dropped column (42703 beats IF NOT EXISTS).
+DO $$ BEGIN
+  IF EXISTS (SELECT 1 FROM information_schema.columns
+             WHERE table_name = 'SentenceProgress' AND column_name = 'childName') THEN
+    CREATE UNIQUE INDEX IF NOT EXISTS "SentenceProgress_childName_packId_sentenceId_key"
+      ON "SentenceProgress"("childName", "packId", "sentenceId");
+    CREATE INDEX IF NOT EXISTS "SentenceProgress_childName_packId_idx"
+      ON "SentenceProgress"("childName", "packId");
+  END IF;
+END $$;
 
 DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'SentenceProgress_packId_fkey') THEN
