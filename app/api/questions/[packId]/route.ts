@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { requireChild, authErrorResponse } from '@/lib/auth'
 import { Word } from '@/lib/types'
 
-const CHILD = 'julian'
 const SESSION_SIZE = 8
 
 /**
@@ -18,17 +18,18 @@ export async function GET(
   const { packId } = params
 
   try {
+    const { child } = await requireChild()
     const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
         where: { id: packId },
         include: { words: { orderBy: { sortOrder: 'asc' } } },
       }),
       prisma.chineseProgress.findMany({
-        where: { childName: CHILD, packId },
+        where: { childId: child.id, packId },
         select: { wordId: true, repetitions: true, nextReview: true },
       }),
       prisma.answerEvent.findMany({
-        where: { childName: CHILD, packId, correct: false },
+        where: { childId: child.id, packId, correct: false },
         orderBy: { answeredAt: 'desc' },
         take: 30,
         select: { itemId: true },
@@ -101,7 +102,7 @@ export async function GET(
       return [{ word, options, correctId: wordId, type: row.type }]
     })
 
-    const allProgress = await prisma.chineseProgress.findMany({ where: { childName: CHILD, packId } })
+    const allProgress = await prisma.chineseProgress.findMany({ where: { childId: child.id, packId } })
     const wordProgress: Record<string, { easiness: number; interval: number; repetitions: number; nextReview: string }> = {}
     for (const p of allProgress) {
       wordProgress[p.wordId] = {
@@ -116,6 +117,8 @@ export async function GET(
 
     return NextResponse.json({ questions, wordProgress })
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[questions GET]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }

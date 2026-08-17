@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { getAuthContext, authErrorResponse } from '@/lib/auth'
 import { Sentence, SentenceQuestion } from '@/lib/types'
 
 // Static imports — bundled by webpack at build time, works on Vercel serverless
@@ -40,6 +41,15 @@ export async function GET(
   { params }: { params: Promise<{ packId: string }> }
 ) {
   const { packId } = await params
+
+  try {
+    await getAuthContext()
+  } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
+    throw err
+  }
+
 
   const data = SENTENCE_PACKS[packId]
   if (!data) {

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-
-const CHILD = 'julian'
+import { requireChild, authErrorResponse } from '@/lib/auth'
 
 /**
  * GET /api/packs              → Chinese packs (backward compatible, no change needed on client)
@@ -13,6 +12,7 @@ export async function GET(req: NextRequest) {
   const subject = req.nextUrl.searchParams.get('subject') ?? 'chinese'
 
   try {
+    const { child } = await requireChild()
     const packs = await prisma.pack.findMany({
       where: { subject },
       include: {
@@ -30,7 +30,7 @@ export async function GET(req: NextRequest) {
 
     if (subject === 'chinese') {
       const rows = await prisma.chineseProgress.findMany({
-        where: { childName: CHILD, packId: { in: packIds } },
+        where: { childId: child.id, packId: { in: packIds } },
         select: { packId: true, wordId: true, repetitions: true },
       })
       const progressByPack: Record<string, Record<string, number>> = {}
@@ -47,7 +47,7 @@ export async function GET(req: NextRequest) {
       }
     } else if (subject === 'math') {
       const rows = await prisma.mathProgress.findMany({
-        where: { childName: CHILD, packId: { in: packIds } },
+        where: { childId: child.id, packId: { in: packIds } },
         select: { packId: true, problemId: true, repetitions: true },
       })
       const progressByPack: Record<string, Record<string, number>> = {}
@@ -81,6 +81,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(result)
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[packs GET]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }
