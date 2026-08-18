@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
+import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
 interface TopicMeta {
   id: string
@@ -46,20 +47,47 @@ function MasteryRing({ percent }: { percent: number }) {
 export default function MathTopicsPage() {
   const router = useRouter()
   const [topics, setTopics] = useState<TopicMeta[]>([])
-  const [loading, setLoading] = useState(true)
+  const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
 
   useEffect(() => {
-    fetch('/api/packs?subject=math')
-      .then((r) => r.json())
-      .then((data: TopicMeta[]) => setTopics(data))
-      .catch(console.error)
-      .finally(() => setLoading(false))
-  }, [])
+    let cancelled = false
+    fetchJsonWithAuthRetry<TopicMeta[]>('/api/packs?subject=math').then(({ ok, status, data }) => {
+      if (cancelled) return
+      if (status === 403) {
+        // Authed but no child yet — first visit, go set one up
+        router.replace('/welcome')
+        return
+      }
+      if (!ok || !Array.isArray(data)) {
+        setStatus('error')
+        return
+      }
+      setTopics(data)
+      setStatus('ready')
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [router])
 
-  if (loading) {
+  if (status === 'loading') {
     return (
       <KidLayout>
         <div className="text-6xl animate-spin">🌟</div>
+      </KidLayout>
+    )
+  }
+
+  if (status === 'error') {
+    return (
+      <KidLayout>
+        <p className="text-2xl font-bold text-red-400">Oops! Could not load the topics.</p>
+        <button
+          onClick={() => router.push('/')}
+          className="mt-6 bg-blue-500 text-white rounded-2xl px-8 py-4 text-xl font-bold"
+        >
+          Go Back
+        </button>
       </KidLayout>
     )
   }

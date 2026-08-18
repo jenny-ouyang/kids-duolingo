@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-
-const CHILD = 'julian'
+import { requireChild, authErrorResponse } from '@/lib/auth'
 
 /**
  * POST /api/answers
@@ -11,6 +10,7 @@ const CHILD = 'julian'
  */
 export async function POST(req: NextRequest) {
   try {
+    const { child } = await requireChild()
     const body = await req.json() as {
       packId: string
       wordId: string
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
 
     await prisma.answerEvent.create({
       data: {
-        childName: CHILD,
+        childId: child.id,
         packId: body.packId,
         itemId: body.wordId,
         correct: body.correct,
@@ -28,6 +28,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[answers POST]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
 
 /**
  * GET /api/answers?packId=animals&limit=30
- * Returns the most recent wrong-answer itemIds for Julian in a pack.
+ * Returns the most recent wrong-answer itemIds for the active child in a pack.
  */
 export async function GET(req: NextRequest) {
   const packId = req.nextUrl.searchParams.get('packId')
@@ -46,8 +48,9 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { child } = await requireChild()
     const events = await prisma.answerEvent.findMany({
-      where: { childName: CHILD, packId, correct: false },
+      where: { childId: child.id, packId, correct: false },
       orderBy: { answeredAt: 'desc' },
       take: limit,
       select: { itemId: true },
@@ -64,6 +67,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ wordIds })
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[answers GET]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }

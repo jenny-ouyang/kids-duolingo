@@ -41,16 +41,6 @@ export interface Pack {
 /** Alias kept for backward compatibility with Chinese practice routes */
 export type WordProgress = BaseProgress
 
-export interface PackProgress {
-  unlocked: boolean
-  words: Record<string, WordProgress>
-}
-
-export interface ChildProgress {
-  childName: string
-  packs: Record<string, PackProgress>
-}
-
 /** How the question is presented to the child */
 export type QuestionType =
   | 'audio_to_picture'    // Hear Chinese → tap the right picture

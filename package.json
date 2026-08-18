@@ -12,11 +12,14 @@
     "db:generate": "prisma generate",
     "db:seed": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/seed.ts",
     "db:generate-questions": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/generate-questions.ts",
-    "db:seed-math": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/seed-math.ts"
+    "db:seed-math": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' prisma/seed-math.ts",
+    "db:migrate-multitenancy": "ts-node --skip-project --compiler-options '{\"module\":\"commonjs\"}' scripts/migrate-multitenancy.ts"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.4.1",
     "@prisma/client": "^7.4.1",
+    "@supabase/ssr": "^0.12.4",
+    "@supabase/supabase-js": "^2.112.3",
     "@types/pg": "^8.16.0",
     "dotenv": "^17.3.1",
     "framer-motion": "^12.34.3",

@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { requireChild, authErrorResponse } from '@/lib/auth'
 import { MathProblem, MathQuestion, BaseProgress } from '@/lib/types'
 import { pickWordsForSession } from '@/lib/spaced-repetition'
 
-const CHILD = 'julian'
 const SESSION_SIZE = 8
 
 function shuffle<T>(arr: T[]): T[] {
@@ -43,6 +43,7 @@ export async function GET(
   const { topicId } = params
 
   try {
+    const { child } = await requireChild()
     // Phase 1: IDs only (avoids loading thousands of full rows)
     const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
@@ -54,11 +55,11 @@ export async function GET(
         },
       }),
       prisma.mathProgress.findMany({
-        where: { childName: CHILD, packId: topicId },
+        where: { childId: child.id, packId: topicId },
         select: { problemId: true, easiness: true, interval: true, repetitions: true, nextReview: true },
       }),
       prisma.answerEvent.findMany({
-        where: { childName: CHILD, packId: topicId, correct: false },
+        where: { childId: child.id, packId: topicId, correct: false },
         orderBy: { answeredAt: 'desc' },
         take: 30,
         select: { itemId: true },
@@ -122,6 +123,8 @@ export async function GET(
 
     return NextResponse.json({ questions, progress: progressMap })
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[math/questions GET]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }

@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
-
-const CHILD = 'julian'
+import { requireChild, authErrorResponse } from '@/lib/auth'
 
 /**
  * GET /api/progress?packId=animals
@@ -17,9 +16,10 @@ export async function GET(req: NextRequest) {
   }
 
   try {
+    const { child } = await requireChild()
     if (subject === 'math') {
       const rows = await prisma.mathProgress.findMany({
-        where: { childName: CHILD, packId },
+        where: { childId: child.id, packId },
       })
       const result: Record<string, { easiness: number; interval: number; repetitions: number; nextReview: string }> = {}
       for (const row of rows) {
@@ -35,7 +35,7 @@ export async function GET(req: NextRequest) {
 
     // Default: chinese
     const rows = await prisma.chineseProgress.findMany({
-      where: { childName: CHILD, packId },
+      where: { childId: child.id, packId },
     })
     const result: Record<string, { easiness: number; interval: number; repetitions: number; nextReview: string }> = {}
     for (const row of rows) {
@@ -48,6 +48,8 @@ export async function GET(req: NextRequest) {
     }
     return NextResponse.json(result)
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[progress GET]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }
@@ -60,6 +62,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
+    const { child } = await requireChild()
     const body = await req.json() as {
       packId: string
       wordId: string
@@ -74,20 +77,22 @@ export async function POST(req: NextRequest) {
 
     if (subject === 'math') {
       await prisma.mathProgress.upsert({
-        where: { childName_packId_problemId: { childName: CHILD, packId, problemId: wordId } },
-        create: { childName: CHILD, packId, problemId: wordId, easiness, interval, repetitions, nextReview: new Date(nextReview) },
+        where: { childId_packId_problemId: { childId: child.id, packId, problemId: wordId } },
+        create: { childId: child.id, packId, problemId: wordId, easiness, interval, repetitions, nextReview: new Date(nextReview) },
         update: { easiness, interval, repetitions, nextReview: new Date(nextReview) },
       })
     } else {
       await prisma.chineseProgress.upsert({
-        where: { childName_packId_wordId: { childName: CHILD, packId, wordId } },
-        create: { childName: CHILD, packId, wordId, easiness, interval, repetitions, nextReview: new Date(nextReview) },
+        where: { childId_packId_wordId: { childId: child.id, packId, wordId } },
+        create: { childId: child.id, packId, wordId, easiness, interval, repetitions, nextReview: new Date(nextReview) },
         update: { easiness, interval, repetitions, nextReview: new Date(nextReview) },
       })
     }
 
     return NextResponse.json({ ok: true })
   } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
     console.error('[progress POST]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }

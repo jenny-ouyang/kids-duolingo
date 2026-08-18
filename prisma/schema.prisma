@@ -7,6 +7,38 @@ datasource db {
   provider = "postgresql"
 }
 
+/// One row per Supabase auth user. id == auth.users.id (uuid string).
+/// Guests (anonymous sign-ins) get a row too; isGuest flips false when claimed.
+model Account {
+  id        String   @id
+  email     String?  @unique
+  isGuest   Boolean  @default(true)
+  plan      String   @default("free")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  children  Child[]
+}
+
+/// Replaces ChildProfile. One account, many children. Nickname + avatar only — no PII.
+model Child {
+  id               String             @id @default(cuid())
+  accountId        String
+  account          Account            @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  name             String
+  avatar           String             @default("🦁")
+  totalHearts      Int                @default(0)
+  streak           Int                @default(0)
+  lastPracticed    DateTime?
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+  chineseProgress  ChineseProgress[]
+  sentenceProgress SentenceProgress[]
+  mathProgress     MathProgress[]
+  answerEvents     AnswerEvent[]
+
+  @@index([accountId])
+}
+
 model Pack {
   id               String             @id
   subject          String             @default("chinese")
@@ -64,10 +96,10 @@ model MathProblem {
   mathProgress MathProgress[]
 }
 
-/// Replaces WordProgress for Chinese — adds proper FK integrity
 model ChineseProgress {
   id          String   @id @default(cuid())
-  childName   String   @default("julian")
+  childId     String
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   packId      String
   pack        Pack     @relation(fields: [packId], references: [id])
   wordId      String
@@ -78,15 +110,16 @@ model ChineseProgress {
   nextReview  DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([childName, packId, wordId])
-  @@index([childName, packId])
+  @@unique([childId, packId, wordId])
+  @@index([childId, packId])
   @@map("WordProgress")
 }
 
 /// Sentence practice progress — SM-2 spaced repetition for sentences
 model SentenceProgress {
   id          String   @id @default(cuid())
-  childName   String   @default("julian")
+  childId     String
+  child       Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   packId      String
   pack        Pack     @relation(fields: [packId], references: [id])
   sentenceId  String
@@ -97,14 +130,15 @@ model SentenceProgress {
   nextReview  DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  @@unique([childName, packId, sentenceId])
-  @@index([childName, packId])
+  @@unique([childId, packId, sentenceId])
+  @@index([childId, packId])
 }
 
 /// Math SM-2 progress — full FK to MathProblem
 model MathProgress {
   id          String      @id @default(cuid())
-  childName   String      @default("julian")
+  childId     String
+  child       Child       @relation(fields: [childId], references: [id], onDelete: Cascade)
   packId      String
   pack        Pack        @relation(fields: [packId], references: [id])
   problemId   String
@@ -115,29 +149,22 @@ model MathProgress {
   nextReview  DateTime    @default(now())
   updatedAt   DateTime    @updatedAt
 
-  @@unique([childName, packId, problemId])
-  @@index([childName, packId])
+  @@unique([childId, packId, problemId])
+  @@index([childId, packId])
 }
 
 model AnswerEvent {
   id         String   @id @default(cuid())
-  childName  String   @default("julian")
+  childId    String
+  child      Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
   packId     String
   pack       Pack     @relation(fields: [packId], references: [id])
   itemId     String   @map("wordId")
   correct    Boolean
   answeredAt DateTime @default(now())
 
-  @@index([childName, packId, itemId])
+  @@index([childId, packId, itemId])
   @@index([answeredAt])
-}
-
-model ChildProfile {
-  name          String    @id
-  totalHearts   Int       @default(0)
-  streak        Int       @default(0)
-  lastPracticed DateTime?
-  updatedAt     DateTime  @updatedAt
 }
 
 /// Pre-generated exercise questions. AI runs once during setup; sessions just read from here.

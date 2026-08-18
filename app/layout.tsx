@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { Nunito } from 'next/font/google'
 import VoicePreloader from '@/components/layout/VoicePreloader'
+import AuthBootstrap from '@/components/auth/AuthBootstrap'
 import './globals.css'
 
 const nunito = Nunito({
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${nunito.variable} font-nunito antialiased`}>
+        <AuthBootstrap />
         <VoicePreloader />
         {children}
       </body>

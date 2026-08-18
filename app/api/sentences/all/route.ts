@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { getAuthContext, authErrorResponse } from '@/lib/auth'
 import { Sentence, SentenceQuestion } from '@/lib/types'
 import animalsData from '@/data/sentences/animals.json'
 import foodData from '@/data/sentences/food.json'
@@ -28,6 +29,14 @@ function shuffle<T>(arr: T[]): T[] {
  * Returns a full session of 8 sentence questions drawn from all packs.
  */
 export async function GET() {
+  try {
+    await getAuthContext()
+  } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
+    throw err
+  }
+
   const shuffled = shuffle(ALL_SENTENCES)
   const selected = shuffled.slice(0, 8)
 
