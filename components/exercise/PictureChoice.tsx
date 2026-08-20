@@ -83,9 +83,9 @@ const SHAKE = { x: [-6, 6, -4, 4, 0] }
 // ─── Option Card variants ────────────────────────────────────────────────────
 
 function PictureCard({
-  word, state, isCorrect, onClick, disabled, edgeClass,
+  word, state, shaking, isCorrect, onClick, disabled, edgeClass,
 }: {
-  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
+  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
   const emojiIcon = EMOJI_FALLBACKS[word.id]
 
@@ -93,7 +93,7 @@ function PictureCard({
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      animate={state === 'wrong' && !isCorrect ? SHAKE : {}}
+      animate={shaking ? SHAKE : {}}
       transition={{ duration: 0.3 }}
       className={`relative rounded-3xl p-4 flex flex-col items-center justify-center gap-2 transition-colors duration-200 cursor-pointer select-none ${tileClasses(state, isCorrect, edgeClass)}`}
       style={{ minHeight: 130 }}
@@ -116,15 +116,15 @@ function PictureCard({
 }
 
 function ChineseCard({
-  word, state, isCorrect, onClick, disabled, edgeClass,
+  word, state, shaking, isCorrect, onClick, disabled, edgeClass,
 }: {
-  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
+  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      animate={state === 'wrong' && !isCorrect ? SHAKE : {}}
+      animate={shaking ? SHAKE : {}}
       transition={{ duration: 0.3 }}
       className={`relative rounded-3xl p-4 flex flex-col items-center justify-center gap-1 transition-colors duration-200 cursor-pointer select-none ${tileClasses(state, isCorrect, edgeClass)}`}
       style={{ minHeight: 130 }}
@@ -198,8 +198,12 @@ function EnglishPrompt({ word }: { word: Word }) {
 // ─── Main component ───────────────────────────────────────────────────────────
 
 export default function PictureChoice({ question, onAnswer }: PictureChoiceProps) {
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [answerState, setAnswerState] = useState<AnswerState>('idle')
+  // Stay-until-right: wrong taps gray out and the question waits for the correct
+  // tap. Only the FIRST tap feeds the memory system (onAnswer), so retry kindness
+  // never corrupts the spaced-repetition data.
+  const [wrongIds, setWrongIds] = useState<string[]>([])
+  const [lastWrongId, setLastWrongId] = useState<string | null>(null)
+  const [solved, setSolved] = useState(false)
 
   // Auto-play audio when question loads (for audio type) or on all types as reinforcement
   useEffect(() => {
@@ -212,25 +216,28 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
   }, [question.word.chinese, question.type])
 
   function handleSelect(wordId: string) {
-    if (answerState !== 'idle') return
-    setSelectedId(wordId)
+    if (solved || wrongIds.includes(wordId)) return
     const correct = wordId === question.correctId
-    setAnswerState(correct ? 'correct' : 'wrong')
 
     if (correct) {
+      const firstTry = wrongIds.length === 0
+      setSolved(true)
       playCorrectSound()
       setTimeout(() => speakChinese(question.word.chinese), 150)
+      setTimeout(() => {
+        onAnswer(firstTry)
+        setWrongIds([])
+        setLastWrongId(null)
+        setSolved(false)
+      }, 1100)
     } else {
       playWrongSound()
-      // Speak the correct answer so Julian hears what it should be
-      setTimeout(() => speakChinese(question.word.chinese), 500)
+      setWrongIds((ids) => [...ids, wordId])
+      setLastWrongId(wordId)
+      setTimeout(() => setLastWrongId(null), 400)
+      // Re-speak the target word — a hint through the ears, not a reveal
+      setTimeout(() => speakChinese(question.word.chinese), 450)
     }
-
-    setTimeout(() => {
-      onAnswer(correct)
-      setSelectedId(null)
-      setAnswerState('idle')
-    }, correct ? 1100 : 1700)
   }
 
   const useChineseOptions =
@@ -243,16 +250,16 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
       {question.type === 'picture_to_chinese' && <PicturePrompt word={question.word} />}
       {question.type === 'english_to_chinese' && <EnglishPrompt word={question.word} />}
 
-      {/* Wrong-answer feedback — warm, no punishment */}
+      {/* Wrong-answer feedback — warm, no punishment, question stays until solved */}
       <AnimatePresence>
-        {answerState === 'wrong' && (
+        {wrongIds.length > 0 && !solved && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="bg-white rounded-full px-5 py-2 shadow-press-chip text-ink font-extrabold text-center text-sm"
           >
-            Almost! Keep going! 🌟
+            Try again — you&apos;ve got this! 🌟
           </motion.div>
         )}
       </AnimatePresence>
@@ -261,20 +268,23 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
       <div className="grid grid-cols-2 gap-4 w-full">
         {question.options.map((word, index) => {
           const isCorrect = word.id === question.correctId
-          const cardState =
-            selectedId === word.id ? answerState :
-            selectedId !== null && isCorrect && answerState === 'wrong' ? 'correct' :
+          const cardState: AnswerState =
+            solved && isCorrect ? 'correct' :
+            wrongIds.includes(word.id) ? 'wrong' :
             'idle'
           const edgeClass = TILE_EDGES[index % TILE_EDGES.length]
+          const shaking = lastWrongId === word.id
+          const cardDisabled = solved || wrongIds.includes(word.id)
 
           return useChineseOptions ? (
             <ChineseCard
               key={word.id}
               word={word}
               state={cardState}
+              shaking={shaking}
               isCorrect={isCorrect}
               onClick={() => handleSelect(word.id)}
-              disabled={answerState !== 'idle'}
+              disabled={cardDisabled}
               edgeClass={edgeClass}
             />
           ) : (
@@ -282,9 +292,10 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
               key={word.id}
               word={word}
               state={cardState}
+              shaking={shaking}
               isCorrect={isCorrect}
               onClick={() => handleSelect(word.id)}
-              disabled={answerState !== 'idle'}
+              disabled={cardDisabled}
               edgeClass={edgeClass}
             />
           )

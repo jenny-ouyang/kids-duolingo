@@ -45,6 +45,8 @@ export default function MathPracticeSession() {
   const [heartPulse, setHeartPulse] = useState(false)
 
   const progressRef = useRef<Record<string, BaseProgress>>({})
+  // Problems missed on first try come back once more before the session ends
+  const requeuedRef = useRef<Set<string>>(new Set())
 
   const loadSession = useCallback(async () => {
     try {
@@ -111,7 +113,16 @@ export default function MathPracticeSession() {
     const newCorrectCount = correct ? correctCount + 1 : correctCount
     if (correct) setCorrectCount(newCorrectCount)
 
-    const isLast = currentIndex >= questions.length - 1
+    // Duolingo-style within-session repetition: a first-try miss re-queues the
+    // problem at the end of the session for one fresh attempt (once per problem).
+    let sessionQuestions = questions
+    if (!correct && !requeuedRef.current.has(problemId)) {
+      requeuedRef.current.add(problemId)
+      sessionQuestions = [...questions, currentQuestion]
+      setQuestions(sessionQuestions)
+    }
+
+    const isLast = currentIndex >= sessionQuestions.length - 1
 
     setTimeout(() => {
       if (isLast) {
@@ -122,7 +133,7 @@ export default function MathPracticeSession() {
         }).catch(console.error)
 
         router.push(
-          `/celebrate?subject=math&pack=${topicId}&correct=${newCorrectCount}&total=${questions.length}&hearts=${newHeartsEarned}`
+          `/celebrate?subject=math&pack=${topicId}&correct=${newCorrectCount}&total=${sessionQuestions.length}&hearts=${newHeartsEarned}`
         )
       } else {
         setCurrentIndex((i) => i + 1)

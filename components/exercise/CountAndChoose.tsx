@@ -10,8 +10,6 @@ interface CountAndChooseProps {
   onAnswer: (correct: boolean) => void
 }
 
-type AnswerState = 'idle' | 'correct' | 'wrong'
-
 // Rotating press-edge colors by tile index (decorative rhythm — DESIGN.md)
 const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
 
@@ -70,44 +68,47 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
 }
 
 export default function CountAndChoose({ question, onAnswer }: CountAndChooseProps) {
-  const [selected, setSelected] = useState<number | null>(null)
-  const [answerState, setAnswerState] = useState<AnswerState>('idle')
+  // Stay-until-right: wrong picks gray out and the problem waits for the correct
+  // answer. Only the FIRST pick feeds the memory system (onAnswer).
+  const [wrongPicks, setWrongPicks] = useState<number[]>([])
+  const [lastWrongPick, setLastWrongPick] = useState<number | null>(null)
+  const [solved, setSolved] = useState(false)
 
   function handleSelect(value: number) {
-    if (answerState !== 'idle') return
-    setSelected(value)
+    if (solved || wrongPicks.includes(value)) return
     const correct = value === question.correctAnswer
-    setAnswerState(correct ? 'correct' : 'wrong')
 
     if (correct) {
+      const firstTry = wrongPicks.length === 0
+      setSolved(true)
       playCorrectSound()
+      setTimeout(() => {
+        onAnswer(firstTry)
+        setWrongPicks([])
+        setLastWrongPick(null)
+        setSolved(false)
+      }, 1100)
     } else {
       playWrongSound()
+      setWrongPicks((picks) => [...picks, value])
+      setLastWrongPick(value)
+      setTimeout(() => setLastWrongPick(null), 400)
     }
-
-    setTimeout(() => {
-      onAnswer(correct)
-      setSelected(null)
-      setAnswerState('idle')
-    }, correct ? 1100 : 1700)
   }
 
   /** Sunrise Playground tile look: white + own-hue edge; success fill + ✓; wrong fades, no red */
   function getButtonStyle(value: number, edgeClass: string): string {
     const isCorrect = value === question.correctAnswer
-    if (answerState === 'idle') {
-      return `bg-white ${edgeClass} pressable`
-    }
-    if (selected === value) {
-      return answerState === 'correct'
-        ? 'bg-success-bg shadow-press-success scale-105'
-        : 'bg-canvas-mid shadow-none opacity-80'
-    }
-    // Show correct answer when wrong
-    if (answerState === 'wrong' && isCorrect) {
+    if (solved && isCorrect) {
       return 'bg-success-bg shadow-press-success scale-105'
     }
-    return `bg-white ${edgeClass} opacity-60`
+    if (wrongPicks.includes(value)) {
+      return 'bg-canvas-mid shadow-none opacity-80'
+    }
+    if (solved) {
+      return `bg-white ${edgeClass} opacity-60`
+    }
+    return `bg-white ${edgeClass} pressable`
   }
 
   return (
@@ -115,16 +116,16 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
       {/* Problem display */}
       <ProblemDisplay question={question} />
 
-      {/* Wrong answer feedback — warm, no punishment */}
+      {/* Wrong answer feedback — warm, no punishment, problem stays until solved */}
       <AnimatePresence>
-        {answerState === 'wrong' && (
+        {wrongPicks.length > 0 && !solved && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
             className="bg-white rounded-full px-5 py-2 shadow-press-chip text-ink font-extrabold text-sm text-center"
           >
-            Almost! Keep going! 🌟
+            Try again — you&apos;ve got this! 🌟
           </motion.div>
         )}
       </AnimatePresence>
@@ -135,12 +136,12 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
           const isCorrect = value === question.correctAnswer
           const edgeClass = TILE_EDGES[index % TILE_EDGES.length]
           const cardStyle = getButtonStyle(value, edgeClass)
-          const isWrongPick = answerState === 'wrong' && selected === value
+          const isWrongPick = lastWrongPick === value
           return (
             <motion.button
               key={value}
               onClick={() => handleSelect(value)}
-              disabled={answerState !== 'idle'}
+              disabled={solved || wrongPicks.includes(value)}
               animate={isWrongPick ? { x: [-6, 6, -4, 4, 0] } : {}}
               transition={{ duration: 0.3 }}
               className={`relative rounded-3xl p-4 flex items-center justify-center transition-colors duration-200 cursor-pointer select-none ${cardStyle}`}
@@ -148,7 +149,7 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
             >
               <span className="text-5xl font-extrabold text-ink tabular-nums">{value}</span>
               <AnimatePresence>
-                {answerState !== 'idle' && isCorrect && (
+                {solved && isCorrect && (
                   <motion.span
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
