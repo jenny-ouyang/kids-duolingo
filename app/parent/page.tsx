@@ -460,7 +460,7 @@ function AccountSection() {
   const [loading, setLoading] = useState(true)
 
   const [claimEmail, setClaimEmail] = useState('')
-  const [claimStatus, setClaimStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  const [claimStatus, setClaimStatus] = useState<'idle' | 'sending' | 'sent' | 'error' | 'exists'>('idle')
 
   const [signinEmail, setSigninEmail] = useState('')
   const [signinStatus, setSigninStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
@@ -487,7 +487,11 @@ function AccountSection() {
     setClaimStatus('sending')
     const supabase = createSupabaseBrowser()
     const { error } = await supabase.auth.updateUser({ email })
-    setClaimStatus(error ? 'error' : 'sent')
+    if (error && /already|registered|exists|in use/i.test(error.message)) {
+      setClaimStatus('exists')
+    } else {
+      setClaimStatus(error ? 'error' : 'sent')
+    }
   }
 
   async function handleSignIn(e: React.FormEvent) {
@@ -564,6 +568,13 @@ function AccountSection() {
               {claimStatus === 'error' && (
                 <p className="text-ink text-sm font-bold">
                   Something went wrong sending the confirmation email. Please try again.
+                </p>
+              )}
+              {claimStatus === 'exists' && (
+                <p className="text-ink text-sm font-bold">
+                  That email already has a Mandarineer account! Use{' '}
+                  <strong>&ldquo;Already saved on another device?&rdquo;</strong> below to
+                  sign into it instead.
                 </p>
               )}
             </form>
