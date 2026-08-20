@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
+import { Hills, Sparkles } from '@/components/design/Scenery'
 import { setActiveChild } from '@/lib/child-cookie'
 import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
@@ -15,14 +16,8 @@ interface ChildSummary {
   streak: number
 }
 
-const TILE_GRADIENTS = [
-  'bg-gradient-to-br from-orange-400 to-red-500',
-  'bg-gradient-to-br from-blue-500 to-purple-600',
-  'bg-gradient-to-br from-green-400 to-emerald-500',
-  'bg-gradient-to-br from-pink-400 to-rose-500',
-  'bg-gradient-to-br from-yellow-400 to-orange-500',
-  'bg-gradient-to-br from-cyan-400 to-blue-500',
-]
+// Decorative rhythm only (docs/design/DESIGN.md) — edge color carries no meaning
+const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
 
 export default function SwitchPage() {
   const router = useRouter()
@@ -55,61 +50,75 @@ export default function SwitchPage() {
   if (loading) {
     return (
       <KidLayout>
-        <div className="text-6xl animate-spin">🌟</div>
+        <Hills />
+        <div className="relative z-10 font-emoji text-6xl animate-spin">🌟</div>
       </KidLayout>
     )
   }
 
   return (
     <KidLayout>
-      <div className="flex flex-col items-center gap-8 w-full max-w-sm">
+      <Sparkles />
+      <Hills />
+
+      <div className="relative z-10 flex flex-col items-center gap-7 w-full max-w-md">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center"
         >
-          <h1 className="text-4xl font-extrabold text-blue-700 drop-shadow-sm">
-            Who&apos;s playing? 🎈
+          <h1 className="text-[27px] font-extrabold text-ink">
+            Who&apos;s playing? <span className="font-emoji">🎈</span>
           </h1>
-          <p className="text-lg text-blue-400 font-semibold mt-2">Tap your buddy!</p>
+          <p className="text-[15px] text-ink-soft font-bold mt-1">Tap your buddy!</p>
         </motion.div>
 
-        <div className="grid grid-cols-2 gap-4 w-full">
+        <div className="grid grid-cols-2 gap-5 w-full">
           {children.map((child, i) => (
-            <motion.button
+            <motion.div
               key={child.id}
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: i * 0.08, type: 'spring', stiffness: 260, damping: 20 }}
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              onClick={() => pickChild(child.id)}
-              className={`${TILE_GRADIENTS[i % TILE_GRADIENTS.length]} rounded-3xl p-5 flex flex-col items-center gap-2 shadow-xl text-white`}
             >
-              <span className="text-6xl leading-none">{child.avatar}</span>
-              <span className="text-xl font-extrabold drop-shadow truncate max-w-full">
-                {child.name}
-              </span>
-              <div className="flex items-center gap-3 text-sm font-bold text-white/90">
-                <span>❤️ {child.totalHearts}</span>
-                {child.streak > 1 && <span>🔥 {child.streak}</span>}
-              </div>
-            </motion.button>
+              <button
+                onClick={() => pickChild(child.id)}
+                className={`pressable w-full min-h-[128px] bg-white rounded-3xl p-5 flex flex-col items-center gap-1.5 ${
+                  TILE_EDGES[i % TILE_EDGES.length]
+                } ${i % 2 === 0 ? 'rotate-[-2deg]' : 'rotate-[2deg]'}`}
+              >
+                <span className="font-emoji text-[44px] leading-none">{child.avatar}</span>
+                <span className="text-lg font-extrabold text-ink truncate max-w-full">
+                  {child.name}
+                </span>
+                <div className="flex items-center gap-3 text-sm font-extrabold text-ink-soft">
+                  <span>
+                    <span className="font-emoji">❤️</span> {child.totalHearts}
+                  </span>
+                  {child.streak > 1 && (
+                    <span>
+                      <span className="font-emoji">🔥</span> {child.streak}
+                    </span>
+                  )}
+                </div>
+              </button>
+            </motion.div>
           ))}
 
           {/* Add a child */}
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: children.length * 0.08, type: 'spring', stiffness: 260, damping: 20 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => router.push('/welcome')}
-            className="rounded-3xl p-5 flex flex-col items-center justify-center gap-2 shadow-md bg-white/70 border-4 border-dashed border-blue-200 text-blue-400"
           >
-            <span className="text-4xl leading-none">➕</span>
-            <span className="text-lg font-extrabold">Add</span>
-          </motion.button>
+            <button
+              onClick={() => router.push('/welcome')}
+              className="pressable w-full min-h-[128px] h-full rounded-3xl p-5 flex flex-col items-center justify-center gap-1.5 bg-white/60 border-[3px] border-dashed border-gold-edge text-ink-soft"
+            >
+              <span className="text-3xl leading-none font-extrabold">+</span>
+              <span className="text-lg font-extrabold">Add</span>
+            </button>
+          </motion.div>
         </div>
       </div>
     </KidLayout>

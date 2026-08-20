@@ -4,12 +4,8 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
-
-const CLOUD_POSITIONS = [
-  { top: '8%', left: '5%', scale: 1.2, delay: 0 },
-  { top: '12%', right: '8%', scale: 0.9, delay: 0.3 },
-  { top: '22%', left: '60%', scale: 0.7, delay: 0.6 },
-]
+import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
+import Mascot from '@/components/design/Mascot'
 
 const PROFILE_MAX_RETRIES = 8
 const PROFILE_RETRY_DELAY_MS = 1000
@@ -23,30 +19,41 @@ interface Profile {
 }
 
 interface SubjectCardProps {
-  emoji: string
   label: string
   description: string
-  gradient: string
+  seal: string
+  variant: 'chinese' | 'math'
   href: string
   delay: number
 }
 
-function SubjectCard({ emoji, label, description, gradient, href, delay }: SubjectCardProps) {
+function SubjectCard({ label, description, seal, variant, href, delay }: SubjectCardProps) {
   const router = useRouter()
+  const surface =
+    variant === 'chinese'
+      ? 'bg-gradient-to-br from-chinese-light to-chinese shadow-press-chinese'
+      : 'bg-gradient-to-br from-math-light to-math shadow-press-math'
   return (
-    <motion.button
+    <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay }}
-      whileHover={{ scale: 1.05 }}
-      whileTap={{ scale: 0.95 }}
-      onClick={() => router.push(href)}
-      className={`${gradient} rounded-[2rem] p-6 flex flex-col items-center gap-2 shadow-xl text-white w-full`}
+      className="w-full"
     >
-      <span className="text-6xl leading-none">{emoji}</span>
-      <span className="text-2xl font-extrabold drop-shadow">{label}</span>
-      <span className="text-sm font-semibold text-white/80">{description}</span>
-    </motion.button>
+      <button
+        onClick={() => router.push(href)}
+        className={`${surface} pressable relative w-full min-h-[88px] rounded-[26px] py-5 pl-5 pr-24 text-left text-white`}
+      >
+        <span className="block text-[27px] font-extrabold leading-tight">{label}</span>
+        <span className="block text-sm font-bold text-white/85">{description}</span>
+        <span
+          aria-hidden
+          className="absolute right-4 top-1/2 -translate-y-1/2 rotate-[4deg] rounded-[14px] bg-white/20 px-3 py-2 font-hanzi text-[28px] leading-none"
+        >
+          {seal}
+        </span>
+      </button>
+    </motion.div>
   )
 }
 
@@ -109,122 +116,111 @@ export default function HomePage() {
 
   const totalHearts = profile?.totalHearts ?? 0
   const streak = profile?.streak ?? 0
+  const showSwitcher = Boolean(profile && hasSiblings)
 
   return (
-    <KidLayout className="relative overflow-hidden">
-      {/* Decorative clouds */}
-      {CLOUD_POSITIONS.map((pos, i) => (
-        <motion.div
-          key={i}
-          className="absolute text-white/80 text-5xl pointer-events-none select-none"
-          style={{ top: pos.top, left: (pos as { left?: string }).left, right: (pos as { right?: string }).right, scale: pos.scale }}
-          animate={{ y: [0, -8, 0] }}
-          transition={{ duration: 3 + i, repeat: Infinity, delay: pos.delay, ease: 'easeInOut' }}
-        >
-          ☁️
-        </motion.div>
-      ))}
+    <KidLayout>
+      <Sun />
+      <Lantern className={showSwitcher ? 'top-5 left-[76px]' : 'top-4 left-10'} />
+      <Sparkles />
+      <Hills />
 
       {/* Child switcher (only when the account has 2+ children) */}
-      {profile && hasSiblings && (
-        <motion.button
+      {showSwitcher && profile && (
+        <motion.div
           initial={{ opacity: 0, scale: 0.6 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => router.push('/switch')}
-          aria-label="Switch player"
-          className="absolute top-4 right-4 z-20 bg-white/80 rounded-3xl w-16 h-16 flex items-center justify-center text-4xl shadow-md"
+          className="absolute top-3 left-3 z-20"
         >
-          {profile.avatar}
-        </motion.button>
+          <button
+            onClick={() => router.push('/switch')}
+            aria-label="Switch player"
+            className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center shadow-press-chip"
+          >
+            <span className="font-emoji text-3xl">{profile.avatar}</span>
+          </button>
+        </motion.div>
       )}
 
-      <div className="flex flex-col items-center gap-8 z-10 w-full max-w-sm">
-        {/* Mascot */}
-        <motion.div
-          animate={{ y: [0, -12, 0] }}
-          transition={{ duration: 2.5, repeat: Infinity, ease: 'easeInOut' }}
-          className="text-[100px] leading-none select-none"
-        >
-          🐼
-        </motion.div>
+      <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
+        {/* Mascot with speech bubble */}
+        <Mascot say="你好!" />
 
         {/* Greeting */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
-          className="text-center"
+          className="text-center -mt-6"
         >
           {status === 'error' ? (
             <>
-              <h1 className="text-4xl font-extrabold text-blue-700 drop-shadow-sm">
-                We&apos;re napping, try again soon 😴
+              <h1 className="text-[36px] font-extrabold text-ink leading-tight">
+                We&apos;re napping, try again soon <span className="font-emoji">😴</span>
               </h1>
-              <p className="text-xl text-blue-400 font-semibold mt-2">
+              <p className="text-lg text-ink-soft font-bold mt-2">
                 Come back in a little bit!
               </p>
             </>
           ) : (
             <>
-              <h1 className="text-5xl font-extrabold text-blue-700 drop-shadow-sm">
+              <h1 className="text-[36px] font-extrabold text-ink leading-tight">
                 {profile ? (
                   <>
-                    Hi, {profile.name}! {profile.avatar}
+                    Hi, {profile.name}! <span className="font-emoji">{profile.avatar}</span>
                   </>
                 ) : (
-                  <>Hi there! 👋</>
+                  <>
+                    Hi there! <span className="font-emoji">👋</span>
+                  </>
                 )}
               </h1>
-              <p className="text-xl text-blue-400 font-semibold mt-2">
+              <p className="text-[15px] text-ink-soft font-bold mt-1.5">
                 What do you want to learn today?
               </p>
             </>
           )}
         </motion.div>
 
-        {/* Hearts + streak stats */}
+        {/* Hearts + streak chips */}
         {totalHearts > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.4 }}
-            className="flex items-center gap-4"
+            className="flex items-center gap-2.5"
           >
-            <div className="bg-white/80 rounded-3xl px-5 py-3 flex items-center gap-2 shadow-md">
-              <span className="text-3xl">❤️</span>
-              <span className="text-xl font-bold text-red-500">
+            <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1.5 shadow-press-chip">
+              <span className="font-emoji text-xl">❤️</span>
+              <span className="text-[15px] font-extrabold text-ink">
                 {totalHearts} heart{totalHearts !== 1 ? 's' : ''}
               </span>
             </div>
             {streak > 1 && (
-              <div className="bg-white/80 rounded-3xl px-5 py-3 flex items-center gap-2 shadow-md">
-                <span className="text-3xl">🔥</span>
-                <span className="text-xl font-bold text-orange-500">
-                  {streak} days
-                </span>
+              <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1.5 shadow-press-chip">
+                <span className="font-emoji text-xl">🔥</span>
+                <span className="text-[15px] font-extrabold text-ink">{streak} days</span>
               </div>
             )}
           </motion.div>
         )}
 
         {/* Subject cards */}
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col gap-5 w-full">
           <SubjectCard
-            emoji="🈶"
             label="Chinese"
             description="Learn Mandarin words"
-            gradient="bg-gradient-to-br from-orange-400 to-red-500"
+            seal="中文"
+            variant="chinese"
             href="/packs"
             delay={0.5}
           />
           <SubjectCard
-            emoji="➕"
             label="Math"
             description="Count and add numbers"
-            gradient="bg-gradient-to-br from-blue-500 to-purple-600"
+            seal="数学"
+            variant="math"
             href="/math/topics"
             delay={0.65}
           />
@@ -236,7 +232,7 @@ export default function HomePage() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
           onClick={() => router.push('/parent')}
-          className="text-gray-400 text-sm underline underline-offset-2"
+          className="text-ink-soft text-sm font-bold underline underline-offset-2"
         >
           Parent Dashboard
         </motion.button>
