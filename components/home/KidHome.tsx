@@ -6,9 +6,12 @@ import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
+import { createSupabaseBrowser } from '@/lib/supabase-browser'
+import type { User } from '@supabase/supabase-js'
 
 const PROFILE_MAX_RETRIES = 8
 const PROFILE_RETRY_DELAY_MS = 1000
+const GUEST_NUDGE_KEY = 'kd_guest_nudge_dismissed'
 
 interface Profile {
   id: string
@@ -62,6 +65,7 @@ export default function KidHome() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [hasSiblings, setHasSiblings] = useState(false)
+  const [showGuestNudge, setShowGuestNudge] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -113,6 +117,28 @@ export default function KidHome() {
       cancelled = true
     }
   }, [router])
+
+  // Guest-save nudge: once the profile is in, a lightweight browser-side check —
+  // guest account + real progress at stake → gentle "save your progress" chip.
+  useEffect(() => {
+    if (status !== 'ready' || !profile || profile.totalHearts <= 0) return
+    if (sessionStorage.getItem(GUEST_NUDGE_KEY) === 'true') return
+    let cancelled = false
+    createSupabaseBrowser()
+      .auth.getUser()
+      .then(({ data: { user } }: { data: { user: User | null } }) => {
+        if (!cancelled && user?.is_anonymous) setShowGuestNudge(true)
+      })
+      .catch(() => {})
+    return () => {
+      cancelled = true
+    }
+  }, [status, profile])
+
+  function dismissGuestNudge() {
+    sessionStorage.setItem(GUEST_NUDGE_KEY, 'true')
+    setShowGuestNudge(false)
+  }
 
   const totalHearts = profile?.totalHearts ?? 0
   const streak = profile?.streak ?? 0
@@ -225,6 +251,30 @@ export default function KidHome() {
             delay={0.65}
           />
         </div>
+
+        {/* Guest-save nudge — quiet, dismissable, parents' business */}
+        {showGuestNudge && (
+          <motion.div
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="bg-white rounded-full pl-4 pr-1.5 py-1.5 flex items-center gap-2 shadow-press-chip max-w-full"
+          >
+            <button
+              onClick={() => router.push('/parent')}
+              className="text-ink-soft text-sm font-bold text-left"
+            >
+              <span className="font-emoji">💾</span> Playing as guest — save your
+              family&apos;s progress
+            </button>
+            <button
+              onClick={dismissGuestNudge}
+              aria-label="Dismiss"
+              className="pressable bg-canvas-top text-ink-soft rounded-full w-8 h-8 flex items-center justify-center text-sm font-extrabold flex-shrink-0"
+            >
+              ✕
+            </button>
+          </motion.div>
+        )}
 
         {/* Parent link */}
         <motion.button
