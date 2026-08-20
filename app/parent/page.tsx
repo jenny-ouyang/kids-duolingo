@@ -462,6 +462,9 @@ function AccountSection() {
   const [claimEmail, setClaimEmail] = useState('')
   const [claimStatus, setClaimStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
 
+  const [signinEmail, setSigninEmail] = useState('')
+  const [signinStatus, setSigninStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+
   useEffect(() => {
     const supabase = createSupabaseBrowser()
     supabase.auth
@@ -485,6 +488,21 @@ function AccountSection() {
     const supabase = createSupabaseBrowser()
     const { error } = await supabase.auth.updateUser({ email })
     setClaimStatus(error ? 'error' : 'sent')
+  }
+
+  async function handleSignIn(e: React.FormEvent) {
+    e.preventDefault()
+    const email = signinEmail.trim()
+    if (!email || signinStatus === 'sending') return
+    setSigninStatus('sending')
+    const supabase = createSupabaseBrowser()
+    // Magic link into an EXISTING account (new device / cleared cookies).
+    // shouldCreateUser: false so a typo can't spawn an empty account.
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
+    })
+    setSigninStatus(error ? 'error' : 'sent')
   }
 
   async function handleSignOut() {
@@ -546,6 +564,50 @@ function AccountSection() {
               {claimStatus === 'error' && (
                 <p className="text-ink text-sm font-bold">
                   Something went wrong sending the confirmation email. Please try again.
+                </p>
+              )}
+            </form>
+          )}
+        </div>
+      )}
+
+      {!loading && account && account.isAnonymous && (
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
+          <div>
+            <h3 className="font-extrabold text-ink">Already saved on another device?</h3>
+            <p className="text-ink-soft text-sm font-bold mt-1">
+              Sign in with the email you used before and we&apos;ll bring your family&apos;s
+              progress to this device.
+            </p>
+          </div>
+          {signinStatus === 'sent' ? (
+            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-sm font-bold">
+              ✓ Check your inbox! Open the sign-in link we sent to{' '}
+              <strong>{signinEmail.trim()}</strong> on this device.
+            </div>
+          ) : (
+            <form onSubmit={handleSignIn} className="flex flex-col gap-2">
+              <div className="flex gap-3">
+                <input
+                  type="email"
+                  value={signinEmail}
+                  onChange={(e) => setSigninEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  required
+                  className={`${inputClass} flex-1 min-w-0`}
+                />
+                <button
+                  type="submit"
+                  disabled={!signinEmail.trim() || signinStatus === 'sending'}
+                  className="pressable min-h-[56px] bg-math text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-math disabled:opacity-50"
+                >
+                  {signinStatus === 'sending' ? 'Sending…' : 'Email me a link'}
+                </button>
+              </div>
+              {signinStatus === 'error' && (
+                <p className="text-ink text-sm font-bold">
+                  We couldn&apos;t find an account with that email, or the email failed to
+                  send. Check the address and try again.
                 </p>
               )}
             </form>
