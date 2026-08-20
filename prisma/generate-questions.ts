@@ -1,4 +1,15 @@
 /**
+ * ⚠️ DEPRECATED (2026-08-20) — do not run casually, it drives local Ollama
+ * inference and will spin the laptop fans for an hour.
+ *
+ * The runtime fallback in /api/questions/[packId] picks random same-pack
+ * distractors per session, which is pedagogically equivalent (packs ARE
+ * categories) and fresher than frozen pre-generated sets. Existing
+ * GeneratedQuestion rows still serve; new words simply use the fallback.
+ * Only revive this (or hand-curate) if a specific confusing distractor
+ * pairing is ever observed in real use.
+ */
+/**
  * One-time AI question generation script.
  *
  * For every word in every pack, calls Ollama (qwen2.5:7b) to generate

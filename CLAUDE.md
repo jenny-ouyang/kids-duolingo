@@ -31,7 +31,7 @@ npm run db:migrate               # Create and apply Prisma migrations
 npm run db:generate              # Generate Prisma client types
 npm run db:seed                  # Seed Chinese vocabulary packs
 npm run db:seed-math             # Seed math problems (addition 1–100)
-npm run db:generate-questions    # Pre-generate exercise questions into DB
+npm run db:generate-questions    # DEPRECATED — runtime same-pack fallback is the official path (see script header)
 npm run db:migrate-multitenancy  # One-shot guarded expand→backfill→contract migration (see docs/plans/deploy-runbook.md)
 ```
 
