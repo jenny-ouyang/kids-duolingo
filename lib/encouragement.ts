@@ -220,7 +220,7 @@ const SPOTLIGHT_TEMPLATES = [
   'You can say "{chinese}" ({english}) now! Try it today!',
   'New word: {chinese} means {english}! Use it tonight!',
   '{chinese} = {english}. Say it 3 times fast!',
-  'Julian knows {chinese}! Teach it to someone!',
+  'You know {chinese} now! Teach it to someone!',
   '{chinese} ({pinyin}) — your newest word!',
 ]
 

@@ -24,6 +24,11 @@ function getCtx(): AudioContext | null {
   return sharedCtx
 }
 
+/** Shared context accessor for other audio modules (lib/tts.ts clip playback). */
+export function getSharedAudioContext(): AudioContext | null {
+  return getCtx()
+}
+
 /**
  * Prime/resume the shared AudioContext. Call this from the first real user
  * gesture (tap/click/key) so every later sound — including ones that fire with
