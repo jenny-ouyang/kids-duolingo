@@ -25,8 +25,8 @@ const notoEmoji = Noto_Color_Emoji({
 })
 
 export const metadata: Metadata = {
-  title: 'Sunrise Playground — Chinese & Math for Kids',
-  description: 'A gentle, playful way for kids to learn Mandarin Chinese and math. No punishment, just practice.',
+  title: 'Mandarin & Math for Kids',
+  description: 'A gentle, playful way for kids to learn Mandarin Chinese, with early math practice included. No punishment, just practice.',
 }
 
 export default function RootLayout({
