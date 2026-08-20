@@ -6,7 +6,7 @@ import Link from 'next/link'
  * ============================================================================
  * This privacy policy was drafted from the actual data model (2026-08-19) and
  * needs Jenny's review before it counts as the app's real policy. The contact
- * email "support@[appdomain]" is a PLACEHOLDER — replace it with a real
+ * email "support@mandarinandmath.com" is a PLACEHOLDER — replace it with a real
  * address (and a real domain) before launch.
  * ============================================================================
  */
@@ -109,7 +109,7 @@ export default function PrivacyPage() {
               You can delete a child&apos;s profile and all of their practice
               history at any time from the Parent Zone. To delete your entire
               account, use the in-app options or email us at{' '}
-              <strong>support@[appdomain]</strong> (placeholder address — a real
+              <strong>support@mandarinandmath.com</strong> (mailbox pending domain setup — a real
               contact address will replace this before launch) and we will remove
               everything associated with your account.
             </p>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
           <Section title="Contact">
             <p>
               Questions about privacy? Email{' '}
-              <strong>support@[appdomain]</strong> (placeholder address).
+              <strong>support@mandarinandmath.com</strong> (mailbox pending domain setup).
             </p>
           </Section>
         </div>

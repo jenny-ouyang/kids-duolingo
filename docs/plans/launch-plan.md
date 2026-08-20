@@ -47,9 +47,9 @@ non-consumable IAP; apply to Small Business Program (15%). Web purchases may unl
 | # | Decision | Outcome | Status |
 |---|---|---|---|
 | D1 | Guest-first vs account-first onboarding | **Guest-first** | DECIDED 2026-08-17 |
-| D2 | Kids Category vs Education listing (sticky) | **Kids Category, age 6–8** | DECIDED 2026-08-17 |
+| D2 | Kids Category vs Education listing (sticky) | **REVISED 2026-08-19: plain Education category** (owner chose lower process overhead; app remains child-directed so COPPA-minimal design stays — parent accounts, nickname+avatar only, zero trackers) | DECIDED 2026-08-19 |
 | D3 | Price + free/paid boundary | **$9.99 one-time, generous free tier (3–4 packs + math sampler free)** | DECIDED 2026-08-17 |
-| D4 | App name (currently "Julian's Chinese") | Shortlist in progress (availability-checked candidates) | IN PROGRESS |
+| D4 | App name (currently "Julian's Chinese") | **"Mandarin & Math for Kids"** (SEO-first; see naming-seo.md). Positioning: Chinese-FIRST copy, math as included bonus. Domains mandarinandmath.com/.app available 2026-08-19 — Jenny to register. | DECIDED 2026-08-19 |
 | D5 | Auth providers at launch | Magic link only (add Google later) | DEFAULT ACCEPTED |
 | D6 | TTS voice | Bake-off in Phase 3 | DEFERRED |
 | D7 | Guest-data retention window | 90 days | DEFAULT ACCEPTED |

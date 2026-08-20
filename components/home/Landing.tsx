@@ -17,7 +17,7 @@ const JSON_LD = {
   operatingSystem: 'Any',
   browserRequirements: 'Requires a modern web browser',
   description:
-    'A gentle, playful web app for kids ages 4–8 to learn Chinese words and early math. Short 8-question sessions, spoken Mandarin audio, spaced repetition, and no punishment for wrong answers.',
+    'A gentle, playful web app for kids ages 4–8 to learn Chinese. Short 8-question sessions, spoken Mandarin audio, spaced repetition, early math practice included — and no punishment for wrong answers.',
   offers: {
     '@type': 'Offer',
     price: '0',
@@ -86,9 +86,10 @@ export default function Landing() {
           </h1>
 
           <p className="max-w-md text-[17px] font-bold leading-relaxed text-ink md:text-lg">
-            A gentle, playful way for kids ages 4–8 to learn Chinese words and
-            early math. No ads, no pressure — wrong answers simply get another
-            try.
+            A gentle, playful way for kids ages 4–8 to learn Chinese — real
+            Mandarin words, spoken aloud, remembered for good. Early math
+            practice included. No ads, no pressure — wrong answers simply get
+            another try.
           </p>
 
           <Link

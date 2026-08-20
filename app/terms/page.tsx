@@ -5,7 +5,7 @@ import Link from 'next/link'
  * DRAFT — PENDING OWNER REVIEW. DO NOT TREAT AS A PUBLISHED LEGAL DOCUMENT.
  * ============================================================================
  * Plain-language terms drafted 2026-08-19. Needs Jenny's review before launch.
- * The governing-law jurisdiction and the contact email "support@[appdomain]"
+ * The governing-law jurisdiction and the contact email "support@mandarinandmath.com"
  * are PLACEHOLDERS — fill both in before this page goes live.
  * ============================================================================
  */
@@ -101,7 +101,7 @@ export default function TermsPage() {
           <Section title="Contact">
             <p>
               Questions about these terms? Email{' '}
-              <strong>support@[appdomain]</strong> (placeholder address).
+              <strong>support@mandarinandmath.com</strong> (mailbox pending domain setup).
             </p>
           </Section>
         </div>

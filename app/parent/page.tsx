@@ -489,6 +489,8 @@ function AccountSection() {
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowser()
+    // Clear the active-child cookie (httpOnly, server-set) so / shows the landing again.
+    await fetch('/api/children/active', { method: 'DELETE' }).catch(() => {})
     await supabase.auth.signOut()
     // Full navigation so a fresh anonymous session bootstraps on the home page.
     window.location.assign('/')
