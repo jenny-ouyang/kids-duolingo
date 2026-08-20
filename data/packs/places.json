@@ -1,0 +1,19 @@
+{
+  "id": "places",
+  "name": "Places We Go",
+  "nameZh": "出门去",
+  "emoji": "🏞️",
+  "color": "#1FA88C",
+  "words": [
+    { "id": "park", "english": "park", "chinese": "公园", "pinyin": "gōngyuán", "image": "🏞️" },
+    { "id": "school", "english": "school", "chinese": "学校", "pinyin": "xuéxiào", "image": "🏫" },
+    { "id": "store", "english": "store", "chinese": "商店", "pinyin": "shāngdiàn", "image": "🏪" },
+    { "id": "playground", "english": "playground", "chinese": "游乐场", "pinyin": "yóulèchǎng", "image": "🛝" },
+    { "id": "zoo", "english": "zoo", "chinese": "动物园", "pinyin": "dòngwùyuán", "image": "🦁" },
+    { "id": "library", "english": "library", "chinese": "图书馆", "pinyin": "túshūguǎn", "image": "📚" },
+    { "id": "beach", "english": "beach", "chinese": "海滩", "pinyin": "hǎitān", "image": "🏖️" },
+    { "id": "hospital", "english": "hospital", "chinese": "医院", "pinyin": "yīyuàn", "image": "🏥" },
+    { "id": "restaurant", "english": "restaurant", "chinese": "餐厅", "pinyin": "cāntīng", "image": "🍽️" },
+    { "id": "farm", "english": "farm", "chinese": "农场", "pinyin": "nóngchǎng", "image": "🚜" }
+  ]
+}

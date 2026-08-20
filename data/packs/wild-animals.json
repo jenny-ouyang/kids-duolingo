@@ -1,0 +1,21 @@
+{
+  "id": "wild-animals",
+  "name": "Wild Animals",
+  "nameZh": "野生动物",
+  "emoji": "🦁",
+  "color": "#F5B93F",
+  "words": [
+    { "id": "tiger", "english": "tiger", "chinese": "老虎", "pinyin": "lǎohǔ", "image": "🐯" },
+    { "id": "panda", "english": "panda", "chinese": "熊猫", "pinyin": "xióngmāo", "image": "🐼" },
+    { "id": "giraffe", "english": "giraffe", "chinese": "长颈鹿", "pinyin": "chángjǐnglù", "image": "🦒" },
+    { "id": "hippo", "english": "hippo", "chinese": "河马", "pinyin": "hémǎ", "image": "🦛" },
+    { "id": "penguin", "english": "penguin", "chinese": "企鹅", "pinyin": "qǐ'é", "image": "🐧" },
+    { "id": "zebra", "english": "zebra", "chinese": "斑马", "pinyin": "bānmǎ", "image": "🦓" },
+    { "id": "kangaroo", "english": "kangaroo", "chinese": "袋鼠", "pinyin": "dàishǔ", "image": "🦘" },
+    { "id": "snake", "english": "snake", "chinese": "蛇", "pinyin": "shé", "image": "🐍" },
+    { "id": "fox", "english": "fox", "chinese": "狐狸", "pinyin": "húli", "image": "🦊" },
+    { "id": "wolf", "english": "wolf", "chinese": "狼", "pinyin": "láng", "image": "🐺" },
+    { "id": "dinosaur", "english": "dinosaur", "chinese": "恐龙", "pinyin": "kǒnglóng", "image": "🦕" },
+    { "id": "deer", "english": "deer", "chinese": "鹿", "pinyin": "lù", "image": "🦌" }
+  ]
+}

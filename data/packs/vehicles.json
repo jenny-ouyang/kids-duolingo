@@ -1,0 +1,21 @@
+{
+  "id": "vehicles",
+  "name": "Things That Go",
+  "nameZh": "交通工具",
+  "emoji": "🚗",
+  "color": "#F4576B",
+  "words": [
+    { "id": "car", "english": "car", "chinese": "汽车", "pinyin": "qìchē", "image": "🚗" },
+    { "id": "bus", "english": "bus", "chinese": "公交车", "pinyin": "gōngjiāochē", "image": "🚌" },
+    { "id": "train", "english": "train", "chinese": "火车", "pinyin": "huǒchē", "image": "🚂" },
+    { "id": "plane", "english": "plane", "chinese": "飞机", "pinyin": "fēijī", "image": "✈️" },
+    { "id": "boat", "english": "boat", "chinese": "船", "pinyin": "chuán", "image": "⛵" },
+    { "id": "bike", "english": "bike", "chinese": "自行车", "pinyin": "zìxíngchē", "image": "🚲" },
+    { "id": "rocket", "english": "rocket", "chinese": "火箭", "pinyin": "huǒjiàn", "image": "🚀" },
+    { "id": "fire-truck", "english": "fire truck", "chinese": "消防车", "pinyin": "xiāofángchē", "image": "🚒" },
+    { "id": "police-car", "english": "police car", "chinese": "警车", "pinyin": "jǐngchē", "image": "🚓" },
+    { "id": "truck", "english": "truck", "chinese": "卡车", "pinyin": "kǎchē", "image": "🚚" },
+    { "id": "motorcycle", "english": "motorcycle", "chinese": "摩托车", "pinyin": "mótuōchē", "image": "🏍️" },
+    { "id": "helicopter", "english": "helicopter", "chinese": "直升机", "pinyin": "zhíshēngjī", "image": "🚁" }
+  ]
+}

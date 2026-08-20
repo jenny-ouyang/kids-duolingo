@@ -1,0 +1,17 @@
+{
+  "id": "shopping",
+  "name": "Shopping",
+  "nameZh": "买东西",
+  "emoji": "🛒",
+  "color": "#1FA88C",
+  "words": [
+    { "id": "money", "english": "money", "chinese": "钱", "pinyin": "qián", "image": "💰" },
+    { "id": "shopping-cart", "english": "shopping cart", "chinese": "购物车", "pinyin": "gòuwùchē", "image": "🛒" },
+    { "id": "basket", "english": "basket", "chinese": "篮子", "pinyin": "lánzi", "image": "🧺" },
+    { "id": "supermarket", "english": "supermarket", "chinese": "超市", "pinyin": "chāoshì", "image": "🏬" },
+    { "id": "buy", "english": "to buy", "chinese": "买", "pinyin": "mǎi", "image": "🛍️" },
+    { "id": "sell", "english": "to sell", "chinese": "卖", "pinyin": "mài", "image": "🏷️" },
+    { "id": "expensive", "english": "expensive", "chinese": "贵", "pinyin": "guì", "image": "💎" },
+    { "id": "cheap", "english": "cheap", "chinese": "便宜", "pinyin": "piányi", "image": "🪙" }
+  ]
+}

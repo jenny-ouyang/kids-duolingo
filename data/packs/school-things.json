@@ -1,0 +1,19 @@
+{
+  "id": "school-things",
+  "name": "School Things",
+  "nameZh": "学校用品",
+  "emoji": "🎒",
+  "color": "#D9A32C",
+  "words": [
+    { "id": "pencil", "english": "pencil", "chinese": "铅笔", "pinyin": "qiānbǐ", "image": "✏️" },
+    { "id": "paper", "english": "paper", "chinese": "纸", "pinyin": "zhǐ", "image": "📄" },
+    { "id": "backpack", "english": "backpack", "chinese": "书包", "pinyin": "shūbāo", "image": "🎒" },
+    { "id": "scissors", "english": "scissors", "chinese": "剪刀", "pinyin": "jiǎndāo", "image": "✂️" },
+    { "id": "glue", "english": "glue", "chinese": "胶水", "pinyin": "jiāoshuǐ", "image": "🧴" },
+    { "id": "crayon", "english": "crayon", "chinese": "蜡笔", "pinyin": "làbǐ", "image": "🖍️" },
+    { "id": "eraser", "english": "eraser", "chinese": "橡皮", "pinyin": "xiàngpí", "image": "🩹" },
+    { "id": "desk", "english": "desk", "chinese": "书桌", "pinyin": "shūzhuō", "image": "🪑" },
+    { "id": "teacher", "english": "teacher", "chinese": "老师", "pinyin": "lǎoshī", "image": "🧑‍🏫" },
+    { "id": "student", "english": "student", "chinese": "学生", "pinyin": "xuésheng", "image": "🧑‍🎓" }
+  ]
+}

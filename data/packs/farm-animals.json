@@ -1,0 +1,19 @@
+{
+  "id": "farm-animals",
+  "name": "Farm Animals",
+  "nameZh": "农场动物",
+  "emoji": "🐄",
+  "color": "#57A05A",
+  "words": [
+    { "id": "cow", "english": "cow", "chinese": "奶牛", "pinyin": "nǎiniú", "image": "🐄" },
+    { "id": "pig", "english": "pig", "chinese": "猪", "pinyin": "zhū", "image": "🐷" },
+    { "id": "chicken", "english": "chicken", "chinese": "鸡", "pinyin": "jī", "image": "🐔" },
+    { "id": "sheep", "english": "sheep", "chinese": "羊", "pinyin": "yáng", "image": "🐑" },
+    { "id": "horse", "english": "horse", "chinese": "马", "pinyin": "mǎ", "image": "🐴" },
+    { "id": "goat", "english": "goat", "chinese": "山羊", "pinyin": "shānyáng", "image": "🐐" },
+    { "id": "goose", "english": "goose", "chinese": "鹅", "pinyin": "é", "image": "🪿" },
+    { "id": "donkey", "english": "donkey", "chinese": "驴", "pinyin": "lǘ", "image": "🫏" },
+    { "id": "rooster", "english": "rooster", "chinese": "公鸡", "pinyin": "gōngjī", "image": "🐓" },
+    { "id": "mouse", "english": "mouse", "chinese": "老鼠", "pinyin": "lǎoshǔ", "image": "🐭" }
+  ]
+}

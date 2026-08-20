@@ -1,0 +1,20 @@
+{
+  "id": "sports",
+  "name": "Sports & Play",
+  "nameZh": "运动",
+  "emoji": "⚽",
+  "color": "#3D7DE4",
+  "words": [
+    { "id": "soccer", "english": "soccer", "chinese": "足球", "pinyin": "zúqiú", "image": "⚽" },
+    { "id": "basketball", "english": "basketball", "chinese": "篮球", "pinyin": "lánqiú", "image": "🏀" },
+    { "id": "ping-pong", "english": "ping pong", "chinese": "乒乓球", "pinyin": "pīngpāngqiú", "image": "🏓" },
+    { "id": "badminton", "english": "badminton", "chinese": "羽毛球", "pinyin": "yǔmáoqiú", "image": "🏸" },
+    { "id": "swimming", "english": "swimming", "chinese": "游泳", "pinyin": "yóuyǒng", "image": "🏊" },
+    { "id": "skating", "english": "skating", "chinese": "滑冰", "pinyin": "huábīng", "image": "⛸️" },
+    { "id": "skiing", "english": "skiing", "chinese": "滑雪", "pinyin": "huáxuě", "image": "⛷️" },
+    { "id": "baseball", "english": "baseball", "chinese": "棒球", "pinyin": "bàngqiú", "image": "⚾" },
+    { "id": "tennis", "english": "tennis", "chinese": "网球", "pinyin": "wǎngqiú", "image": "🎾" },
+    { "id": "slide", "english": "slide", "chinese": "滑梯", "pinyin": "huátī", "image": "🛝" },
+    { "id": "swing", "english": "swing", "chinese": "秋千", "pinyin": "qiūqiān", "image": "🎠" }
+  ]
+}

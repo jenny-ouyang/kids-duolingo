@@ -1,0 +1,19 @@
+{
+  "id": "weather",
+  "name": "Weather",
+  "nameZh": "天气",
+  "emoji": "⛅",
+  "color": "#57A5F5",
+  "words": [
+    { "id": "sunny", "english": "sunny", "chinese": "晴天", "pinyin": "qíngtiān", "image": "☀️" },
+    { "id": "cloudy", "english": "cloudy", "chinese": "阴天", "pinyin": "yīntiān", "image": "☁️" },
+    { "id": "rainbow", "english": "rainbow", "chinese": "彩虹", "pinyin": "cǎihóng", "image": "🌈" },
+    { "id": "lightning", "english": "lightning", "chinese": "闪电", "pinyin": "shǎndiàn", "image": "⚡" },
+    { "id": "thunder", "english": "thunder", "chinese": "打雷", "pinyin": "dǎléi", "image": "🌩️" },
+    { "id": "fog", "english": "fog", "chinese": "雾", "pinyin": "wù", "image": "🌫️" },
+    { "id": "ice", "english": "ice", "chinese": "冰", "pinyin": "bīng", "image": "🧊" },
+    { "id": "umbrella", "english": "umbrella", "chinese": "雨伞", "pinyin": "yǔsǎn", "image": "☂️" },
+    { "id": "snowman", "english": "snowman", "chinese": "雪人", "pinyin": "xuěrén", "image": "⛄" },
+    { "id": "warm", "english": "warm", "chinese": "暖和", "pinyin": "nuǎnhuo", "image": "🌤️" }
+  ]
+}

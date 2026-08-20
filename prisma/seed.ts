@@ -64,9 +64,21 @@ const PACK_ORDER = [
   'mealtime',
   'feelings',
   'actions',
-  // Levels 3-4 land in later batches
-  'pronouns',
+  // Level 3 · Big World
+  'farm-animals',
+  'wild-animals',
+  'little-creatures',
   'nature',
+  'weather',
+  'vehicles',
+  'places',
+  'shopping',
+  'school-things',
+  'sports',
+  'tools',
+  'jobs',
+  // Level 4 lands in a later batch
+  'pronouns',
   'words',
   'sentences',
 ]

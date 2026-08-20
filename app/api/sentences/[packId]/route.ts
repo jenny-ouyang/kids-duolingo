@@ -10,6 +10,7 @@ import feelingsData from '@/data/sentences/feelings.json'
 import homeData from '@/data/sentences/home.json'
 import s1Data from '@/data/sentences/s1-this-is.json'
 import s2Data from '@/data/sentences/s2-colors-counts.json'
+import s3Data from '@/data/sentences/s3-where-have.json'
 
 interface SentenceFile {
   packId: string
@@ -24,6 +25,7 @@ const SENTENCE_PACKS: Record<string, SentenceFile> = {
   home: homeData as SentenceFile,
   's1-this-is': s1Data as SentenceFile,
   's2-colors-counts': s2Data as SentenceFile,
+  's3-where-have': s3Data as SentenceFile,
 }
 
 function shuffle<T>(arr: T[]): T[] {

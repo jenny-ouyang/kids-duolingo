@@ -1,0 +1,19 @@
+{
+  "id": "jobs",
+  "name": "Jobs",
+  "nameZh": "职业",
+  "emoji": "🧑‍🚒",
+  "color": "#FF7A82",
+  "words": [
+    { "id": "doctor", "english": "doctor", "chinese": "医生", "pinyin": "yīshēng", "image": "🧑‍⚕️" },
+    { "id": "nurse", "english": "nurse", "chinese": "护士", "pinyin": "hùshi", "image": "🧑‍⚕️" },
+    { "id": "firefighter", "english": "firefighter", "chinese": "消防员", "pinyin": "xiāofángyuán", "image": "🧑‍🚒" },
+    { "id": "police-officer", "english": "police officer", "chinese": "警察", "pinyin": "jǐngchá", "image": "👮" },
+    { "id": "chef", "english": "chef", "chinese": "厨师", "pinyin": "chúshī", "image": "🧑‍🍳" },
+    { "id": "farmer", "english": "farmer", "chinese": "农民", "pinyin": "nóngmín", "image": "🧑‍🌾" },
+    { "id": "driver", "english": "driver", "chinese": "司机", "pinyin": "sījī", "image": "🚗" },
+    { "id": "pilot", "english": "pilot", "chinese": "飞行员", "pinyin": "fēixíngyuán", "image": "🧑‍✈️" },
+    { "id": "dentist", "english": "dentist", "chinese": "牙医", "pinyin": "yáyī", "image": "🦷" },
+    { "id": "astronaut", "english": "astronaut", "chinese": "宇航员", "pinyin": "yǔhángyuán", "image": "🧑‍🚀" }
+  ]
+}

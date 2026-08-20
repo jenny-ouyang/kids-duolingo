@@ -1,0 +1,19 @@
+{
+  "id": "little-creatures",
+  "name": "Little Creatures",
+  "nameZh": "小虫子",
+  "emoji": "🦋",
+  "color": "#9A7BE8",
+  "words": [
+    { "id": "butterfly", "english": "butterfly", "chinese": "蝴蝶", "pinyin": "húdié", "image": "🦋" },
+    { "id": "bee", "english": "bee", "chinese": "蜜蜂", "pinyin": "mìfēng", "image": "🐝" },
+    { "id": "ant", "english": "ant", "chinese": "蚂蚁", "pinyin": "mǎyǐ", "image": "🐜" },
+    { "id": "ladybug", "english": "ladybug", "chinese": "瓢虫", "pinyin": "piáochóng", "image": "🐞" },
+    { "id": "snail", "english": "snail", "chinese": "蜗牛", "pinyin": "wōniú", "image": "🐌" },
+    { "id": "spider", "english": "spider", "chinese": "蜘蛛", "pinyin": "zhīzhū", "image": "🕷️" },
+    { "id": "frog", "english": "frog", "chinese": "青蛙", "pinyin": "qīngwā", "image": "🐸" },
+    { "id": "caterpillar", "english": "caterpillar", "chinese": "毛毛虫", "pinyin": "máomaochóng", "image": "🐛" },
+    { "id": "dragonfly", "english": "dragonfly", "chinese": "蜻蜓", "pinyin": "qīngtíng", "image": "🪰" },
+    { "id": "turtle", "english": "turtle", "chinese": "乌龟", "pinyin": "wūguī", "image": "🐢" }
+  ]
+}

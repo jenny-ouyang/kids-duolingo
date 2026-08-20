@@ -1,0 +1,19 @@
+{
+  "id": "tools",
+  "name": "Tools",
+  "nameZh": "工具",
+  "emoji": "🔨",
+  "color": "#B0813F",
+  "words": [
+    { "id": "hammer", "english": "hammer", "chinese": "锤子", "pinyin": "chuízi", "image": "🔨" },
+    { "id": "nail", "english": "nail", "chinese": "钉子", "pinyin": "dīngzi", "image": "🔩" },
+    { "id": "screwdriver", "english": "screwdriver", "chinese": "螺丝刀", "pinyin": "luósīdāo", "image": "🪛" },
+    { "id": "ladder", "english": "ladder", "chinese": "梯子", "pinyin": "tīzi", "image": "🪜" },
+    { "id": "tape", "english": "tape", "chinese": "胶带", "pinyin": "jiāodài", "image": "🩹" },
+    { "id": "flashlight", "english": "flashlight", "chinese": "手电筒", "pinyin": "shǒudiàntǒng", "image": "🔦" },
+    { "id": "saw", "english": "saw", "chinese": "锯子", "pinyin": "jùzi", "image": "🪚" },
+    { "id": "brush", "english": "brush", "chinese": "刷子", "pinyin": "shuāzi", "image": "🖌️" },
+    { "id": "bucket", "english": "bucket", "chinese": "桶", "pinyin": "tǒng", "image": "🪣" },
+    { "id": "rope", "english": "rope", "chinese": "绳子", "pinyin": "shéngzi", "image": "🪢" }
+  ]
+}

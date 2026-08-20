@@ -1,0 +1,15 @@
+{
+  "packId": "s3-where-have",
+  "sentences": [
+    { "id": "s3_cat_where", "english": "Where is the cat?", "chinese": ["猫", "在", "哪里"], "pinyin": "māo zài nǎlǐ", "emoji": "🐱" },
+    { "id": "s3_panda_tree", "english": "The panda is in the tree.", "chinese": ["熊猫", "在", "树", "上"], "pinyin": "xióngmāo zài shù shàng", "emoji": "🐼" },
+    { "id": "s3_fish_water", "english": "The fish is in the water.", "chinese": ["鱼", "在", "水", "里"], "pinyin": "yú zài shuǐ lǐ", "emoji": "🐟" },
+    { "id": "s3_go_park", "english": "I want to go to the park.", "chinese": ["我要", "去", "公园"], "pinyin": "wǒ yào qù gōngyuán", "emoji": "🏞️" },
+    { "id": "s3_go_zoo", "english": "Let's go to the zoo!", "chinese": ["我们", "去", "动物园", "吧"], "pinyin": "wǒmen qù dòngwùyuán ba", "emoji": "🦁" },
+    { "id": "s3_dog_under_bed", "english": "The dog is under the bed.", "chinese": ["狗", "在", "床", "下面"], "pinyin": "gǒu zài chuáng xiàmiàn", "emoji": "🐶" },
+    { "id": "s3_tiger_where", "english": "Where is the tiger?", "chinese": ["老虎", "在", "哪里"], "pinyin": "lǎohǔ zài nǎlǐ", "emoji": "🐯" },
+    { "id": "s3_bird_sky", "english": "The bird is in the sky.", "chinese": ["鸟", "在", "天上"], "pinyin": "niǎo zài tiānshàng", "emoji": "🐦" },
+    { "id": "s3_i_have_rocket", "english": "I have three rockets.", "chinese": ["我有", "三个", "火箭"], "pinyin": "wǒ yǒu sān gè huǒjiàn", "emoji": "🚀" },
+    { "id": "s3_mom_where", "english": "Where is mommy?", "chinese": ["妈妈", "在", "哪里"], "pinyin": "māma zài nǎlǐ", "emoji": "👩" }
+  ]
+}

@@ -6,7 +6,7 @@
 set -uo pipefail
 cd "$(dirname "$0")/.."
 
-PACKS=${@:-"animals toys my-room clothes fruits vegetables snacks-drinks food home nature"}
+PACKS=${@:-"animals toys my-room clothes fruits vegetables snacks-drinks food home nature farm-animals wild-animals little-creatures weather vehicles places shopping school-things sports tools jobs"}
 STYLE="STYLE (must be followed exactly): flat vector illustration, chunky rounded shapes, thick soft forms, no outlines, warm and friendly, big gentle eyes, small smile, simple two-tone shading. EXACTLY ONE single character/object — never two, never a pair, never a group. Centered in the middle of the frame with generous empty margins on both sides, full body, no background scene — plain pure white background (#FFFFFF), no text, no letters, no border. Palette accents: coral #F4576B, gold #FFCF57, teal #1FA88C, warm brown #6B4423. Toy-like, cute, suitable for ages 4-8."
 
 mkdir -p .image-work public/images/words
@@ -14,7 +14,7 @@ mkdir -p .image-work public/images/words
 python3 - "$PACKS" <<'EOF' > .image-work/queue.txt
 import json, sys
 packs = sys.argv[1].split()
-skip_ids = {'hungry-meal','full-meal','yummy'}  # feelings keep emoji
+skip_ids = {'hungry-meal','full-meal','yummy','buy','sell','expensive','cheap','warm'}  # feelings keep emoji
 for p in packs:
     d = json.load(open(f'data/packs/{p}.json'))
     for w in d['words']:
