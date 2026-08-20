@@ -33,19 +33,33 @@ export async function getAuthContext(): Promise<{ userId: string }> {
   } = await supabase.auth.getUser()
   if (!user) throw new AuthError(401, 'unauthenticated')
 
-  const isGuest = user.is_anonymous ?? !user.email
-  // Upsert (atomic) — concurrent first requests from a new user must not race on create.
-  const existing = await prisma.account.upsert({
-    where: { id: user.id },
-    create: { id: user.id, email: user.email ?? null, isGuest },
-    update: {},
-  })
+  // Supabase reports anonymous users with email as EMPTY STRING, not null — and
+  // Account.email is @unique, so "" must normalize to null or the second guest
+  // ever created collides with the first.
+  const userEmail = user.email || null
+  const isGuest = user.is_anonymous ?? !userEmail
+  // Race-safe provisioning. NOTE: upsert is NOT atomic here — Account has a second
+  // unique field (email), which makes Prisma fall back to find-then-create, and a
+  // new user's first page load fires several API calls concurrently. So: create,
+  // and on a unique-violation loss re-read the winner's row.
+  let existing = await prisma.account.findUnique({ where: { id: user.id } })
+  if (!existing) {
+    try {
+      existing = await prisma.account.create({
+        data: { id: user.id, email: userEmail, isGuest },
+      })
+    } catch (err) {
+      if (!isUniqueViolation(err)) throw err
+      existing = await prisma.account.findUnique({ where: { id: user.id } })
+      if (!existing) throw err
+    }
+  }
   if (existing.isGuest && !isGuest) {
     // Guest just claimed the account (magic link / OAuth) — record it.
     try {
       await prisma.account.update({
         where: { id: user.id },
-        data: { email: user.email ?? existing.email, isGuest: false },
+        data: { email: userEmail ?? existing.email, isGuest: false },
       })
     } catch (err) {
       if (!isUniqueViolation(err)) throw err
