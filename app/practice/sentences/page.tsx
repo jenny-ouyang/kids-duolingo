@@ -3,12 +3,23 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import KidLayout from '@/components/layout/KidLayout'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import SentenceBuild from '@/components/exercise/SentenceBuild'
+import { Hills, Sparkles } from '@/components/design/Scenery'
 import { SentenceQuestion } from '@/lib/types'
 
 const MAX_HEARTS = 5
+
+/** Sunrise Playground screen wrapper — scenery behind, content above (z-10) */
+function PracticeCanvas({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="sunrise-canvas flex flex-col items-center justify-center p-4">
+      <Hills />
+      <Sparkles positions="sparse" />
+      <div className="relative z-10 w-full flex flex-col items-center">{children}</div>
+    </div>
+  )
+}
 
 export default function SentencesPractice() {
   const router = useRouter()
@@ -85,55 +96,65 @@ export default function SentencesPractice() {
 
   if (loading) {
     return (
-      <KidLayout>
+      <PracticeCanvas>
         <motion.div
           animate={{ rotate: 360 }}
           transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
-          className="text-6xl"
+          className="font-emoji text-6xl"
         >
           💬
         </motion.div>
-      </KidLayout>
+        <p className="text-2xl font-extrabold text-ink-soft mt-4">Getting ready...</p>
+      </PracticeCanvas>
     )
   }
 
   if (questions.length === 0) {
     return (
-      <KidLayout>
-        <p className="text-xl text-gray-500">No sentences available.</p>
-        <button onClick={() => router.push('/packs')} className="mt-6 bg-blue-500 text-white rounded-2xl px-8 py-4 text-xl font-bold">
+      <PracticeCanvas>
+        <span className="font-emoji text-6xl" aria-hidden>🐼</span>
+        <p className="text-2xl font-extrabold text-ink mt-4 text-center">
+          No sentences here yet!
+        </p>
+        <p className="text-lg font-bold text-ink-soft mt-1">Let&apos;s pick another pack!</p>
+        <button
+          onClick={() => router.push('/packs')}
+          className="pressable mt-6 min-h-[56px] bg-chinese text-white rounded-3xl px-8 py-4 text-xl font-extrabold shadow-press-chinese"
+        >
           Go Back
         </button>
-      </KidLayout>
+      </PracticeCanvas>
     )
   }
 
   const currentQuestion = questions[currentIndex]
 
   return (
-    <KidLayout>
+    <PracticeCanvas>
       <div className="w-full max-w-2xl flex flex-col gap-6">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push('/packs')}
-              className="bg-white/70 rounded-2xl px-4 py-2 text-2xl shadow-sm hover:bg-white transition-colors"
+              className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl text-ink shadow-press-chip"
+              aria-label="Back to packs"
             >
               ←
             </button>
             <div className="flex items-center gap-2">
-              <span className="text-2xl">💬</span>
-              <span className="text-xl font-bold text-gray-600">Simple Sentences</span>
+              <span className="font-emoji text-2xl">💬</span>
+              <span className="text-xl font-extrabold text-ink">Simple Sentences</span>
             </div>
           </div>
 
-          <div className="flex items-center gap-1">
+          {/* Hearts chip */}
+          <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1.5 shadow-press-chip">
             {Array.from({ length: MAX_HEARTS }).map((_, i) => (
               <motion.span
                 key={i}
                 animate={heartPulse && i === heartsEarned - 1 ? { scale: [1, 1.5, 1] } : {}}
                 transition={{ duration: 0.4 }}
-                className="text-2xl select-none"
+                className="font-emoji text-2xl select-none"
               >
                 {i < heartsEarned ? '❤️' : '🤍'}
               </motion.span>
@@ -155,6 +176,6 @@ export default function SentencesPractice() {
           </AnimatePresence>
         </ExerciseShell>
       </div>
-    </KidLayout>
+    </PracticeCanvas>
   )
 }

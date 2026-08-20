@@ -12,6 +12,15 @@ const ONE_YEAR = 60 * 60 * 24 * 365
  * does JS-written cookies — a silent eviction would misroute progress writes to
  * the account's oldest child via requireChild()'s fallback.
  */
+/**
+ * DELETE /api/children/active — clears the active-child cookie (sign-out path;
+ * without this the / landing-vs-app fork would never show the landing again).
+ */
+export async function DELETE() {
+  cookies().set(CHILD_COOKIE, '', { httpOnly: true, sameSite: 'lax', maxAge: 0, path: '/' })
+  return NextResponse.json({ ok: true })
+}
+
 export async function POST(req: NextRequest) {
   try {
     const { userId } = await getAuthContext()

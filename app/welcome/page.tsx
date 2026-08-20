@@ -4,9 +4,14 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
+import { Hills, Sparkles } from '@/components/design/Scenery'
+import Mascot from '@/components/design/Mascot'
 import { setActiveChild } from '@/lib/child-cookie'
 
 const AVATARS = ['🦁', '🐼', '🐰', '🦊', '🐸', '🐯', '🐨', '🦄', '🐶', '🐱', '🐧', '🐢']
+
+// Decorative rhythm only — selection is shown by success tokens + ✓ badge
+const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
 
 const MAX_RETRIES = 6
 const RETRY_DELAY_MS = 1200
@@ -73,30 +78,22 @@ export default function WelcomePage() {
 
   return (
     <KidLayout>
-      <div className="flex flex-col items-center gap-8 w-full max-w-sm">
-        {/* Bouncing avatar preview */}
-        <motion.div
-          key={avatar}
-          initial={{ scale: 0.5 }}
-          animate={{ scale: 1, y: [0, -12, 0] }}
-          transition={{
-            scale: { type: 'spring', stiffness: 300, damping: 15 },
-            y: { duration: 2.5, repeat: Infinity, ease: 'easeInOut' },
-          }}
-          className="text-[100px] leading-none select-none"
-        >
-          {avatar}
-        </motion.div>
+      <Sparkles />
+      <Hills />
+
+      <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
+        {/* Panda guide */}
+        <Mascot say="你好!" />
 
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center"
+          className="text-center -mt-6"
         >
-          <h1 className="text-4xl font-extrabold text-blue-700 drop-shadow-sm">
-            Who&apos;s learning? 🌟
+          <h1 className="text-[27px] font-extrabold text-ink">
+            Who&apos;s learning? <span className="font-emoji">🌟</span>
           </h1>
-          <p className="text-lg text-blue-400 font-semibold mt-2">
+          <p className="text-[15px] text-ink-soft font-bold mt-1">
             Pick a buddy and tell us your name!
           </p>
         </motion.div>
@@ -115,7 +112,7 @@ export default function WelcomePage() {
           maxLength={20}
           placeholder="My name is..."
           autoFocus
-          className="w-full bg-white rounded-3xl px-6 py-4 text-2xl font-bold text-blue-700 text-center shadow-md placeholder:text-blue-200 focus:outline-none focus:ring-4 focus:ring-blue-300"
+          className="w-full bg-white rounded-3xl px-6 py-4 text-2xl font-extrabold text-ink text-center shadow-press-card placeholder:text-ink-soft/60 focus:outline-none focus:ring-4 focus:ring-gold"
         />
 
         {/* Avatar picker */}
@@ -123,27 +120,40 @@ export default function WelcomePage() {
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
-          className="grid grid-cols-4 gap-3 w-full"
+          className="grid grid-cols-4 gap-3.5 w-full"
         >
-          {AVATARS.map((emoji, i) => (
-            <motion.button
-              key={emoji}
-              initial={{ opacity: 0, scale: 0.6 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.25 + i * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setAvatar(emoji)}
-              aria-label={`Pick ${emoji}`}
-              className={`rounded-3xl text-4xl py-3 shadow-md transition-colors ${
-                avatar === emoji
-                  ? 'bg-yellow-300 ring-4 ring-yellow-400'
-                  : 'bg-white/80 hover:bg-white'
-              }`}
-            >
-              {emoji}
-            </motion.button>
-          ))}
+          {AVATARS.map((emoji, i) => {
+            const selected = avatar === emoji
+            return (
+              <motion.div
+                key={emoji}
+                initial={{ opacity: 0, scale: 0.6 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.25 + i * 0.04, type: 'spring', stiffness: 300, damping: 20 }}
+              >
+                <button
+                  onClick={() => setAvatar(emoji)}
+                  aria-label={`Pick ${emoji}`}
+                  aria-pressed={selected}
+                  className={`pressable relative w-full min-h-[60px] rounded-3xl py-3 ${
+                    selected
+                      ? 'bg-success-bg shadow-press-success'
+                      : `bg-white ${TILE_EDGES[i % TILE_EDGES.length]}`
+                  }`}
+                >
+                  <span className="font-emoji text-4xl leading-none">{emoji}</span>
+                  {selected && (
+                    <span
+                      aria-hidden
+                      className="absolute -top-2 -right-1.5 w-6 h-6 bg-success text-white rounded-full flex items-center justify-center text-sm font-extrabold shadow-[0_2px_0_#147663]"
+                    >
+                      ✓
+                    </span>
+                  )}
+                </button>
+              </motion.div>
+            )
+          })}
         </motion.div>
 
         {/* Gentle status / error */}
@@ -151,7 +161,7 @@ export default function WelcomePage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-lg text-blue-400 font-semibold"
+            className="text-[15px] text-ink-soft font-bold"
           >
             One moment… ✨
           </motion.p>
@@ -160,29 +170,35 @@ export default function WelcomePage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-lg text-orange-500 font-semibold text-center"
+            className="text-[15px] text-chinese font-bold text-center"
           >
             {error}
           </motion.p>
         )}
 
         {/* Let's go! */}
-        <motion.button
+        <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          whileHover={{ scale: canSubmit ? 1.05 : 1 }}
-          whileTap={{ scale: canSubmit ? 0.95 : 1 }}
-          onClick={createChild}
-          disabled={!canSubmit}
-          className={`w-full rounded-[2rem] py-5 text-3xl font-extrabold text-white shadow-xl transition-opacity ${
-            canSubmit
-              ? 'bg-gradient-to-br from-green-400 to-emerald-500'
-              : 'bg-gradient-to-br from-green-400 to-emerald-500 opacity-40'
-          }`}
+          className="w-full"
         >
-          {saving ? 'Getting ready… 🎈' : "Let's go! 🚀"}
-        </motion.button>
+          <button
+            onClick={createChild}
+            disabled={!canSubmit}
+            className="pressable w-full min-h-[64px] rounded-[26px] py-5 text-2xl font-extrabold text-white bg-success shadow-press-success disabled:opacity-40"
+          >
+            {saving ? (
+              <>
+                Getting ready… <span className="font-emoji">🎈</span>
+              </>
+            ) : (
+              <>
+                Let&apos;s go! <span className="font-emoji">🚀</span>
+              </>
+            )}
+          </button>
+        </motion.div>
       </div>
     </KidLayout>
   )

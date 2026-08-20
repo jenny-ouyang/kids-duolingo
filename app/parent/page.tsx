@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
@@ -50,6 +51,12 @@ function formatLastPracticed(iso: string | null): string {
   return `Practiced ${days} days ago`
 }
 
+/* Calm variant of Sunrise Playground: same palette, warm ink, press physics —
+   no mascot, no hills, no sparkles (per DESIGN.md, parent zone rule). */
+
+const inputClass =
+  'bg-canvas-top rounded-2xl px-4 min-h-[56px] text-ink font-semibold placeholder:text-ink-soft/60 focus:outline-none focus:ring-4 focus:ring-gold'
+
 function AdultGate({ onPass }: { onPass: () => void }) {
   const router = useRouter()
   const [questionIdx, setQuestionIdx] = useState(() => pickQuestion())
@@ -68,19 +75,19 @@ function AdultGate({ onPass }: { onPass: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-canvas-top flex items-center justify-center p-6">
       <motion.div
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 w-full max-w-sm text-center"
+        className="bg-white rounded-[26px] p-8 shadow-press-card w-full max-w-sm text-center"
       >
-        <div className="text-4xl mb-3">🔒</div>
-        <h1 className="text-xl font-bold text-gray-800">Grown-ups only</h1>
-        <p className="text-gray-500 text-sm mt-1">
+        <div className="font-emoji text-4xl mb-3">🔒</div>
+        <h1 className="text-xl font-extrabold text-ink">Grown-ups only</h1>
+        <p className="text-ink-soft text-sm font-bold mt-1">
           Answer this to open the parent zone.
         </p>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
-          <p className="text-lg font-semibold text-gray-700">
+          <p className="text-lg font-extrabold text-ink">
             {GATE_QUESTIONS[questionIdx].prompt}
           </p>
           <input
@@ -89,21 +96,23 @@ function AdultGate({ onPass }: { onPass: () => void }) {
             value={answer}
             onChange={(e) => setAnswer(e.target.value)}
             autoFocus
-            className="border border-gray-200 rounded-xl px-4 py-2 text-center text-lg font-semibold text-gray-800 focus:outline-none focus:border-blue-400"
+            className={`${inputClass} text-center text-lg`}
           />
           {wrong && (
-            <p className="text-red-500 text-sm">Not quite — try this one instead.</p>
+            <p className="text-ink-soft text-sm font-bold">
+              Not quite — try this one instead.
+            </p>
           )}
           <button
             type="submit"
-            className="bg-blue-600 text-white rounded-xl px-4 py-2 font-semibold hover:bg-blue-700 transition-colors"
+            className="pressable min-h-[56px] bg-success text-white rounded-2xl px-4 font-extrabold shadow-press-success"
           >
             Unlock
           </button>
         </form>
         <button
           onClick={() => router.push('/')}
-          className="mt-4 text-gray-400 text-sm underline underline-offset-2"
+          className="mt-5 min-h-[44px] text-ink-soft text-sm font-bold underline underline-offset-2"
         >
           ← Back to the app
         </button>
@@ -120,19 +129,21 @@ function AvatarPicker({
   onChange: (avatar: string) => void
 }) {
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-2.5">
       {AVATARS.map((avatar) => (
         <button
           key={avatar}
           type="button"
           onClick={() => onChange(avatar)}
-          className={`w-10 h-10 rounded-xl flex items-center justify-center text-xl transition-colors ${
+          aria-label={`Pick ${avatar}`}
+          aria-pressed={value === avatar}
+          className={`pressable w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
             value === avatar
-              ? 'bg-blue-100 border-2 border-blue-400'
-              : 'bg-gray-50 border border-gray-200 hover:bg-gray-100'
+              ? 'bg-success-bg shadow-press-success'
+              : 'bg-canvas-top shadow-press-chip'
           }`}
         >
-          {avatar}
+          <span className="font-emoji leading-none">{avatar}</span>
         </button>
       ))}
     </div>
@@ -255,8 +266,8 @@ function ChildrenSection() {
 
   return (
     <section className="flex flex-col gap-4">
-      <div className="flex items-center justify-between">
-        <h2 className="text-lg font-bold text-gray-700">Children</h2>
+      <div className="flex items-center justify-between gap-3">
+        <h2 className="text-lg font-extrabold text-ink">Children</h2>
         {children !== null && children.length < MAX_CHILDREN && !showAdd && (
           <button
             onClick={() => {
@@ -264,7 +275,7 @@ function ChildrenSection() {
               setEditingId(null)
               setDeletingId(null)
             }}
-            className="bg-blue-50 text-blue-600 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-blue-100 transition-colors"
+            className="pressable min-h-[56px] bg-success text-white rounded-2xl px-5 text-[15px] font-extrabold shadow-press-success"
           >
             + Add a child
           </button>
@@ -272,11 +283,11 @@ function ChildrenSection() {
       </div>
 
       {loadFailed && (
-        <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-red-600 text-sm flex items-center justify-between gap-3">
+        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-sm font-bold flex items-center justify-between gap-3">
           <span>Couldn&apos;t load your children.</span>
           <button
             onClick={fetchChildren}
-            className="font-semibold underline underline-offset-2 flex-shrink-0"
+            className="min-h-[44px] font-extrabold underline underline-offset-2 flex-shrink-0"
           >
             Try again
           </button>
@@ -284,13 +295,13 @@ function ChildrenSection() {
       )}
 
       {error && (
-        <div className="bg-red-50 border border-red-100 rounded-xl px-4 py-3 text-red-600 text-sm">
+        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-sm font-bold">
           {error}
         </div>
       )}
 
       {children !== null && children.length >= MAX_CHILDREN && (
-        <p className="text-gray-500 text-sm">
+        <p className="text-ink-soft text-sm font-bold">
           You&apos;ve reached the maximum of {MAX_CHILDREN} children on one account.
         </p>
       )}
@@ -302,7 +313,7 @@ function ChildrenSection() {
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
             onSubmit={handleAdd}
-            className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3 overflow-hidden"
+            className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-4 overflow-hidden"
           >
             <input
               type="text"
@@ -311,21 +322,21 @@ function ChildrenSection() {
               placeholder="Child's nickname"
               maxLength={20}
               autoFocus
-              className="border border-gray-200 rounded-xl px-4 py-2 text-gray-800 focus:outline-none focus:border-blue-400"
+              className={inputClass}
             />
             <AvatarPicker value={newAvatar} onChange={setNewAvatar} />
-            <div className="flex gap-2">
+            <div className="flex gap-3">
               <button
                 type="submit"
                 disabled={!newName.trim() || saving}
-                className="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="pressable min-h-[56px] bg-success text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-success disabled:opacity-50"
               >
                 Add
               </button>
               <button
                 type="button"
                 onClick={() => setShowAdd(false)}
-                className="bg-gray-100 text-gray-600 rounded-xl px-4 py-2 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
               >
                 Cancel
               </button>
@@ -335,11 +346,11 @@ function ChildrenSection() {
       </AnimatePresence>
 
       {children === null && (
-        <div className="text-gray-400 text-sm">Loading…</div>
+        <div className="text-ink-soft text-sm font-bold">Loading…</div>
       )}
 
       {children !== null && children.length === 0 && !loadFailed && (
-        <p className="text-gray-500 text-sm">
+        <p className="text-ink-soft text-sm font-bold">
           No children yet. Add one to get started.
         </p>
       )}
@@ -349,31 +360,31 @@ function ChildrenSection() {
           key={child.id}
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          className="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 flex flex-col gap-3"
+          className="bg-white rounded-[22px] p-4 shadow-press-card flex flex-col gap-3"
         >
           {editingId === child.id ? (
-            <form onSubmit={handleEdit} className="flex flex-col gap-3">
+            <form onSubmit={handleEdit} className="flex flex-col gap-4">
               <input
                 type="text"
                 value={editName}
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={20}
                 autoFocus
-                className="border border-gray-200 rounded-xl px-4 py-2 text-gray-800 focus:outline-none focus:border-blue-400"
+                className={inputClass}
               />
               <AvatarPicker value={editAvatar} onChange={setEditAvatar} />
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <button
                   type="submit"
                   disabled={!editName.trim() || saving}
-                  className="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-success text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-success disabled:opacity-50"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingId(null)}
-                  className="bg-gray-100 text-gray-600 rounded-xl px-4 py-2 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
                 >
                   Cancel
                 </button>
@@ -381,20 +392,21 @@ function ChildrenSection() {
             </form>
           ) : (
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center text-2xl flex-shrink-0">
-                {child.avatar}
+              <div className="w-14 h-14 rounded-2xl bg-[#FFF3D6] rotate-[-4deg] flex items-center justify-center flex-shrink-0">
+                <span className="font-emoji text-2xl leading-none">{child.avatar}</span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-bold text-gray-800">{child.name}</p>
-                <p className="text-sm text-gray-500 mt-0.5">
-                  ❤️ {child.totalHearts} hearts · 🔥 {child.streak} day streak ·{' '}
+                <p className="font-extrabold text-ink">{child.name}</p>
+                <p className="text-sm font-bold text-ink-soft mt-0.5">
+                  <span className="font-emoji">❤️</span> {child.totalHearts} hearts ·{' '}
+                  <span className="font-emoji">🔥</span> {child.streak} day streak ·{' '}
                   {formatLastPracticed(child.lastPracticed)}
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <button
                   onClick={() => startEdit(child)}
-                  className="bg-gray-100 text-gray-600 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-gray-200 transition-colors"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
                 >
                   Edit
                 </button>
@@ -404,7 +416,7 @@ function ChildrenSection() {
                     setDeleteText('')
                     setEditingId(null)
                   }}
-                  className="bg-red-50 text-red-500 rounded-xl px-3 py-2 text-sm font-semibold hover:bg-red-100 transition-colors"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
                 >
                   Remove
                 </button>
@@ -413,23 +425,24 @@ function ChildrenSection() {
           )}
 
           {deletingId === child.id && editingId !== child.id && (
-            <div className="border-t border-gray-100 pt-3 flex flex-col gap-2">
-              <p className="text-sm text-red-600">
+            <div className="border-t border-chip-track pt-3 flex flex-col gap-2">
+              <p className="text-sm font-bold text-ink">
                 This permanently deletes <strong>{child.name}</strong> and all their
                 progress. Type <strong>{child.name}</strong> to confirm.
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input
                   type="text"
                   value={deleteText}
                   onChange={(e) => setDeleteText(e.target.value)}
                   placeholder={child.name}
-                  className="border border-gray-200 rounded-xl px-4 py-2 text-gray-800 flex-1 focus:outline-none focus:border-red-400"
+                  className={`${inputClass} flex-1 min-w-0`}
                 />
+                {/* chinese-edge red is reserved for exactly this confirm action */}
                 <button
                   onClick={() => handleDelete(child)}
                   disabled={deleteText !== child.name || saving}
-                  className="bg-red-500 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-red-600 transition-colors disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-chinese-edge text-white rounded-2xl px-6 text-sm font-extrabold shadow-[0_6px_0_#8E2038] disabled:opacity-50"
                 >
                   Delete
                 </button>
@@ -476,6 +489,8 @@ function AccountSection() {
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowser()
+    // Clear the active-child cookie (httpOnly, server-set) so / shows the landing again.
+    await fetch('/api/children/active', { method: 'DELETE' }).catch(() => {})
     await supabase.auth.signOut()
     // Full navigation so a fresh anonymous session bootstraps on the home page.
     window.location.assign('/')
@@ -483,53 +498,53 @@ function AccountSection() {
 
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-bold text-gray-700">Account</h2>
+      <h2 className="text-lg font-extrabold text-ink">Account</h2>
 
-      {loading && <div className="text-gray-400 text-sm">Loading…</div>}
+      {loading && <div className="text-ink-soft text-sm font-bold">Loading…</div>}
 
       {!loading && !account && (
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100">
-          <p className="text-gray-500 text-sm">
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card">
+          <p className="text-ink-soft text-sm font-bold">
             No account session found. Head back to the app and try again.
           </p>
         </div>
       )}
 
       {!loading && account && account.isAnonymous && (
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex flex-col gap-3">
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
-            <h3 className="font-bold text-gray-800">Save your family&apos;s progress</h3>
-            <p className="text-gray-500 text-sm mt-1">
+            <h3 className="font-extrabold text-ink">Save your family&apos;s progress</h3>
+            <p className="text-ink-soft text-sm font-bold mt-1">
               You&apos;re using a guest account right now. Add your email to keep your
               children&apos;s progress safe and use it on other devices.
             </p>
           </div>
           {claimStatus === 'sent' ? (
-            <div className="bg-green-50 border border-green-100 rounded-xl px-4 py-3 text-green-700 text-sm">
-              Check your inbox! Open the confirmation link we sent to{' '}
+            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-sm font-bold">
+              ✓ Check your inbox! Open the confirmation link we sent to{' '}
               <strong>{claimEmail.trim()}</strong> to finish saving your account.
             </div>
           ) : (
             <form onSubmit={handleClaim} className="flex flex-col gap-2">
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <input
                   type="email"
                   value={claimEmail}
                   onChange={(e) => setClaimEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
-                  className="border border-gray-200 rounded-xl px-4 py-2 text-gray-800 flex-1 focus:outline-none focus:border-blue-400"
+                  className={`${inputClass} flex-1 min-w-0`}
                 />
                 <button
                   type="submit"
                   disabled={!claimEmail.trim() || claimStatus === 'sending'}
-                  className="bg-blue-600 text-white rounded-xl px-4 py-2 text-sm font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-success text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-success disabled:opacity-50"
                 >
                   {claimStatus === 'sending' ? 'Sending…' : 'Save progress'}
                 </button>
               </div>
               {claimStatus === 'error' && (
-                <p className="text-red-500 text-sm">
+                <p className="text-ink text-sm font-bold">
                   Something went wrong sending the confirmation email. Please try again.
                 </p>
               )}
@@ -539,16 +554,16 @@ function AccountSection() {
       )}
 
       {!loading && account && !account.isAnonymous && (
-        <div className="bg-white rounded-2xl p-5 shadow-sm border border-gray-100 flex items-center gap-4">
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card flex items-center gap-4">
           <div className="flex-1 min-w-0">
-            <p className="font-bold text-gray-800 truncate">{account.email}</p>
-            <p className="text-gray-500 text-sm mt-0.5">
+            <p className="font-extrabold text-ink truncate">{account.email}</p>
+            <p className="text-ink-soft text-sm font-bold mt-0.5">
               Your family&apos;s progress is saved to this account.
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="bg-gray-100 text-gray-600 rounded-xl px-4 py-2 text-sm font-semibold hover:bg-gray-200 transition-colors flex-shrink-0"
+            className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex-shrink-0"
           >
             Sign out
           </button>
@@ -568,8 +583,8 @@ export default function ParentZone() {
 
   if (gate === 'checking') {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-4xl animate-spin">⏳</div>
+      <div className="min-h-screen bg-canvas-top flex items-center justify-center">
+        <div className="font-emoji text-4xl animate-spin">⏳</div>
       </div>
     )
   }
@@ -586,24 +601,41 @@ export default function ParentZone() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-canvas-top">
       <div className="max-w-2xl mx-auto p-6 flex flex-col gap-8">
         {/* Header */}
         <div className="flex items-center gap-4">
           <button
             onClick={() => router.push('/')}
-            className="bg-white border border-gray-200 rounded-xl px-4 py-2 text-gray-600 hover:bg-gray-100 transition-colors font-medium"
+            aria-label="Back to the app"
+            className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl text-ink shadow-press-chip flex-shrink-0"
           >
-            ← Back to the app
+            ←
           </button>
           <div>
-            <h1 className="text-2xl font-bold text-gray-800">Parent Zone</h1>
-            <p className="text-gray-500 text-sm">Manage your children and account</p>
+            <h1 className="text-[27px] font-extrabold text-ink leading-tight">Parent Zone</h1>
+            <p className="text-ink-soft text-sm font-bold">Manage your children and account</p>
           </div>
         </div>
 
         <ChildrenSection />
         <AccountSection />
+
+        {/* Quiet trust links — parents' surface only */}
+        <footer className="flex items-center justify-center gap-6 pb-4">
+          <Link
+            href="/privacy"
+            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+          >
+            Privacy
+          </Link>
+          <Link
+            href="/terms"
+            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+          >
+            Terms
+          </Link>
+        </footer>
       </div>
     </div>
   )

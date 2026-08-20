@@ -54,89 +54,111 @@ export const EMOJI_FALLBACKS: Record<string, string> = {
   together: '🤝', up: '⬆️', down: '⬇️', again: '🔄',
 }
 
+// Rotating press-edge colors by tile index (decorative rhythm — DESIGN.md)
+const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
+
+/** Sunrise Playground tile look: white + own-hue edge; success fill + ✓; wrong fades, no red */
+function tileClasses(state: AnswerState, isCorrect: boolean, edgeClass: string): string {
+  if (state !== 'idle' && isCorrect) return 'bg-success-bg shadow-press-success scale-105'
+  if (state === 'wrong') return 'bg-canvas-mid shadow-none opacity-80'
+  return `bg-white ${edgeClass} pressable`
+}
+
+/** ✓ badge that pops on the correct tile — color is never the only signal */
+function CorrectBadge() {
+  return (
+    <motion.span
+      initial={{ scale: 0 }}
+      animate={{ scale: 1 }}
+      transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+      className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-success text-white text-lg font-extrabold flex items-center justify-center"
+    >
+      ✓
+    </motion.span>
+  )
+}
+
+const SHAKE = { x: [-6, 6, -4, 4, 0] }
+
 // ─── Option Card variants ────────────────────────────────────────────────────
 
 function PictureCard({
-  word, state, isCorrect, onClick, disabled,
+  word, state, isCorrect, onClick, disabled, edgeClass,
 }: {
-  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean
+  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
-  const highlight =
-    state !== 'idle' && isCorrect ? 'border-green-400 bg-green-50 scale-105' :
-    state === 'wrong' ? 'border-red-300 bg-red-50' :
-    'border-white/80 bg-white hover:border-blue-300 hover:bg-blue-50 active:scale-95'
-
   const emojiIcon = EMOJI_FALLBACKS[word.id]
 
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      whileTap={!disabled ? { scale: 0.94 } : {}}
-      className={`relative rounded-3xl border-4 p-4 flex flex-col items-center justify-center gap-2 shadow-md transition-all duration-200 cursor-pointer select-none ${highlight}`}
+      animate={state === 'wrong' && !isCorrect ? SHAKE : {}}
+      transition={{ duration: 0.3 }}
+      className={`relative rounded-3xl p-4 flex flex-col items-center justify-center gap-2 transition-colors duration-200 cursor-pointer select-none ${tileClasses(state, isCorrect, edgeClass)}`}
       style={{ minHeight: 130 }}
     >
       {emojiIcon ? (
         <>
-          <div className="text-6xl leading-none">{emojiIcon}</div>
-          <span className="text-sm font-semibold text-gray-500 capitalize">{word.english}</span>
+          <div className="font-emoji text-[46px] leading-none">{emojiIcon}</div>
+          <span className="text-sm font-extrabold text-ink capitalize">{word.english}</span>
         </>
       ) : (
-        <span className="text-3xl font-extrabold text-gray-700 capitalize text-center leading-tight px-1">
+        <span className="text-3xl font-extrabold text-ink capitalize text-center leading-tight px-1">
           {word.english}
         </span>
       )}
       <AnimatePresence>
-        {state !== 'idle' && isCorrect && (
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-3 -right-3 text-2xl">⭐</motion.div>
-        )}
+        {state !== 'idle' && isCorrect && <CorrectBadge />}
       </AnimatePresence>
     </motion.button>
   )
 }
 
 function ChineseCard({
-  word, state, isCorrect, onClick, disabled,
+  word, state, isCorrect, onClick, disabled, edgeClass,
 }: {
-  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean
+  word: Word; state: AnswerState; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
-  const highlight =
-    state !== 'idle' && isCorrect ? 'border-green-400 bg-green-50 scale-105' :
-    state === 'wrong' ? 'border-red-300 bg-red-50' :
-    'border-white/80 bg-white hover:border-blue-300 hover:bg-blue-50 active:scale-95'
-
   return (
     <motion.button
       onClick={onClick}
       disabled={disabled}
-      whileTap={!disabled ? { scale: 0.94 } : {}}
-      className={`relative rounded-3xl border-4 p-4 flex flex-col items-center justify-center gap-1 shadow-md transition-all duration-200 cursor-pointer select-none ${highlight}`}
+      animate={state === 'wrong' && !isCorrect ? SHAKE : {}}
+      transition={{ duration: 0.3 }}
+      className={`relative rounded-3xl p-4 flex flex-col items-center justify-center gap-1 transition-colors duration-200 cursor-pointer select-none ${tileClasses(state, isCorrect, edgeClass)}`}
       style={{ minHeight: 130 }}
     >
-      <span className="text-4xl font-bold text-blue-700">{word.chinese}</span>
-      <span className="text-base text-gray-400">{word.pinyin}</span>
+      <span className="font-hanzi text-4xl text-ink">{word.chinese}</span>
+      <span className="text-base font-bold text-ink-soft">{word.pinyin}</span>
       <AnimatePresence>
-        {state !== 'idle' && isCorrect && (
-          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} className="absolute -top-3 -right-3 text-2xl">⭐</motion.div>
-        )}
+        {state !== 'idle' && isCorrect && <CorrectBadge />}
       </AnimatePresence>
     </motion.button>
   )
 }
 
-// ─── Prompt variants ─────────────────────────────────────────────────────────
+// ─── Prompt variants (Hanzi hero block — DESIGN.md) ──────────────────────────
 
 function AudioPrompt({ word }: { word: Word }) {
   return (
     <div className="text-center">
-      <p className="text-xl font-bold text-gray-600 mb-2">Which one is</p>
       <button
         onClick={() => speakChinese(word.chinese)}
-        className="inline-flex items-center gap-2 bg-white rounded-2xl px-6 py-3 shadow-md border-2 border-blue-200 hover:border-blue-400 transition-colors"
+        className="pressable bg-white rounded-3xl shadow-press-card px-7 py-4 flex flex-col items-center gap-2"
       >
-        <span className="text-4xl font-bold text-blue-700">{word.chinese}</span>
-        <span className="text-gray-400 text-lg">{word.pinyin}</span>
-        <span className="text-2xl">🔊</span>
+        <span className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+          Which one is
+        </span>
+        <span className="font-hanzi text-[52px] leading-tight text-ink border-b-[6px] border-gold pb-0.5">
+          {word.chinese}
+        </span>
+        <span className="flex items-center gap-2">
+          <span className="text-lg font-bold text-chinese">{word.pinyin}</span>
+          <span className="bg-gold rounded-full px-3 py-1 shadow-press-gold">
+            <span className="font-emoji text-xl">🔊</span>
+          </span>
+        </span>
       </button>
     </div>
   )
@@ -146,12 +168,14 @@ function PicturePrompt({ word }: { word: Word }) {
   const emojiIcon = EMOJI_FALLBACKS[word.id]
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-xl font-bold text-gray-600">What is this in Chinese?</p>
+      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+        What is this in Chinese?
+      </p>
       {emojiIcon ? (
-        <div className="text-8xl leading-none">{emojiIcon}</div>
+        <div className="font-emoji text-8xl leading-none">{emojiIcon}</div>
       ) : (
-        <div className="bg-white rounded-2xl px-8 py-4 shadow-md border-2 border-blue-200">
-          <span className="text-4xl font-extrabold text-blue-700 capitalize">{word.english}</span>
+        <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card">
+          <span className="text-4xl font-extrabold text-ink capitalize">{word.english}</span>
         </div>
       )}
     </div>
@@ -161,9 +185,11 @@ function PicturePrompt({ word }: { word: Word }) {
 function EnglishPrompt({ word }: { word: Word }) {
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-xl font-bold text-gray-600">How do you say this in Chinese?</p>
-      <div className="bg-white rounded-2xl px-8 py-4 shadow-md border-2 border-blue-200">
-        <span className="text-4xl font-extrabold text-blue-700 capitalize">{word.english}</span>
+      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+        How do you say this in Chinese?
+      </p>
+      <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card">
+        <span className="text-4xl font-extrabold text-ink capitalize">{word.english}</span>
       </div>
     </div>
   )
@@ -217,14 +243,14 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
       {question.type === 'picture_to_chinese' && <PicturePrompt word={question.word} />}
       {question.type === 'english_to_chinese' && <EnglishPrompt word={question.word} />}
 
-      {/* Wrong-answer feedback */}
+      {/* Wrong-answer feedback — warm, no punishment */}
       <AnimatePresence>
         {answerState === 'wrong' && (
           <motion.div
             initial={{ opacity: 0, y: -8 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="bg-orange-100 border-2 border-orange-300 rounded-2xl px-5 py-2 text-orange-700 font-semibold text-center text-sm"
+            className="bg-white rounded-full px-5 py-2 shadow-press-chip text-ink font-extrabold text-center text-sm"
           >
             Almost! Keep going! 🌟
           </motion.div>
@@ -233,12 +259,13 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
 
       {/* 4 option cards */}
       <div className="grid grid-cols-2 gap-4 w-full">
-        {question.options.map((word) => {
+        {question.options.map((word, index) => {
           const isCorrect = word.id === question.correctId
           const cardState =
             selectedId === word.id ? answerState :
             selectedId !== null && isCorrect && answerState === 'wrong' ? 'correct' :
             'idle'
+          const edgeClass = TILE_EDGES[index % TILE_EDGES.length]
 
           return useChineseOptions ? (
             <ChineseCard
@@ -248,6 +275,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
               isCorrect={isCorrect}
               onClick={() => handleSelect(word.id)}
               disabled={answerState !== 'idle'}
+              edgeClass={edgeClass}
             />
           ) : (
             <PictureCard
@@ -257,6 +285,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
               isCorrect={isCorrect}
               onClick={() => handleSelect(word.id)}
               disabled={answerState !== 'idle'}
+              edgeClass={edgeClass}
             />
           )
         })}

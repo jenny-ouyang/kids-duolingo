@@ -6,15 +6,8 @@ import { SentenceQuestion } from '@/lib/types'
 import { speakChinese } from '@/lib/tts'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
 
-// Each character gets a distinct vivid color — consistent as it moves bank ↔ slot
-const TILE_COLORS = [
-  { bg: 'bg-pink-400',   shadow: 'shadow-pink-200',   text: 'text-white' },
-  { bg: 'bg-violet-500', shadow: 'shadow-violet-200',  text: 'text-white' },
-  { bg: 'bg-cyan-400',   shadow: 'shadow-cyan-200',    text: 'text-white' },
-  { bg: 'bg-emerald-400',shadow: 'shadow-emerald-200', text: 'text-white' },
-  { bg: 'bg-amber-400',  shadow: 'shadow-amber-200',   text: 'text-white' },
-  { bg: 'bg-rose-400',   shadow: 'shadow-rose-200',    text: 'text-white' },
-]
+// Rotating press-edge colors for bank tiles (decorative rhythm — DESIGN.md)
+const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
 
 interface Props {
   question: SentenceQuestion
@@ -24,11 +17,6 @@ interface Props {
 export default function SentenceBuild({ question, onAnswer }: Props) {
   const { sentence, tiles } = question
   const slotCount = sentence.chinese.length
-
-  // Assign a color to each unique character — stable across bank/slot moves
-  const colorMap = Object.fromEntries(
-    sentence.chinese.map((char, i) => [char, TILE_COLORS[i % TILE_COLORS.length]])
-  )
 
   const [placed, setPlaced] = useState<string[]>([])
   const [bank, setBank] = useState<string[]>(tiles)
@@ -93,30 +81,29 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
       >
         {sentence.emoji && (
           <motion.span
-            className="text-6xl leading-none"
+            className="font-emoji text-6xl leading-none"
             animate={{ rotate: [0, -6, 6, 0] }}
             transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
           >
             {sentence.emoji}
           </motion.span>
         )}
-        <p className="text-2xl font-extrabold text-gray-700 leading-snug max-w-xs">
+        <p className="text-2xl font-extrabold text-ink leading-snug max-w-xs">
           {sentence.english}
         </p>
-        <p className="text-xs font-bold text-blue-300 uppercase tracking-[0.2em]">
+        <p className="text-xs font-extrabold text-ink-soft uppercase tracking-[0.2em]">
           tap the tiles in order
         </p>
       </motion.div>
 
-      {/* Answer slots */}
+      {/* Answer slots — placed tiles fill math-blue; gentle shake on wrong, no red */}
       <motion.div
         className="flex gap-3 flex-wrap justify-center"
-        animate={shaking ? { x: [0, -12, 12, -10, 10, -6, 6, 0] } : {}}
-        transition={{ duration: 0.55 }}
+        animate={shaking ? { x: [0, -6, 6, -4, 4, 0] } : {}}
+        transition={{ duration: 0.4 }}
       >
         {Array.from({ length: slotCount }).map((_, i) => {
           const tile = placed[i]
-          const color = tile ? colorMap[tile] : null
 
           return (
             <motion.button
@@ -126,11 +113,11 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
               transition={{ delay: isCorrect ? i * 0.08 : 0, duration: 0.5, type: 'spring' }}
               className={`
                 relative w-[72px] h-[72px] rounded-2xl flex items-center justify-center
-                text-3xl font-black select-none
+                font-hanzi text-3xl select-none
                 transition-colors duration-200
                 ${tile
-                  ? `${color!.bg} ${color!.text} shadow-lg ${color!.shadow} active:scale-95 cursor-pointer`
-                  : 'bg-white/50 border-[2.5px] border-dashed border-blue-200 cursor-default'
+                  ? 'bg-math text-white shadow-press-math active:scale-95 cursor-pointer'
+                  : 'bg-chip-track cursor-default'
                 }
               `}
             >
@@ -160,9 +147,9 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
             initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            className="bg-white/80 backdrop-blur-sm rounded-2xl px-6 py-3 shadow-sm border border-blue-100"
+            className="bg-white rounded-2xl px-6 py-3 shadow-press-card"
           >
-            <p className="text-base font-semibold text-blue-500 tracking-wide text-center">
+            <p className="text-base font-bold text-chinese tracking-wide text-center">
               {sentence.pinyin}
             </p>
           </motion.div>
@@ -170,13 +157,13 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
       </AnimatePresence>
 
       {/* Divider */}
-      <div className="w-full max-w-[280px] h-px bg-gradient-to-r from-transparent via-blue-200 to-transparent" />
+      <div className="w-full max-w-[280px] h-px bg-gradient-to-r from-transparent via-card-edge to-transparent" />
 
-      {/* Tile bank */}
+      {/* Tile bank — white toy blocks with rotating press edges */}
       <div className="flex gap-3 flex-wrap justify-center min-h-[80px]">
         <AnimatePresence>
           {bank.map((tile, i) => {
-            const color = colorMap[tile]
+            const edgeClass = TILE_EDGES[i % TILE_EDGES.length]
             return (
               <motion.button
                 key={`${tile}-${i}`}
@@ -184,15 +171,14 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.6, opacity: 0, y: -8 }}
                 whileHover={{ scale: 1.1, y: -4 }}
-                whileTap={{ scale: 0.88 }}
+                whileTap={{ scale: 0.94, y: 4 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
                 onClick={() => tapBankTile(tile, i)}
                 disabled={shaking || showPinyin}
                 className={`
                   w-[72px] h-[72px] rounded-2xl flex items-center justify-center
-                  ${color.bg} ${color.text}
-                  text-3xl font-black select-none
-                  shadow-lg ${color.shadow}
+                  bg-white text-ink ${edgeClass}
+                  font-hanzi text-3xl select-none
                   disabled:opacity-40 disabled:cursor-not-allowed
                   cursor-pointer
                 `}

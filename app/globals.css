@@ -4,15 +4,69 @@
 
 @layer base {
   html {
-    font-family: var(--font-nunito), 'Nunito', sans-serif;
+    font-family: var(--font-baloo), ui-rounded, system-ui, sans-serif;
   }
 
   body {
     -webkit-tap-highlight-color: transparent;
     user-select: none;
+    color: #6b4423; /* ink — never black */
+    background: #fff8e7;
   }
 
   button {
     cursor: pointer;
+  }
+
+  /* Windows/Android emoji parity: prefer platform color emoji on Apple,
+     Noto Color Emoji webfont everywhere else (ahead of flat Segoe). */
+  .emoji,
+  [data-emoji] {
+    font-family: 'Apple Color Emoji', var(--font-emoji), 'Segoe UI Emoji', sans-serif;
+  }
+}
+
+@layer components {
+  /* Full-viewport sunrise canvas — kid-facing screens sit on this */
+  .sunrise-canvas {
+    min-height: 100dvh;
+    background: linear-gradient(180deg, #fff8e7 0%, #ffefd0 60%, #ffe6bd 100%);
+    position: relative;
+    overflow: hidden;
+  }
+
+  /* Jade hills pinned to the bottom of the viewport, behind content */
+  .hill-near,
+  .hill-far {
+    position: absolute;
+    pointer-events: none;
+    border-radius: 50% 50% 0 0;
+  }
+  .hill-near { left: -12%; right: -12%; bottom: -84px; height: 180px; background: #9fd8ab; }
+  .hill-far { left: -30%; right: 18%; bottom: -50px; height: 160px; background: #c0e7c7; }
+
+  /* Toy physics: chunky press-down interaction (pair with a shadow-press-* token) */
+  .pressable {
+    transition: transform 0.1s ease, box-shadow 0.1s ease;
+  }
+  .pressable:active {
+    transform: translateY(5px);
+    box-shadow: 0 1px 0 rgba(0, 0, 0, 0.08);
+  }
+
+  .sparkle {
+    position: absolute;
+    color: #f5b93f;
+    pointer-events: none;
+    animation: twinkle 2.8s ease-in-out infinite;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-bob,
+  .animate-sway,
+  .animate-twinkle,
+  .sparkle {
+    animation: none !important;
   }
 }

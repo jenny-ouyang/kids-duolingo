@@ -3,8 +3,9 @@
 import { useEffect, useState, Suspense } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
-import KidLayout from '@/components/layout/KidLayout'
 import Confetti from '@/components/celebration/Confetti'
+import Mascot from '@/components/design/Mascot'
+import { Hills, Sparkles } from '@/components/design/Scenery'
 import { speakChinese } from '@/lib/tts'
 import { playCelebrationSound, playStarSound } from '@/lib/sounds'
 import { getEncouragement, SessionData, Encouragement } from '@/lib/encouragement'
@@ -20,6 +21,7 @@ function CelebrationContent() {
 
   const backHref = subject === 'math' ? '/math/topics' : '/packs'
   const playAgainHref = subject === 'math' ? `/math/practice/${packId}` : `/practice/${packId}`
+  const isMath = subject === 'math'
 
   const allCorrect = correct === total
   const stars = correct <= 2 ? 1 : correct <= 5 ? 2 : correct <= 7 ? 3 : 4
@@ -68,7 +70,7 @@ function CelebrationContent() {
       initial={{ scale: 0, rotate: -30 }}
       animate={{ scale: 1, rotate: 0 }}
       transition={{ delay: 0.3 + i * 0.15, type: 'spring', stiffness: 300 }}
-      className="text-5xl"
+      className="font-emoji text-5xl"
     >
       ⭐
     </motion.span>
@@ -82,23 +84,17 @@ function CelebrationContent() {
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200 }}
-        className="flex flex-col items-center gap-5 text-center px-4"
+        className="relative z-10 flex flex-col items-center gap-5 text-center px-4"
       >
-        {/* Big animated emoji */}
-        <motion.div
-          animate={{ rotate: [0, -10, 10, -10, 0] }}
-          transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-8xl"
-        >
-          {enc.emoji}
-        </motion.div>
+        {/* Panda guide celebrates */}
+        <Mascot say="太棒了!" size={76} />
 
         {/* Varied heading */}
         <motion.h1
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-3xl sm:text-4xl font-extrabold text-blue-700"
+          className="text-3xl sm:text-4xl font-extrabold text-ink"
         >
           {enc.heading}
         </motion.h1>
@@ -108,15 +104,18 @@ function CelebrationContent() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="bg-white/80 rounded-2xl px-6 py-3 shadow-sm border border-blue-100"
         >
           <button
             onClick={() => speakChinese(enc.chinesePhrase)}
-            className="flex flex-col items-center gap-1 cursor-pointer"
+            className="pressable bg-white rounded-3xl px-7 py-4 shadow-press-card flex flex-col items-center gap-1 cursor-pointer"
           >
-            <span className="text-3xl font-bold text-blue-700">{enc.chinesePhrase}</span>
-            <span className="text-sm text-gray-400">{enc.chinesePinyin}</span>
-            <span className="text-sm text-gray-500 italic">{enc.chineseMeaning} 🔊</span>
+            <span className="font-hanzi text-4xl text-ink border-b-[6px] border-gold pb-0.5">
+              {enc.chinesePhrase}
+            </span>
+            <span className="text-base font-bold text-chinese">{enc.chinesePinyin}</span>
+            <span className="text-sm font-bold text-ink-soft">
+              {enc.chineseMeaning} <span className="font-emoji">🔊</span>
+            </span>
           </button>
         </motion.div>
 
@@ -125,7 +124,7 @@ function CelebrationContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="text-xl font-semibold text-gray-500"
+          className="text-xl font-bold text-ink-soft"
         >
           {enc.subMessage}
         </motion.p>
@@ -133,16 +132,16 @@ function CelebrationContent() {
         {/* Stars */}
         <div className="flex gap-2">{starRow}</div>
 
-        {/* Hearts earned */}
+        {/* Hearts earned — chip rule */}
         {heartsEarned > 0 && (
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.8, type: 'spring', stiffness: 250 }}
-            className="bg-red-50 border-2 border-red-200 rounded-3xl px-6 py-3 flex items-center gap-3"
+            className="bg-white rounded-full px-6 py-3 shadow-press-chip flex items-center gap-3"
           >
-            <span className="text-3xl">❤️</span>
-            <span className="text-xl font-bold text-red-500">
+            <span className="font-emoji text-3xl">❤️</span>
+            <span className="text-xl font-extrabold text-ink">
               +{heartsEarned} heart{heartsEarned !== 1 ? 's' : ''} earned!
             </span>
           </motion.div>
@@ -154,13 +153,13 @@ function CelebrationContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.0 }}
-            className="bg-gradient-to-r from-amber-50 to-yellow-50 border-2 border-amber-200 rounded-2xl px-5 py-3 max-w-sm"
+            className="bg-white rounded-2xl px-5 py-3 shadow-press-card max-w-sm"
           >
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xl">💡</span>
-              <span className="font-bold text-amber-700">Word Spotlight</span>
+              <span className="font-emoji text-xl">💡</span>
+              <span className="font-extrabold text-ink">Word Spotlight</span>
             </div>
-            <p className="text-gray-700 text-sm">{enc.spotlightWord.message}</p>
+            <p className="text-ink text-sm font-semibold text-left">{enc.spotlightWord.message}</p>
           </motion.div>
         )}
 
@@ -170,13 +169,13 @@ function CelebrationContent() {
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 1.2 }}
-            className="bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-200 rounded-2xl px-5 py-3 max-w-sm"
+            className="bg-white rounded-2xl px-5 py-3 shadow-press-card max-w-sm"
           >
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xl">🎯</span>
-              <span className="font-bold text-emerald-700">Today&apos;s Mission</span>
+              <span className="font-emoji text-xl">🎯</span>
+              <span className="font-extrabold text-ink">Today&apos;s Mission</span>
             </div>
-            <p className="text-gray-700 text-sm">{enc.mission}</p>
+            <p className="text-ink text-sm font-semibold text-left">{enc.mission}</p>
           </motion.div>
         )}
 
@@ -185,17 +184,19 @@ function CelebrationContent() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1.4 }}
-          className="flex flex-col gap-3 mt-2 w-full max-w-xs"
+          className="flex flex-col gap-4 mt-2 w-full max-w-xs"
         >
           <button
             onClick={() => router.push(playAgainHref)}
-            className="bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-extrabold text-xl rounded-3xl py-4 px-8 shadow-lg hover:scale-105 active:scale-95 transition-transform"
+            className={`pressable min-h-[56px] text-white font-extrabold text-xl rounded-3xl py-4 px-8 ${
+              isMath ? 'bg-math shadow-press-math' : 'bg-chinese shadow-press-chinese'
+            }`}
           >
             Play Again 🔄
           </button>
           <button
             onClick={() => router.push(backHref)}
-            className="bg-white border-2 border-blue-300 text-blue-600 font-bold text-lg rounded-3xl py-3 px-8 hover:bg-blue-50 transition-colors"
+            className="pressable min-h-[56px] bg-white text-ink font-extrabold text-lg rounded-3xl py-3 px-8 shadow-press-card"
           >
             {subject === 'math' ? 'Pick Another Topic' : 'Pick Another Pack'}
           </button>
@@ -207,10 +208,12 @@ function CelebrationContent() {
 
 export default function CelebratePage() {
   return (
-    <KidLayout>
-      <Suspense fallback={<div className="text-4xl animate-spin">🌟</div>}>
+    <div className="sunrise-canvas flex flex-col items-center justify-center p-4 py-10">
+      <Hills />
+      <Sparkles />
+      <Suspense fallback={<div className="font-emoji text-4xl animate-spin relative z-10">🌟</div>}>
         <CelebrationContent />
       </Suspense>
-    </KidLayout>
+    </div>
   )
 }

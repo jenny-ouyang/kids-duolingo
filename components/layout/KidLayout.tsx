@@ -7,11 +7,14 @@ interface KidLayoutProps {
   className?: string
 }
 
+/**
+ * Sunrise Playground canvas wrapper (docs/design/DESIGN.md): full-bleed
+ * sunrise-cream gradient with scenery layered behind a centered column.
+ * Pages render Hills/Sun/Sparkles themselves; content sits at z-10+.
+ */
 export default function KidLayout({ children, className = '' }: KidLayoutProps) {
   return (
-    <div
-      className={`min-h-screen bg-gradient-to-b from-sky-100 to-blue-50 flex flex-col items-center justify-center p-4 ${className}`}
-    >
+    <div className={`sunrise-canvas flex flex-col items-center justify-center p-4 ${className}`}>
       {children}
     </div>
   )
