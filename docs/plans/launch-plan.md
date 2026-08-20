@@ -55,6 +55,16 @@ non-consumable IAP; apply to Small Business Program (15%). Web purchases may unl
 | D7 | Guest-data retention window | 90 days | DEFAULT ACCEPTED |
 | D8 | Zero third-party SDK commitment (required by D2) | Yes | LOCKED by D2 |
 
+## Next expansion (decided 2026-08-20)
+
+**Custom Family Packs** — parents create their own packs ("My Family's Words": 姥姥,
+the dog's name, favorite snacks) via a parent-zone editor with auto-pinyin; browser
+voice covers custom words. THE retention feature + THE paid differentiator.
+Sequencing: after parent progress reports. **Pricing fork to decide at build time:**
+included in the $9.99 one-time unlock vs. a small separate subscription (custom packs
+are an ongoing service, so a sub is defensible despite the no-subscription rule for
+content). Jenny's go-to-market focus: SEO.
+
 ## Corrections to CLAUDE.md discovered during design
 - API routes run on the **Node runtime** (`pg` driver), not edge as CLAUDE.md states.
 - Parent dashboard reads legacy localStorage, not the DB — effectively broken for current usage.
