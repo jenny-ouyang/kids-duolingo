@@ -12,7 +12,7 @@ import Mascot from '@/components/design/Mascot'
 const JSON_LD = {
   '@context': 'https://schema.org',
   '@type': 'WebApplication',
-  name: 'Mandarin & Math for Kids',
+  name: 'Mandarineer',
   applicationCategory: 'EducationalApplication',
   operatingSystem: 'Any',
   browserRequirements: 'Requires a modern web browser',
@@ -82,7 +82,7 @@ export default function Landing() {
           <Mascot say="你好!" />
 
           <h1 className="-mt-4 text-[38px] font-extrabold leading-[1.1] text-ink md:text-[52px]">
-            Mandarin &amp; Math for Kids
+            Mandarineer
           </h1>
 
           <p className="max-w-md text-[17px] font-bold leading-relaxed text-ink md:text-lg">
@@ -264,7 +264,7 @@ export default function Landing() {
             </Link>
           </nav>
           <p className="text-sm font-bold text-ink-soft">
-            © 2026 Mandarin &amp; Math for Kids
+            © 2026 Mandarineer · mandarineer.com
           </p>
         </div>
       </footer>

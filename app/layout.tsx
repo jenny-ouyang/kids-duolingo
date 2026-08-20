@@ -25,7 +25,7 @@ const notoEmoji = Noto_Color_Emoji({
 })
 
 export const metadata: Metadata = {
-  title: 'Mandarin & Math for Kids',
+  title: 'Mandarineer — Mandarin for Kids',
   description: 'A gentle, playful way for kids to learn Mandarin Chinese, with early math practice included. No punishment, just practice.',
 }
 
