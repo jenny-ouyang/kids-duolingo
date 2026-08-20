@@ -404,6 +404,12 @@ function ChildrenSection() {
                 </p>
               </div>
               <div className="flex gap-2 flex-shrink-0">
+                <Link
+                  href={`/parent/report/${child.id}`}
+                  className="pressable min-h-[56px] bg-white text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex items-center"
+                >
+                  Report
+                </Link>
                 <button
                   onClick={() => startEdit(child)}
                   className="pressable min-h-[56px] bg-canvas-top text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
