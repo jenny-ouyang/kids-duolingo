@@ -6,6 +6,8 @@ import foodData from '@/data/sentences/food.json'
 import familyData from '@/data/sentences/family.json'
 import feelingsData from '@/data/sentences/feelings.json'
 import homeData from '@/data/sentences/home.json'
+import s1Data from '@/data/sentences/s1-this-is.json'
+import s2Data from '@/data/sentences/s2-colors-counts.json'
 
 const ALL_SENTENCES: Sentence[] = [
   ...(animalsData.sentences as Sentence[]),
@@ -13,6 +15,8 @@ const ALL_SENTENCES: Sentence[] = [
   ...(familyData.sentences as Sentence[]),
   ...(feelingsData.sentences as Sentence[]),
   ...(homeData.sentences as Sentence[]),
+  ...(s1Data.sentences as Sentence[]),
+  ...(s2Data.sentences as Sentence[]),
 ]
 
 function shuffle<T>(arr: T[]): T[] {

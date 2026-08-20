@@ -1,0 +1,19 @@
+{
+  "id": "vegetables",
+  "name": "Vegetables",
+  "nameZh": "蔬菜",
+  "emoji": "🥕",
+  "color": "#57A05A",
+  "words": [
+    { "id": "carrot", "english": "carrot", "chinese": "胡萝卜", "pinyin": "húluóbo", "image": "🥕" },
+    { "id": "tomato", "english": "tomato", "chinese": "西红柿", "pinyin": "xīhóngshì", "image": "🍅" },
+    { "id": "potato", "english": "potato", "chinese": "土豆", "pinyin": "tǔdòu", "image": "🥔" },
+    { "id": "corn", "english": "corn", "chinese": "玉米", "pinyin": "yùmǐ", "image": "🌽" },
+    { "id": "cucumber", "english": "cucumber", "chinese": "黄瓜", "pinyin": "huángguā", "image": "🥒" },
+    { "id": "broccoli", "english": "broccoli", "chinese": "西兰花", "pinyin": "xīlánhuā", "image": "🥦" },
+    { "id": "onion", "english": "onion", "chinese": "洋葱", "pinyin": "yángcōng", "image": "🧅" },
+    { "id": "mushroom", "english": "mushroom", "chinese": "蘑菇", "pinyin": "mógu", "image": "🍄" },
+    { "id": "pumpkin", "english": "pumpkin", "chinese": "南瓜", "pinyin": "nánguā", "image": "🎃" },
+    { "id": "peas", "english": "peas", "chinese": "豌豆", "pinyin": "wāndòu", "image": "🫛" }
+  ]
+}

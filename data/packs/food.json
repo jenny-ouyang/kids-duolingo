@@ -60,6 +60,34 @@
       "chinese": "蛋糕",
       "pinyin": "dàngāo",
       "image": "/images/food/cake.png"
+    },
+    {
+      "id": "bread",
+      "english": "bread",
+      "chinese": "面包",
+      "pinyin": "miànbāo",
+      "image": "🍞"
+    },
+    {
+      "id": "dumplings",
+      "english": "dumplings",
+      "chinese": "饺子",
+      "pinyin": "jiǎozi",
+      "image": "🥟"
+    },
+    {
+      "id": "soup",
+      "english": "soup",
+      "chinese": "汤",
+      "pinyin": "tāng",
+      "image": "🍲"
+    },
+    {
+      "id": "tea",
+      "english": "tea",
+      "chinese": "茶",
+      "pinyin": "chá",
+      "image": "🍵"
     }
   ]
 }

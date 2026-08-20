@@ -1,0 +1,15 @@
+{
+  "packId": "s2-colors-counts",
+  "sentences": [
+    { "id": "s2_blue_bird", "english": "A blue bird.", "chinese": ["一只", "蓝色的", "鸟"], "pinyin": "yì zhī lánsè de niǎo", "emoji": "🐦" },
+    { "id": "s2_red_ball", "english": "A red ball.", "chinese": ["一个", "红色的", "球"], "pinyin": "yí gè hóngsè de qiú", "emoji": "⚽" },
+    { "id": "s2_i_am_cat", "english": "I am a kitty.", "chinese": ["我是", "一只", "猫咪"], "pinyin": "wǒ shì yì zhī māomī", "emoji": "🐱" },
+    { "id": "s2_i_have_dog", "english": "I have a dog.", "chinese": ["我有", "一条", "狗"], "pinyin": "wǒ yǒu yì tiáo gǒu", "emoji": "🐶" },
+    { "id": "s2_yellow_duck", "english": "A yellow duck.", "chinese": ["一只", "黄色的", "鸭子"], "pinyin": "yì zhī huángsè de yāzi", "emoji": "🦆" },
+    { "id": "s2_green_apple", "english": "A green apple.", "chinese": ["一个", "绿色的", "苹果"], "pinyin": "yí gè lǜsè de píngguǒ", "emoji": "🍏" },
+    { "id": "s2_cat_and_dog", "english": "A cat and a dog.", "chinese": ["一只", "猫", "和", "一条", "狗"], "pinyin": "yì zhī māo hé yì tiáo gǒu", "emoji": "🐱" },
+    { "id": "s2_i_want_juice", "english": "I want juice.", "chinese": ["我要", "果汁"], "pinyin": "wǒ yào guǒzhī", "emoji": "🧃" },
+    { "id": "s2_white_rabbit", "english": "A white rabbit.", "chinese": ["一只", "白色的", "兔子"], "pinyin": "yì zhī báisè de tùzi", "emoji": "🐰" },
+    { "id": "s2_purple_balloon", "english": "A purple balloon.", "chinese": ["一个", "紫色的", "气球"], "pinyin": "yí gè zǐsè de qìqiú", "emoji": "🎈" }
+  ]
+}

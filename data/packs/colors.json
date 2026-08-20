@@ -74,6 +74,20 @@
       "chinese": "棕色",
       "pinyin": "zōngsè",
       "image": "/images/colors/brown.png"
+    },
+    {
+      "id": "gray",
+      "english": "gray",
+      "chinese": "灰色",
+      "pinyin": "huīsè",
+      "image": "🩶"
+    },
+    {
+      "id": "gold",
+      "english": "gold",
+      "chinese": "金色",
+      "pinyin": "jīnsè",
+      "image": "🌟"
     }
   ]
 }

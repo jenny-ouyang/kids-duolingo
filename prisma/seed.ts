@@ -44,18 +44,29 @@ interface PackData {
 
 // Canonical sort order for packs
 const PACK_ORDER = [
+  // Level 1 · First Words
   'animals',
   'colors',
   'numbers',
   'food',
-  'family',
-  'greetings',
-  'pronouns',
-  'feelings',
   'body',
+  'family',
+  'shapes',
+  'greetings',
+  // Level 2 · My World
+  'toys',
+  'my-room',
   'home',
-  'nature',
+  'clothes',
+  'fruits',
+  'vegetables',
+  'snacks-drinks',
+  'mealtime',
+  'feelings',
   'actions',
+  // Levels 3-4 land in later batches
+  'pronouns',
+  'nature',
   'words',
   'sentences',
 ]

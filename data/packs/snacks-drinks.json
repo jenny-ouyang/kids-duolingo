@@ -1,0 +1,19 @@
+{
+  "id": "snacks-drinks",
+  "name": "Snacks & Drinks",
+  "nameZh": "零食饮料",
+  "emoji": "🧃",
+  "color": "#FF7A82",
+  "words": [
+    { "id": "juice", "english": "juice", "chinese": "果汁", "pinyin": "guǒzhī", "image": "🧃" },
+    { "id": "cookie", "english": "cookie", "chinese": "饼干", "pinyin": "bǐnggān", "image": "🍪" },
+    { "id": "candy", "english": "candy", "chinese": "糖果", "pinyin": "tángguǒ", "image": "🍬" },
+    { "id": "ice-cream", "english": "ice cream", "chinese": "冰淇淋", "pinyin": "bīngqílín", "image": "🍦" },
+    { "id": "yogurt", "english": "yogurt", "chinese": "酸奶", "pinyin": "suānnǎi", "image": "🥛" },
+    { "id": "chips", "english": "chips", "chinese": "薯片", "pinyin": "shǔpiàn", "image": "🍟" },
+    { "id": "chocolate", "english": "chocolate", "chinese": "巧克力", "pinyin": "qiǎokèlì", "image": "🍫" },
+    { "id": "popcorn", "english": "popcorn", "chinese": "爆米花", "pinyin": "bàomǐhuā", "image": "🍿" },
+    { "id": "lollipop", "english": "lollipop", "chinese": "棒棒糖", "pinyin": "bàngbàngtáng", "image": "🍭" },
+    { "id": "soda", "english": "soda", "chinese": "汽水", "pinyin": "qìshuǐ", "image": "🥤" }
+  ]
+}

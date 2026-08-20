@@ -1,0 +1,19 @@
+{
+  "id": "toys",
+  "name": "Toys",
+  "nameZh": "玩具",
+  "emoji": "🧸",
+  "color": "#F4576B",
+  "words": [
+    { "id": "ball", "english": "ball", "chinese": "球", "pinyin": "qiú", "image": "⚽" },
+    { "id": "doll", "english": "doll", "chinese": "娃娃", "pinyin": "wáwa", "image": "🪆" },
+    { "id": "blocks", "english": "blocks", "chinese": "积木", "pinyin": "jīmù", "image": "🧱" },
+    { "id": "teddy-bear", "english": "teddy bear", "chinese": "玩具熊", "pinyin": "wánjù xióng", "image": "🧸" },
+    { "id": "puzzle", "english": "puzzle", "chinese": "拼图", "pinyin": "pīntú", "image": "🧩" },
+    { "id": "toy-car", "english": "toy car", "chinese": "玩具车", "pinyin": "wánjù chē", "image": "🏎️" },
+    { "id": "balloon", "english": "balloon", "chinese": "气球", "pinyin": "qìqiú", "image": "🎈" },
+    { "id": "bubbles", "english": "bubbles", "chinese": "泡泡", "pinyin": "pàopao", "image": "🫧" },
+    { "id": "robot", "english": "robot", "chinese": "机器人", "pinyin": "jīqìrén", "image": "🤖" },
+    { "id": "kite", "english": "kite", "chinese": "风筝", "pinyin": "fēngzheng", "image": "🪁" }
+  ]
+}

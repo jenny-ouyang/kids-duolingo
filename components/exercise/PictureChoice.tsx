@@ -82,12 +82,18 @@ const SHAKE = { x: [-6, 6, -4, 4, 0] }
 
 // ─── Option Card variants ────────────────────────────────────────────────────
 
+/** New packs ship the emoji in word.image; legacy packs use the fallback map */
+export function wordEmoji(word: Word): string | undefined {
+  if (word.image && !word.image.startsWith('/')) return word.image
+  return EMOJI_FALLBACKS[word.id]
+}
+
 function PictureCard({
   word, state, shaking, isCorrect, onClick, disabled, edgeClass,
 }: {
   word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
-  const emojiIcon = EMOJI_FALLBACKS[word.id]
+  const emojiIcon = wordEmoji(word)
 
   return (
     <motion.button
@@ -165,7 +171,7 @@ function AudioPrompt({ word }: { word: Word }) {
 }
 
 function PicturePrompt({ word }: { word: Word }) {
-  const emojiIcon = EMOJI_FALLBACKS[word.id]
+  const emojiIcon = wordEmoji(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
       <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">

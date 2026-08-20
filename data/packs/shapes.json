@@ -1,0 +1,17 @@
+{
+  "id": "shapes",
+  "name": "Shapes",
+  "nameZh": "形状",
+  "emoji": "⭐",
+  "color": "#F5B93F",
+  "words": [
+    { "id": "circle", "english": "circle", "chinese": "圆形", "pinyin": "yuánxíng", "image": "🔵" },
+    { "id": "square", "english": "square", "chinese": "方形", "pinyin": "fāngxíng", "image": "🟦" },
+    { "id": "triangle", "english": "triangle", "chinese": "三角形", "pinyin": "sānjiǎoxíng", "image": "🔺" },
+    { "id": "star-shape", "english": "star", "chinese": "星形", "pinyin": "xīngxíng", "image": "⭐" },
+    { "id": "heart-shape", "english": "heart", "chinese": "心形", "pinyin": "xīnxíng", "image": "❤️" },
+    { "id": "rectangle", "english": "rectangle", "chinese": "长方形", "pinyin": "chángfāngxíng", "image": "▬" },
+    { "id": "oval", "english": "oval", "chinese": "椭圆形", "pinyin": "tuǒyuánxíng", "image": "🥚" },
+    { "id": "diamond-shape", "english": "diamond", "chinese": "菱形", "pinyin": "língxíng", "image": "🔷" }
+  ]
+}

@@ -1,0 +1,19 @@
+{
+  "id": "fruits",
+  "name": "Fruits",
+  "nameZh": "水果",
+  "emoji": "🍉",
+  "color": "#1FA88C",
+  "words": [
+    { "id": "watermelon", "english": "watermelon", "chinese": "西瓜", "pinyin": "xīguā", "image": "🍉" },
+    { "id": "grape", "english": "grapes", "chinese": "葡萄", "pinyin": "pútao", "image": "🍇" },
+    { "id": "strawberry", "english": "strawberry", "chinese": "草莓", "pinyin": "cǎoméi", "image": "🍓" },
+    { "id": "orange-fruit", "english": "orange", "chinese": "橙子", "pinyin": "chéngzi", "image": "🍊" },
+    { "id": "peach", "english": "peach", "chinese": "桃子", "pinyin": "táozi", "image": "🍑" },
+    { "id": "mango", "english": "mango", "chinese": "芒果", "pinyin": "mángguǒ", "image": "🥭" },
+    { "id": "pear", "english": "pear", "chinese": "梨", "pinyin": "lí", "image": "🍐" },
+    { "id": "pineapple", "english": "pineapple", "chinese": "菠萝", "pinyin": "bōluó", "image": "🍍" },
+    { "id": "cherry", "english": "cherries", "chinese": "樱桃", "pinyin": "yīngtáo", "image": "🍒" },
+    { "id": "lemon", "english": "lemon", "chinese": "柠檬", "pinyin": "níngméng", "image": "🍋" }
+  ]
+}

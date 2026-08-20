@@ -8,6 +8,8 @@ import foodData from '@/data/sentences/food.json'
 import familyData from '@/data/sentences/family.json'
 import feelingsData from '@/data/sentences/feelings.json'
 import homeData from '@/data/sentences/home.json'
+import s1Data from '@/data/sentences/s1-this-is.json'
+import s2Data from '@/data/sentences/s2-colors-counts.json'
 
 interface SentenceFile {
   packId: string
@@ -20,6 +22,8 @@ const SENTENCE_PACKS: Record<string, SentenceFile> = {
   family: familyData as SentenceFile,
   feelings: feelingsData as SentenceFile,
   home: homeData as SentenceFile,
+  's1-this-is': s1Data as SentenceFile,
+  's2-colors-counts': s2Data as SentenceFile,
 }
 
 function shuffle<T>(arr: T[]): T[] {

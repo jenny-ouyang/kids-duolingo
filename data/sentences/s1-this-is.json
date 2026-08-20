@@ -1,0 +1,15 @@
+{
+  "packId": "s1-this-is",
+  "sentences": [
+    { "id": "s1_this_cat", "english": "This is a cat.", "chinese": ["这是", "一只", "猫"], "pinyin": "zhè shì yì zhī māo", "emoji": "🐱" },
+    { "id": "s1_this_dog", "english": "This is a dog.", "chinese": ["这是", "一条", "狗"], "pinyin": "zhè shì yì tiáo gǒu", "emoji": "🐶" },
+    { "id": "s1_this_fish", "english": "This is a fish.", "chinese": ["这是", "一条", "鱼"], "pinyin": "zhè shì yì tiáo yú", "emoji": "🐟" },
+    { "id": "s1_this_bird", "english": "This is a bird.", "chinese": ["这是", "一只", "鸟"], "pinyin": "zhè shì yì zhī niǎo", "emoji": "🐦" },
+    { "id": "s1_this_rabbit", "english": "This is a rabbit.", "chinese": ["这是", "一只", "兔子"], "pinyin": "zhè shì yì zhī tùzi", "emoji": "🐰" },
+    { "id": "s1_two_dogs", "english": "Two dogs.", "chinese": ["两条", "狗"], "pinyin": "liǎng tiáo gǒu", "emoji": "🐶" },
+    { "id": "s1_three_birds", "english": "Three birds.", "chinese": ["三只", "鸟"], "pinyin": "sān zhī niǎo", "emoji": "🐦" },
+    { "id": "s1_five_fish", "english": "Five fish.", "chinese": ["五条", "鱼"], "pinyin": "wǔ tiáo yú", "emoji": "🐟" },
+    { "id": "s1_what_this", "english": "What is this?", "chinese": ["这", "是", "什么"], "pinyin": "zhè shì shénme", "emoji": "❓" },
+    { "id": "s1_many_fish", "english": "So many fish!", "chinese": ["许多", "鱼"], "pinyin": "xǔduō yú", "emoji": "🐟" }
+  ]
+}

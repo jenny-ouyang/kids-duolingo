@@ -185,6 +185,16 @@
   },
   "active": "98672c79a4563a69",
   "lastOpenFiles": [
+    "data/sentences/s2-colors-counts.json",
+    "data/sentences/s1-this-is.json",
+    "data/packs/mealtime.json",
+    "data/packs/snacks-drinks.json",
+    "data/packs/vegetables.json",
+    "data/packs/fruits.json",
+    "data/packs/clothes.json",
+    "data/packs/my-room.json",
+    "data/packs/toys.json",
+    "data/packs/shapes.json",
     "docs/design/DESIGN.md"
   ]
 }

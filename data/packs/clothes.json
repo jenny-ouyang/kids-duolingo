@@ -1,0 +1,19 @@
+{
+  "id": "clothes",
+  "name": "Clothes",
+  "nameZh": "衣服",
+  "emoji": "👕",
+  "color": "#3D7DE4",
+  "words": [
+    { "id": "shirt", "english": "shirt", "chinese": "衬衫", "pinyin": "chènshān", "image": "👔" },
+    { "id": "t-shirt", "english": "T-shirt", "chinese": "T恤", "pinyin": "T xù", "image": "👕" },
+    { "id": "pants", "english": "pants", "chinese": "裤子", "pinyin": "kùzi", "image": "👖" },
+    { "id": "dress", "english": "dress", "chinese": "裙子", "pinyin": "qúnzi", "image": "👗" },
+    { "id": "shoes", "english": "shoes", "chinese": "鞋子", "pinyin": "xiézi", "image": "👟" },
+    { "id": "socks", "english": "socks", "chinese": "袜子", "pinyin": "wàzi", "image": "🧦" },
+    { "id": "hat", "english": "hat", "chinese": "帽子", "pinyin": "màozi", "image": "🧢" },
+    { "id": "coat", "english": "coat", "chinese": "外套", "pinyin": "wàitào", "image": "🧥" },
+    { "id": "gloves", "english": "gloves", "chinese": "手套", "pinyin": "shǒutào", "image": "🧤" },
+    { "id": "scarf", "english": "scarf", "chinese": "围巾", "pinyin": "wéijīn", "image": "🧣" }
+  ]
+}

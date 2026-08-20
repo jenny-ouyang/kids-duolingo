@@ -20,32 +20,11 @@
       "image": "/images/home/table.png"
     },
     {
-      "id": "bed",
-      "english": "bed",
-      "chinese": "大床",
-      "pinyin": "dàchuáng",
-      "image": "/images/home/bed.png"
-    },
-    {
       "id": "sofa",
       "english": "sofa",
       "chinese": "沙发",
       "pinyin": "shāfā",
       "image": "/images/home/sofa.png"
-    },
-    {
-      "id": "door",
-      "english": "door",
-      "chinese": "大门",
-      "pinyin": "dàmén",
-      "image": "/images/home/door.png"
-    },
-    {
-      "id": "window",
-      "english": "window",
-      "chinese": "窗户",
-      "pinyin": "chuānghu",
-      "image": "/images/home/window.png"
     },
     {
       "id": "stairs",
@@ -55,46 +34,11 @@
       "image": "/images/home/stairs.png"
     },
     {
-      "id": "lamp",
-      "english": "light / lamp",
-      "chinese": "台灯",
-      "pinyin": "táidēng",
-      "image": "/images/home/lamp.png"
-    },
-    {
       "id": "floor",
       "english": "floor",
       "chinese": "地板",
       "pinyin": "dìbǎn",
       "image": "/images/home/floor.png"
-    },
-    {
-      "id": "cup",
-      "english": "cup",
-      "chinese": "杯子",
-      "pinyin": "bēizi",
-      "image": "/images/home/cup.png"
-    },
-    {
-      "id": "bowl",
-      "english": "bowl",
-      "chinese": "饭碗",
-      "pinyin": "fànwǎn",
-      "image": "/images/home/bowl.png"
-    },
-    {
-      "id": "chopsticks",
-      "english": "chopsticks",
-      "chinese": "筷子",
-      "pinyin": "kuàizi",
-      "image": "/images/home/chopsticks.png"
-    },
-    {
-      "id": "spoon",
-      "english": "spoon",
-      "chinese": "勺子",
-      "pinyin": "sháozi",
-      "image": "/images/home/spoon.png"
     },
     {
       "id": "fridge",
@@ -130,20 +74,6 @@
       "chinese": "玩具",
       "pinyin": "wánjù",
       "image": "/images/home/toy.png"
-    },
-    {
-      "id": "ball",
-      "english": "ball",
-      "chinese": "皮球",
-      "pinyin": "píqiú",
-      "image": "/images/home/ball.png"
-    },
-    {
-      "id": "mirror",
-      "english": "mirror",
-      "chinese": "镜子",
-      "pinyin": "jìngzi",
-      "image": "/images/home/mirror.png"
     }
   ]
 }

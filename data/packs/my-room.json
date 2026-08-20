@@ -1,0 +1,79 @@
+{
+  "id": "my-room",
+  "name": "My Room",
+  "nameZh": "我的房间",
+  "emoji": "🛏️",
+  "color": "#9A7BE8",
+  "words": [
+    {
+      "id": "bed",
+      "english": "bed",
+      "chinese": "床",
+      "pinyin": "chuáng",
+      "image": "🛏️"
+    },
+    {
+      "id": "pillow",
+      "english": "pillow",
+      "chinese": "枕头",
+      "pinyin": "zhěntou",
+      "image": "🛌"
+    },
+    {
+      "id": "blanket",
+      "english": "blanket",
+      "chinese": "毯子",
+      "pinyin": "tǎnzi",
+      "image": "🧣"
+    },
+    {
+      "id": "lamp",
+      "english": "lamp",
+      "chinese": "灯",
+      "pinyin": "dēng",
+      "image": "💡"
+    },
+    {
+      "id": "book",
+      "english": "book",
+      "chinese": "书",
+      "pinyin": "shū",
+      "image": "📖"
+    },
+    {
+      "id": "door",
+      "english": "door",
+      "chinese": "门",
+      "pinyin": "mén",
+      "image": "🚪"
+    },
+    {
+      "id": "window",
+      "english": "window",
+      "chinese": "窗户",
+      "pinyin": "chuānghu",
+      "image": "🪟"
+    },
+    {
+      "id": "closet",
+      "english": "closet",
+      "chinese": "衣柜",
+      "pinyin": "yīguì",
+      "image": "🗄️"
+    },
+    {
+      "id": "mirror",
+      "english": "mirror",
+      "chinese": "镜子",
+      "pinyin": "jìngzi",
+      "image": "🪞"
+    },
+    {
+      "id": "clock",
+      "english": "clock",
+      "chinese": "钟",
+      "pinyin": "zhōng",
+      "image": "⏰"
+    }
+  ]
+}

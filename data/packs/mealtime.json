@@ -1,0 +1,19 @@
+{
+  "id": "mealtime",
+  "name": "Mealtime",
+  "nameZh": "吃饭",
+  "emoji": "🥣",
+  "color": "#D9A32C",
+  "words": [
+    { "id": "bowl", "english": "bowl", "chinese": "碗", "pinyin": "wǎn", "image": "🥣" },
+    { "id": "cup", "english": "cup", "chinese": "杯子", "pinyin": "bēizi", "image": "🥤" },
+    { "id": "spoon", "english": "spoon", "chinese": "勺子", "pinyin": "sháozi", "image": "🥄" },
+    { "id": "chopsticks", "english": "chopsticks", "chinese": "筷子", "pinyin": "kuàizi", "image": "🥢" },
+    { "id": "plate", "english": "plate", "chinese": "盘子", "pinyin": "pánzi", "image": "🍽️" },
+    { "id": "fork", "english": "fork", "chinese": "叉子", "pinyin": "chāzi", "image": "🍴" },
+    { "id": "napkin", "english": "napkin", "chinese": "餐巾纸", "pinyin": "cānjīnzhǐ", "image": "🧻" },
+    { "id": "hungry-meal", "english": "hungry", "chinese": "饿", "pinyin": "è", "image": "🤤" },
+    { "id": "full-meal", "english": "full", "chinese": "饱", "pinyin": "bǎo", "image": "😌" },
+    { "id": "yummy", "english": "yummy", "chinese": "好吃", "pinyin": "hǎochī", "image": "😋" }
+  ]
+}
