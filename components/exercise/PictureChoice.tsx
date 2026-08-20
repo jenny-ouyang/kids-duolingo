@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { speakChinese } from '@/lib/tts'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
 import { Word, ExerciseQuestion } from '@/lib/types'
+import wordImageIds from '@/lib/word-images.json'
 
 interface PictureChoiceProps {
   question: ExerciseQuestion
@@ -88,12 +89,20 @@ export function wordEmoji(word: Word): string | undefined {
   return EMOJI_FALLBACKS[word.id]
 }
 
+// Custom Sunrise Playground illustrations (scripts/generate-images.sh).
+// Words in the manifest render real art; everything else falls back to emoji.
+const ILLUSTRATED = new Set<string>(wordImageIds as string[])
+export function wordImageSrc(word: Word): string | null {
+  return ILLUSTRATED.has(word.id) ? `/images/words/${word.id}.jpg` : null
+}
+
 function PictureCard({
   word, state, shaking, isCorrect, onClick, disabled, edgeClass,
 }: {
   word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
 }) {
   const emojiIcon = wordEmoji(word)
+  const imageSrc = wordImageSrc(word)
 
   return (
     <motion.button
@@ -104,7 +113,13 @@ function PictureCard({
       className={`relative rounded-3xl p-4 flex flex-col items-center justify-center gap-2 transition-colors duration-200 cursor-pointer select-none ${tileClasses(state, isCorrect, edgeClass)}`}
       style={{ minHeight: 130 }}
     >
-      {emojiIcon ? (
+      {imageSrc ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={imageSrc} alt={word.english} className="w-[88px] h-[88px] object-contain rounded-2xl" draggable={false} />
+          <span className="text-sm font-extrabold text-ink capitalize">{word.english}</span>
+        </>
+      ) : emojiIcon ? (
         <>
           <div className="font-emoji text-[46px] leading-none">{emojiIcon}</div>
           <span className="text-sm font-extrabold text-ink capitalize">{word.english}</span>
@@ -172,12 +187,16 @@ function AudioPrompt({ word }: { word: Word }) {
 
 function PicturePrompt({ word }: { word: Word }) {
   const emojiIcon = wordEmoji(word)
+  const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
       <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
         What is this in Chinese?
       </p>
-      {emojiIcon ? (
+      {imageSrc ? (
+        // eslint-disable-next-line @next/next/no-img-element
+        <img src={imageSrc} alt={word.english} className="w-40 h-40 object-contain rounded-3xl" draggable={false} />
+      ) : emojiIcon ? (
         <div className="font-emoji text-8xl leading-none">{emojiIcon}</div>
       ) : (
         <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card">
