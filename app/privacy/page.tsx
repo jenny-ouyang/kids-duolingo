@@ -109,7 +109,7 @@ export default function PrivacyPage() {
               You can delete a child&apos;s profile and all of their practice
               history at any time from the Parent Zone. To delete your entire
               account, use the in-app options or email us at{' '}
-              <strong>support@mandarineer.com</strong> (mailbox pending domain setup — a real
+              <strong>support@mandarineer.com</strong> (a real
               contact address will replace this before launch) and we will remove
               everything associated with your account.
             </p>
@@ -125,7 +125,7 @@ export default function PrivacyPage() {
           <Section title="Contact">
             <p>
               Questions about privacy? Email{' '}
-              <strong>support@mandarineer.com</strong> (mailbox pending domain setup).
+              <strong>support@mandarineer.com</strong>.
             </p>
           </Section>
         </div>

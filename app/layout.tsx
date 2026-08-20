@@ -25,8 +25,12 @@ const notoEmoji = Noto_Color_Emoji({
 })
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://mandarineer.com'),
   title: 'Mandarineer — Mandarin for Kids',
   description: 'A gentle, playful way for kids to learn Mandarin Chinese, with early math practice included. No punishment, just practice.',
+  icons: { apple: '/apple-touch-icon.png' },
+  appleWebApp: { capable: true, title: 'Mandarineer', statusBarStyle: 'default' },
+  openGraph: { images: ['/og.png'] },
 }
 
 export default function RootLayout({

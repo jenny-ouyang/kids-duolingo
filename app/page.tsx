@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   description:
     'Learn Chinese for kids, the gentle way. Mandarin for kids ages 4–8 with spoken words, pictures, and early math — short 8-question sessions, no ads, and no punishment for wrong answers.',
   openGraph: {
+    images: ['/og.png'],
     title: 'Mandarineer: Mandarin for Kids — Learn Chinese, Ages 4–8',
     description:
       'A playful web app where kids 4–8 learn Chinese words and early math. Spoken Mandarin, spaced repetition, and kind-by-design practice — free to play.',

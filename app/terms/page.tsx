@@ -94,14 +94,14 @@ export default function TermsPage() {
           <Section title="Governing law">
             <p>
               These terms are governed by the laws of{' '}
-              <strong>[Jurisdiction — placeholder, to be set before launch]</strong>.
+              the United States.
             </p>
           </Section>
 
           <Section title="Contact">
             <p>
               Questions about these terms? Email{' '}
-              <strong>support@mandarineer.com</strong> (mailbox pending domain setup).
+              <strong>support@mandarineer.com</strong>.
             </p>
           </Section>
         </div>
