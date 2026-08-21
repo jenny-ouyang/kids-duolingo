@@ -33,8 +33,12 @@ async function playClip(text: string): Promise<boolean> {
     let buffer = bufferCache.get(file)
     if (!buffer) {
       const res = await fetch(`/audio/zh/${file}`)
-      if (!res.ok) return false
-      buffer = await ctx.decodeAudioData(await res.arrayBuffer())
+      // Capacitor's local-scheme responses report status 0 — treat a body as
+      // success there, or every bundled clip would fall back to Web Speech.
+      if (!res.ok && res.status !== 0) return false
+      const bytes = await res.arrayBuffer()
+      if (bytes.byteLength === 0) return false
+      buffer = await ctx.decodeAudioData(bytes)
       bufferCache.set(file, buffer)
     }
     stopClip()
