@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { speakChinese } from '@/lib/tts'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
+import { hapticCorrect, hapticWrong } from '@/lib/haptics'
 import { Word, ExerciseQuestion } from '@/lib/types'
 import wordImageIds from '@/lib/word-images.json'
 
@@ -248,6 +249,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
       const firstTry = wrongIds.length === 0
       setSolved(true)
       playCorrectSound()
+      hapticCorrect()
       setTimeout(() => speakChinese(question.word.chinese), 150)
       setTimeout(() => {
         onAnswer(firstTry)
@@ -257,6 +259,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
       }, 1100)
     } else {
       playWrongSound()
+      hapticWrong()
       setWrongIds((ids) => [...ids, wordId])
       setLastWrongId(wordId)
       setTimeout(() => setLastWrongId(null), 400)

@@ -1,3 +1,4 @@
+import { apiFetch } from '@/lib/api-fetch'
 import { Word, ExerciseQuestion, WordQuestionType } from './types'
 
 const QUESTION_TYPES: WordQuestionType[] = [
@@ -34,7 +35,7 @@ export async function generateQuestion(
   const otherWords = allWords.filter((w) => w.id !== targetWord.id)
 
   try {
-    const res = await fetch('/api/generate-options', {
+    const res = await apiFetch('/api/generate-options', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ word: targetWord, packWords: otherWords }),

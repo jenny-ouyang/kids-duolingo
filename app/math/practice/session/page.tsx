@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import CountAndChoose from '@/components/exercise/CountAndChoose'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { MathQuestion, BaseProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
-import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonCached } from '@/lib/api-fetch'
 
 const MAX_HEARTS = 5
 
@@ -28,10 +28,18 @@ function PracticeCanvas({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function MathPracticeSession() {
+export default function MathPracticeSessionPage() {
+  // useSearchParams needs a Suspense boundary under static export
+  return (
+    <Suspense fallback={null}>
+      <MathPracticeSession />
+    </Suspense>
+  )
+}
+
+function MathPracticeSession() {
   const router = useRouter()
-  const params = useParams()
-  const topicId = params.topicId as string
+  const topicId = useSearchParams().get('topic') ?? ''
 
   const [topicName, setTopicName] = useState('')
   const [topicEmoji, setTopicEmoji] = useState('➕')
@@ -51,8 +59,8 @@ export default function MathPracticeSession() {
   const loadSession = useCallback(async () => {
     try {
       const [sessionRes, packRes] = await Promise.all([
-        fetchJsonWithAuthRetry<MathSessionResponse>(`/api/math/questions/${topicId}`),
-        fetchJsonWithAuthRetry<{ name?: string; emoji?: string }>(`/api/packs/${topicId}`),
+        fetchJsonCached<MathSessionResponse>(`/api/math/questions/${topicId}`),
+        fetchJsonCached<{ name?: string; emoji?: string }>(`/api/packs/${topicId}`),
       ])
 
       if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
@@ -90,13 +98,13 @@ export default function MathPracticeSession() {
     progressRef.current[problemId] = updated
 
     // Fire-and-forget — never blocks UI
-    fetch('/api/progress', {
+    apiFetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ packId: topicId, wordId: problemId, subject: 'math', ...updated }),
     }).catch(console.error)
 
-    fetch('/api/answers', {
+    apiFetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ packId: topicId, wordId: problemId, correct }),
@@ -126,7 +134,7 @@ export default function MathPracticeSession() {
 
     setTimeout(() => {
       if (isLast) {
-        fetch('/api/profile', {
+        apiFetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ heartsEarned: newHeartsEarned, tzOffsetMinutes: new Date().getTimezoneOffset() }),

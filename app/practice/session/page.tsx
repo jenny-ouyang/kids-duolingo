@@ -1,14 +1,14 @@
 'use client'
 
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useRouter, useParams } from 'next/navigation'
+import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import PictureChoice from '@/components/exercise/PictureChoice'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { ExerciseQuestion, WordProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
-import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonCached } from '@/lib/api-fetch'
 
 const MAX_HEARTS = 5
 
@@ -28,10 +28,18 @@ function PracticeCanvas({ children }: { children: React.ReactNode }) {
   )
 }
 
-export default function PracticeSession() {
+export default function PracticeSessionPage() {
+  // useSearchParams needs a Suspense boundary under static export
+  return (
+    <Suspense fallback={null}>
+      <PracticeSession />
+    </Suspense>
+  )
+}
+
+function PracticeSession() {
   const router = useRouter()
-  const params = useParams()
-  const packId = params.packId as string
+  const packId = useSearchParams().get('pack') ?? ''
 
   const [packName, setPackName] = useState('')
   const [packEmoji, setPackEmoji] = useState('📦')
@@ -54,8 +62,8 @@ export default function PracticeSession() {
   const loadSession = useCallback(async () => {
     try {
       const [sessionRes, packRes] = await Promise.all([
-        fetchJsonWithAuthRetry<SessionResponse>(`/api/questions/${packId}`),
-        fetchJsonWithAuthRetry<{ name?: string; emoji?: string }>(`/api/packs/${packId}`),
+        fetchJsonCached<SessionResponse>(`/api/questions/${packId}`),
+        fetchJsonCached<{ name?: string; emoji?: string }>(`/api/packs/${packId}`),
       ])
 
       if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
@@ -93,13 +101,13 @@ export default function PracticeSession() {
     wordProgressRef.current[itemId] = updated
 
     // Save to DB — fire-and-forget, never blocks the UI
-    fetch('/api/progress', {
+    apiFetch('/api/progress', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ packId, wordId: itemId, ...updated }),
     }).catch(console.error)
 
-    fetch('/api/answers', {
+    apiFetch('/api/answers', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ packId, wordId: itemId, correct }),
@@ -134,7 +142,7 @@ export default function PracticeSession() {
 
     setTimeout(() => {
       if (isLast) {
-        fetch('/api/profile', {
+        apiFetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ heartsEarned: newHeartsEarned, tzOffsetMinutes: new Date().getTimezoneOffset() }),

@@ -1,5 +1,6 @@
 'use client'
 
+import { apiFetch } from '@/lib/api-fetch'
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -36,7 +37,7 @@ export default function SentencesPractice() {
 
   const loadSession = useCallback(async () => {
     try {
-      const res = await fetch('/api/sentences/all')
+      const res = await apiFetch('/api/sentences/all')
       if (!res.ok) throw new Error('Could not load sentences')
       const data = await res.json()
       setQuestions(data.sentences ?? [])

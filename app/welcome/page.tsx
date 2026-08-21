@@ -1,5 +1,6 @@
 'use client'
 
+import { apiFetch } from '@/lib/api-fetch'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -33,7 +34,7 @@ export default function WelcomePage() {
 
     try {
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
-        const res = await fetch('/api/children', {
+        const res = await apiFetch('/api/children', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ name: name.trim(), avatar }),

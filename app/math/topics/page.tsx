@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
-import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { fetchJsonCached } from '@/lib/api-fetch'
 
 interface TopicMeta {
   id: string
@@ -39,7 +39,7 @@ export default function MathTopicsPage() {
 
   useEffect(() => {
     let cancelled = false
-    fetchJsonWithAuthRetry<TopicMeta[]>('/api/packs?subject=math').then(({ ok, status, data }) => {
+    fetchJsonCached<TopicMeta[]>('/api/packs?subject=math').then(({ ok, status, data }) => {
       if (cancelled) return
       if (status === 403) {
         // Authed but no child yet — first visit, go set one up
@@ -117,7 +117,7 @@ export default function MathTopicsPage() {
               transition={{ delay: i * 0.08 }}
             >
               <button
-                onClick={() => router.push(`/math/practice/${topic.id}`)}
+                onClick={() => router.push(`/math/practice/session?topic=${topic.id}`)}
                 className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
               >
                 <span className="font-emoji text-[34px] leading-none bg-[#E4EFFD] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]">

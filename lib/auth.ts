@@ -1,4 +1,4 @@
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { createSupabaseServer } from '@/lib/supabase-server'
@@ -28,9 +28,12 @@ export class AuthError extends Error {
  */
 export async function getAuthContext(): Promise<{ userId: string }> {
   const supabase = createSupabaseServer()
+  // The native (Capacitor) app is cross-origin, so its session arrives as a
+  // Bearer token instead of cookies. getUser(jwt) validates it the same way.
+  const bearer = headers().get('authorization')?.match(/^Bearer (.+)$/)?.[1]
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = bearer ? await supabase.auth.getUser(bearer) : await supabase.auth.getUser()
   if (!user) throw new AuthError(401, 'unauthenticated')
 
   // Supabase reports anonymous users with email as EMPTY STRING, not null — and
@@ -84,12 +87,14 @@ export async function getAuthContext(): Promise<{ userId: string }> {
 export async function requireChild(): Promise<{ userId: string; child: Child }> {
   const { userId } = await getAuthContext()
 
-  const cookieChildId = cookies().get(CHILD_COOKIE)?.value
+  // Active-child hint: x-child-id header (native app) or kd_child cookie (web).
+  // Either way it is only a hint — ownership is verified against the account.
+  const hintedChildId = headers().get('x-child-id') ?? cookies().get(CHILD_COOKIE)?.value
   let child: Child | null = null
 
-  if (cookieChildId) {
+  if (hintedChildId) {
     child = await prisma.child.findFirst({
-      where: { id: cookieChildId, accountId: userId },
+      where: { id: hintedChildId, accountId: userId },
     })
   }
   if (!child) {

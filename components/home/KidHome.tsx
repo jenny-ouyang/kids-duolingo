@@ -1,5 +1,6 @@
 'use client'
 
+import { apiFetch } from '@/lib/api-fetch'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
@@ -73,7 +74,7 @@ export default function KidHome() {
     async function loadProfile() {
       for (let attempt = 0; attempt < PROFILE_MAX_RETRIES; attempt++) {
         try {
-          const res = await fetch('/api/profile')
+          const res = await apiFetch('/api/profile')
           if (cancelled) return
 
           if (res.status === 401) {
@@ -97,7 +98,7 @@ export default function KidHome() {
           setStatus('ready')
 
           // Show the switcher entry when the account has more than one child
-          fetch('/api/children')
+          apiFetch('/api/children')
             .then((r) => (r.ok ? r.json() : []))
             .then((children: unknown) => {
               if (!cancelled && Array.isArray(children)) setHasSiblings(children.length > 1)

@@ -25,8 +25,12 @@ export const metadata: Metadata = {
  * Server-side fork: returning families (kd_child cookie set) go straight to
  * the kid home; everyone else — first-time visitors and crawlers, which never
  * carry the cookie — sees the public marketing landing (the SEO surface).
+ *
+ * The Capacitor build is statically exported (no request cookies) and is an
+ * installed app, not a marketing surface — it always renders the kid home.
  */
 export default function HomePage() {
+  if (process.env.NEXT_PUBLIC_CAP_BUILD === '1') return <KidHome />
   const hasChild = cookies().has(CHILD_COOKIE)
   return hasChild ? <KidHome /> : <Landing />
 }

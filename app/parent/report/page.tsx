@@ -1,7 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { Suspense, useCallback, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 
@@ -106,12 +106,18 @@ function PackRow({ pack }: { pack: ReportPack }) {
   )
 }
 
-export default function ChildReport({
-  params,
-}: {
-  params: { childId: string }
-}) {
+export default function ChildReportPage() {
+  // useSearchParams needs a Suspense boundary under static export
+  return (
+    <Suspense fallback={null}>
+      <ChildReport />
+    </Suspense>
+  )
+}
+
+function ChildReport() {
   const router = useRouter()
+  const childId = useSearchParams().get('child') ?? ''
   const [report, setReport] = useState<Report | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'failed'>('loading')
 
@@ -126,7 +132,7 @@ export default function ChildReport({
   const fetchReport = useCallback(async () => {
     setStatus('loading')
     const { ok, status: httpStatus, data } = await fetchJsonWithAuthRetry<Report>(
-      `/api/children/${encodeURIComponent(params.childId)}/report`
+      `/api/children/${encodeURIComponent(childId)}/report`
     )
     if (httpStatus === 404) {
       router.replace('/parent')
@@ -138,7 +144,7 @@ export default function ChildReport({
     } else {
       setStatus('failed')
     }
-  }, [params.childId, router])
+  }, [childId, router])
 
   useEffect(() => {
     fetchReport()

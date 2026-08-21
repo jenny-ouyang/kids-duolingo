@@ -40,3 +40,8 @@ next-env.d.ts
 # managed by openclaw
 .env.vercel
 .image-work/
+
+# Capacitor
+.cap-hidden/
+out/
+ios/App/App/public/

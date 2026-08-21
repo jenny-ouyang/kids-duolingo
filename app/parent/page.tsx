@@ -5,7 +5,8 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
-import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { clearActiveChild } from '@/lib/child-cookie'
 import type { User } from '@supabase/supabase-js'
 
 const GATE_KEY = 'kd_parent_gate'
@@ -191,7 +192,7 @@ function ChildrenSection() {
     if (!newName.trim() || saving) return
     setSaving(true)
     try {
-      const res = await fetch('/api/children', {
+      const res = await apiFetch('/api/children', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: newName.trim(), avatar: newAvatar }),
@@ -227,7 +228,7 @@ function ChildrenSection() {
     if (!editingId || !editName.trim() || saving) return
     setSaving(true)
     try {
-      const res = await fetch('/api/children', {
+      const res = await apiFetch('/api/children', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id: editingId, name: editName.trim(), avatar: editAvatar }),
@@ -248,7 +249,7 @@ function ChildrenSection() {
     if (deleteText !== child.name || saving) return
     setSaving(true)
     try {
-      const res = await fetch(`/api/children?id=${encodeURIComponent(child.id)}`, {
+      const res = await apiFetch(`/api/children?id=${encodeURIComponent(child.id)}`, {
         method: 'DELETE',
       })
       if (!res.ok) {
@@ -405,7 +406,7 @@ function ChildrenSection() {
               </div>
               <div className="flex gap-2 flex-shrink-0">
                 <Link
-                  href={`/parent/report/${child.id}`}
+                  href={`/parent/report?child=${child.id}`}
                   className="pressable min-h-[56px] bg-white text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex items-center"
                 >
                   Report
@@ -517,8 +518,9 @@ function AccountSection() {
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowser()
-    // Clear the active-child cookie (httpOnly, server-set) so / shows the landing again.
-    await fetch('/api/children/active', { method: 'DELETE' }).catch(() => {})
+    // Clear the active-child selection (cookie on web, localStorage on native)
+    // so / shows the landing/picker again.
+    await clearActiveChild()
     await supabase.auth.signOut()
     // Full navigation so a fresh anonymous session bootstraps on the home page.
     window.location.assign('/')

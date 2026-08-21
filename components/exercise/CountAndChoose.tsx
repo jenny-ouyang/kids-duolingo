@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
+import { hapticCorrect, hapticWrong } from '@/lib/haptics'
 import { MathQuestion } from '@/lib/types'
 
 interface CountAndChooseProps {
@@ -82,6 +83,7 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
       const firstTry = wrongPicks.length === 0
       setSolved(true)
       playCorrectSound()
+      hapticCorrect()
       setTimeout(() => {
         onAnswer(firstTry)
         setWrongPicks([])
@@ -90,6 +92,7 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
       }, 1100)
     } else {
       playWrongSound()
+      hapticWrong()
       setWrongPicks((picks) => [...picks, value])
       setLastWrongPick(value)
       setTimeout(() => setLastWrongPick(null), 400)

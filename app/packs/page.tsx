@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
-import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { fetchJsonCached } from '@/lib/api-fetch'
 
 interface PackMeta {
   id: string
@@ -41,7 +41,7 @@ export default function PacksPage() {
 
   useEffect(() => {
     let cancelled = false
-    fetchJsonWithAuthRetry<PackMeta[]>('/api/packs').then(({ ok, status, data }) => {
+    fetchJsonCached<PackMeta[]>('/api/packs').then(({ ok, status, data }) => {
       if (cancelled) return
       if (status === 403) {
         // Authed but no child yet — first visit, go set one up
@@ -162,7 +162,7 @@ export default function PacksPage() {
                 >
                   <button
                     onClick={() =>
-                      router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/${pack.id}`)
+                      router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
                     }
                     className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
                   >

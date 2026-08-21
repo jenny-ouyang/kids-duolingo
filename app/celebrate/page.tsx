@@ -8,6 +8,7 @@ import Mascot from '@/components/design/Mascot'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { speakChinese } from '@/lib/tts'
 import { playCelebrationSound, playStarSound } from '@/lib/sounds'
+import { hapticCelebrate } from '@/lib/haptics'
 import { getEncouragement, SessionData, Encouragement } from '@/lib/encouragement'
 
 function CelebrationContent() {
@@ -20,7 +21,7 @@ function CelebrationContent() {
   const heartsEarned = Number(searchParams.get('hearts') ?? 0)
 
   const backHref = subject === 'math' ? '/math/topics' : '/packs'
-  const playAgainHref = subject === 'math' ? `/math/practice/${packId}` : `/practice/${packId}`
+  const playAgainHref = subject === 'math' ? `/math/practice/session?topic=${packId}` : `/practice/session?pack=${packId}`
   const isMath = subject === 'math'
 
   const allCorrect = correct === total
@@ -53,6 +54,7 @@ function CelebrationContent() {
     setEnc(encouragement)
 
     playCelebrationSound()
+    hapticCelebrate()
     Array.from({ length: stars }).forEach((_, i) => {
       playStarSound(300 + i * 150)
     })
