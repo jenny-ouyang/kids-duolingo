@@ -172,7 +172,9 @@ export default function SentencesPractice() {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <SentenceBuild question={currentQuestion} onAnswer={handleAnswer} />
+              {/* key forces a clean remount per question — SentenceBuild seeds
+                  its tile bank from props once, so reuse shows stale tiles */}
+              <SentenceBuild key={currentQuestion.sentence.id} question={currentQuestion} onAnswer={handleAnswer} />
             </motion.div>
           </AnimatePresence>
         </ExerciseShell>
