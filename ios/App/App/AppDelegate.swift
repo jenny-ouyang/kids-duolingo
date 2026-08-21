@@ -1,4 +1,5 @@
 import UIKit
+import AVFAudio
 import Capacitor
 
 @UIApplicationMain
@@ -7,7 +8,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+        // Learning audio must play even with the ring/silent switch on silent
+        // (like any game or video app). Default WKWebView audio is "ambient",
+        // which the mute switch silences — .playback ignores it.
+        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
+        try? AVAudioSession.sharedInstance().setActive(true)
         return true
     }
 
