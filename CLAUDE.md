@@ -125,6 +125,10 @@ Note: `.env` also references a different Supabase project (`fhdjzktrpcsjleargmrb
 
 Deployed on Vercel (`.vercel/` config present).
 
+## Content invariant
+
+**Every word must have a visual** (illustration in `lib/word-images.json`, emoji in its data `image` field, or an EMOJI_FALLBACKS entry). Verify with `python3 scripts/audit-visuals.py` after any content batch and before any iOS build — 14 body-pack words shipped text-only on 2026-08-21 and Jenny caught it in TestFlight.
+
 ## Recent changes
 
 - 2026-08-20: Batch C complete — all 360 words across 33 packs now have custom illustrations (216 in lib/word-images.json; some abstract words intentionally stay emoji). Parent progress reports live (`/parent/report/[childId]` + ownership-checked `/api/children/[childId]/report`). Image pipeline note: nanobanana (Gemini) hit its monthly spend cap mid-batch; final 30 images were generated with OpenAI `gpt-image-1` (key in shell env, ~4¢/image, same STYLE prompt from `scripts/generate-images.sh`, style-matches nanobanana closely) + white-point correction for its cream backgrounds — use it as the fallback generator whenever Gemini quota is exhausted.

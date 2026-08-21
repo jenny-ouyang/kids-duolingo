@@ -209,12 +209,22 @@ function PicturePrompt({ word }: { word: Word }) {
 }
 
 function EnglishPrompt({ word }: { word: Word }) {
+  // English alone is a wall of text to a pre-reader — pair it with the word's
+  // picture whenever one exists (illustration first, emoji otherwise).
+  const emojiIcon = wordEmoji(word)
+  const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
       <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
         How do you say this in Chinese?
       </p>
-      <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card">
+      <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card flex flex-col items-center gap-2">
+        {imageSrc ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={imageSrc} alt="" className="w-28 h-28 object-contain rounded-2xl" draggable={false} />
+        ) : emojiIcon ? (
+          <span className="font-emoji text-6xl leading-none">{emojiIcon}</span>
+        ) : null}
         <span className="text-4xl font-extrabold text-ink capitalize">{word.english}</span>
       </div>
     </div>
