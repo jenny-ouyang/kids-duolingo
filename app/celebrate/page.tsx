@@ -149,7 +149,7 @@ function CelebrationContent() {
           </motion.div>
         )}
 
-        {/* Word spotlight — highlights a specific word Julian mastered */}
+        {/* Word spotlight — highlights a specific word the child mastered */}
         {enc.spotlightWord && (
           <motion.div
             initial={{ opacity: 0, y: 10 }}

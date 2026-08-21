@@ -41,7 +41,7 @@ export interface Encouragement {
   } | null
 }
 
-// ─── Praise phrases Julian hears (a different one each time) ────────────────
+// ─── Praise phrases (a different one each time) ────────────────
 
 const CHINESE_PRAISE = [
   { phrase: '你真棒', pinyin: 'nǐ zhēn bàng', meaning: "You're really great" },
@@ -67,7 +67,7 @@ const HEADINGS_PERFECT = [
   'Perfect! Not a single mistake!',
   'WOW! Every one correct!',
   'Flawless! You nailed it!',
-  "You're a superstar, Julian!",
+  "You're a superstar!",
   'Clean sweep!',
   '100%! Nothing stops you!',
   'Total perfection!',
@@ -77,7 +77,7 @@ const HEADINGS_PERFECT = [
 ]
 
 const HEADINGS_GREAT = [
-  'Great job, Julian!',
+  'Great job!',
   'You did it!',
   'Nice work!',
   'Keep it up — almost perfect!',
@@ -85,13 +85,13 @@ const HEADINGS_GREAT = [
   'So close to perfect!',
   "You're getting stronger!",
   'That was really good!',
-  'Well done, Julian!',
+  'Well done!',
   'Awesome effort!',
   "You're crushing it!",
 ]
 
 const HEADINGS_GOOD = [
-  'Good try, Julian!',
+  'Good try!',
   "You're learning!",
   'Every mistake teaches you!',
   "You'll get there — keep practicing!",
