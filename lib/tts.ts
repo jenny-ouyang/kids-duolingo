@@ -15,17 +15,55 @@ import { getSharedAudioContext } from '@/lib/sounds'
 const clipFiles = manifest as Record<string, string>
 const bufferCache = new Map<string, AudioBuffer>()
 let currentSource: AudioBufferSourceNode | null = null
+let currentElement: HTMLAudioElement | null = null
+
+function isNativeShell(): boolean {
+  if (typeof window === 'undefined') return false
+  const cap = (window as unknown as { Capacitor?: { isNativePlatform?: () => boolean } }).Capacitor
+  return cap?.isNativePlatform?.() ?? false
+}
 
 function stopClip(): void {
   if (currentSource) {
     try { currentSource.stop() } catch { /* already stopped */ }
     currentSource = null
   }
+  if (currentElement) {
+    try { currentElement.pause() } catch { /* already stopped */ }
+    currentElement = null
+  }
+}
+
+const elementCache = new Map<string, HTMLAudioElement>()
+
+/**
+ * Native (Capacitor) clip playback: HTMLAudioElement, NOT WebAudio. On real
+ * devices WKWebView's WebAudio output proved unreliable (builds 2–3 were
+ * silent), while HTMLMediaElement plays through the media channel — audible
+ * regardless of the ring/silent switch, with no AVAudioSession involvement.
+ */
+async function playClipNative(file: string): Promise<boolean> {
+  try {
+    stopClip()
+    let el = elementCache.get(file)
+    if (!el) {
+      el = new Audio(`/audio/zh/${file}`)
+      el.preload = 'auto'
+      elementCache.set(file, el)
+    }
+    el.currentTime = 0
+    currentElement = el
+    await el.play()
+    return true
+  } catch {
+    return false
+  }
 }
 
 async function playClip(text: string): Promise<boolean> {
   const file = clipFiles[text]
   if (!file) return false
+  if (isNativeShell()) return playClipNative(file)
   const ctx = getSharedAudioContext()
   if (!ctx) return false
 

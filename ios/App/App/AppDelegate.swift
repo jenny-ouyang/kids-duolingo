@@ -1,5 +1,4 @@
 import UIKit
-import AVFAudio
 import Capacitor
 
 @UIApplicationMain
@@ -8,11 +7,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        // Learning audio must play even with the ring/silent switch on silent
-        // (like any game or video app). Default WKWebView audio is "ambient",
-        // which the mute switch silences — .playback ignores it.
-        try? AVAudioSession.sharedInstance().setCategory(.playback, options: [.mixWithOthers])
-        try? AVAudioSession.sharedInstance().setActive(true)
+        // Do NOT touch AVAudioSession here: WKWebView manages its own audio
+        // session on-device, and overriding it has silenced webview audio
+        // entirely (build 3 regression). Clip playback uses HTMLAudioElement
+        // on native (lib/tts.ts), which plays through the media channel —
+        // audible regardless of the ring/silent switch — with no native help.
         return true
     }
 
