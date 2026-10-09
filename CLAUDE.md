@@ -2,143 +2,252 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## Status (updated: 2026-08-17)
+## Status (updated: 2026-08-28)
 
-**ACTIVE — public relaunch in progress.** Goal: free public web app, then iOS App Store (Capacitor, $9.99 one-time). Master plan + decision register: `docs/plans/launch-plan.md`; design specs in `docs/plans/` (multi-tenancy, launch readiness, audio pipeline, App Store path, naming).
+**Mandarineer** — a kid-friendly Mandarin + Math learning app. Free web app live at
+**https://mandarineer.com** (also `kids-duolingo.vercel.app`); iOS wrap via Capacitor is at
+**build 5**, App Store listing copy + screenshots staged in `store/`.
 
-**Current phase:** Phase 1 (multi-tenancy) code-complete on branch `launch/multi-tenancy`. The app now uses parent accounts (Supabase Auth, guest-first anonymous sign-in) with multiple children per account. NOT yet deployed — blocked on the Supabase dashboard checklist in `docs/plans/deploy-runbook.md` (enable anonymous sign-ins, anon key into env, owner account, run `npm run db:migrate-multitenancy`, RLS lockdown).
+App name is settled (decision D4, LOCKED 2026-08-20): **Mandarineer**, subtitle pattern
+"Mandarineer: Mandarin for Kids". The repo/npm package is still `kids-duolingo` — that's
+the old working name, not a rename target.
 
-### Active work
-- [x] Phase 1 code: Account/Child schema + guarded 3-step migration, requireChild() auth funnel in all API routes, /api/children CRUD, anonymous bootstrap + /welcome onboarding + /switch child switcher, rebuilt /parent zone (adult gate, claim-account flow)
-- [ ] Deploy runbook steps A–F (needs Jenny: Supabase dashboard + env keys)
-- [ ] Phase 2: landing page, trust pages (privacy/terms), remaining branding (blocked on app-name decision — see docs/plans/naming.md)
-- [ ] Phase 3: pre-generated Mandarin audio (docs/plans/audio-pipeline.md)
-- [ ] Phase 5: iOS wrap (docs/plans/app-store-path.md)
+Master plan + decision register: `docs/plans/launch-plan.md`. Design specs (multi-tenancy,
+launch readiness, audio pipeline, App Store path, curriculum, naming) live alongside it.
+`PLAN.md` at the root is the original v1 design (Ollama + localStorage) — historical only,
+none of it is the current architecture.
 
-## What This Is
-
-A kid-friendly Chinese + Math learning app (Duolingo-style) built with Next.js 14, Prisma, and Supabase. Core philosophy: **no punishment**—wrong answers show the correct answer and encourage retries. Sessions are 8 questions, end with a celebration screen.
+Phases 1–3 (multi-tenancy, public polish, pre-generated audio) are on `main` and deployed.
+Phase 5 (iOS) is in progress. Next planned expansion: **Custom Family Packs** (parent-authored
+packs; pricing fork still open — see launch-plan).
 
 ## Commands
 
 ```bash
-npm run dev              # Start dev server (localhost:3000)
-npm run build            # Production build
+npm run dev              # Dev server (localhost:3000)
+npm run build            # Production build (Vercel/server build)
 npm run lint             # ESLint
 
 # Database
-npm run db:migrate               # Create and apply Prisma migrations
-npm run db:generate              # Generate Prisma client types
-npm run db:seed                  # Seed Chinese vocabulary packs
-npm run db:seed-math             # Seed math problems (addition 1–100)
-npm run db:generate-questions    # DEPRECATED — runtime same-pack fallback is the official path (see script header)
-npm run db:migrate-multitenancy  # One-shot guarded expand→backfill→contract migration (see docs/plans/deploy-runbook.md)
+npm run db:migrate               # prisma migrate dev — see the multitenancy warning below
+npm run db:generate              # Prisma client → lib/generated/prisma
+npm run db:seed                  # Seed packs: words AND sentences from data/packs/*.json
+npm run db:seed-math             # Seed math problems
+npm run db:migrate-multitenancy  # One-shot guarded expand→backfill→contract (docs/plans/deploy-runbook.md)
+npm run db:generate-questions    # RETIRED — do not use (see "Question generation" below)
+
+# Content pipelines (run from repo root)
+uv run --with edge-tts scripts/generate-audio.py   # Mandarin clips → public/audio/zh + lib/audio-manifest.json
+./scripts/generate-images.sh [packId ...]          # Word illustrations → public/images/words/<id>.jpg
+python3 scripts/audit-visuals.py                   # MUST pass after any content batch
+
+# iOS
+./scripts/build-ios.sh   # static export + cap sync ios, then: npx cap open ios
 ```
 
 ⚠️ The two `20260817*_multitenancy_*` migrations must NOT be applied via `npm run db:migrate` /
-`prisma migrate deploy` — the backfill has to run between them. Use `db:migrate-multitenancy` only.
+`prisma migrate deploy` — the backfill has to run between them. Use `db:migrate-multitenancy`.
+They are already applied in production; this matters only for a fresh database.
 
 No test suite exists. TypeScript + `npm run lint` are the primary quality checks.
+Ask Jenny before running Xcode builds, simulators, or batch content jobs — they're expensive.
 
 ## Architecture
 
-### Session Flow
+### Session flow
 
 ```
-Home → Subject (Chinese/Math) → Pack/Topic selection → 8-question practice → Celebration
+Landing / Home → Chinese or Math → Pack or Topic grid → 8-question session → Celebration
 ```
 
-Practice sessions load **pre-generated questions** from the DB (no AI calls at runtime). SM-2 spaced repetition picks which words/problems are due. Progress updates are fire-and-forget (never block the UI).
+Sessions load questions from the DB (no AI at runtime). SM-2 spaced repetition picks which
+items are due. Answers are **stay-until-right**: a wrong answer shows the correct one, keeps the
+question up, and re-queues first-try misses later in the same session. Progress writes are
+fire-and-forget and must never block the UI.
 
-### Key Directories
+### Routes are query-param, not dynamic segments
 
 ```
-app/
-├── page.tsx                          # Home: Chinese vs Math subject picker
-├── packs/page.tsx                    # Chinese pack grid with mastery rings
-├── practice/[packId]/page.tsx        # Chinese practice session
-├── math/topics/page.tsx              # Math topic selection
-├── math/practice/[topicId]/page.tsx  # Math practice session
-└── celebrate/page.tsx                # End-of-session celebration screen
-
-app/api/
-├── packs/                  # List packs by subject
-├── questions/[packId]/     # Load 8 questions + current word progress
-├── math/questions/[topicId]/
-├── progress/               # POST: save SM-2 updates
-├── answers/                # POST: log answer events
-└── profile/                # GET/POST: hearts & streak
-
-components/
-├── PictureChoice.tsx        # Main Chinese exercise (3 question types)
-├── CountAndChoose.tsx       # Math exercise
-├── ExerciseShell.tsx        # Progress bar wrapper
-└── KidLayout.tsx            # Full-screen kid-friendly layout
-
-lib/
-├── db.ts                    # Prisma singleton with PrismaPg adapter (edge runtime)
-├── spaced-repetition.ts     # SM-2 algorithm: updateSM2(), pickWordsForSession()
-├── tts.ts                   # speakChinese() via Web Speech API (zh-CN)
-├── encouragement.ts         # Varied praise with emoji, Chinese phrases, missions
-├── sounds.ts                # Celebration/correct/wrong sound effects
-└── types.ts                 # Shared TypeScript interfaces
+/practice/session?pack=<packId>
+/math/practice/session?topic=<topicId>
+/practice/sentences
 ```
 
-### Database Models
+This is deliberate: the Capacitor iOS shell is a Next.js **static export**, which cannot
+render dynamic route segments. Any new kid-facing page must follow the same pattern — a static
+path plus `useSearchParams()` inside a `<Suspense>` boundary. (API routes under `app/api/`
+keep dynamic segments; they're server-only and are excluded from the iOS bundle.)
 
-- **Account** – One row per Supabase auth user (id == auth.users.id); isGuest until claimed; plan for future paid unlock
-- **Child** – Per-account child profile (nickname + avatar emoji only, no PII); holds hearts/streak; replaces ChildProfile
-- **Pack** – Vocabulary pack or math topic (subject, name, emoji, color, sortOrder)
-- **Word** – Chinese vocab (english, chinese, pinyin, image, packId)
-- **MathProblem** – Arithmetic fact (operand1, operator, operand2, answer, emoji)
-- **GeneratedQuestion** – Pre-cached exercise questions with distractor options (JSON)
-- **ChineseProgress / MathProgress** – SM-2 state per child × item, keyed by childId FK (easeFactor, interval, nextReview)
-- **AnswerEvent** – Full answer history for analytics, keyed by childId
+### Two platforms, two auth transports
 
-### Critical Patterns
+This is the single most important thing to understand before touching any API call.
 
-**Prisma + Node runtime:** Uses `@prisma/adapter-pg` (PrismaPg) over a `pg` Pool. Routes run on the **Node runtime** (the `pg` driver is not edge-compatible — an earlier version of this doc claimed edge; that was wrong). `lib/db.ts` exports a singleton client. Migrations use session-mode pooler; app runtime uses transaction-mode pooler.
+| | Web | Native (Capacitor) |
+|---|---|---|
+| Origin | same-origin | `capacitor://localhost` → `NEXT_PUBLIC_API_BASE` |
+| Supabase session | httpOnly cookies | `Authorization: Bearer <token>` |
+| Active child | `kd_child` cookie | `x-child-id` header (id in localStorage) |
 
-**Auth (added 2026-08-17):** Supabase Auth, guest-first. `components/auth/AuthBootstrap.tsx` silently runs `signInAnonymously()` on first visit; parents later "claim" the account (`updateUser({ email })` keeps the same user id, so no data migration). `lib/auth.ts` is the single funnel: `requireChild()` validates the JWT (`getUser()`, never `getSession()`), verifies the `kd_child` cookie's child belongs to the account, and is the ONLY way handlers obtain a childId — handlers must never accept childId from a request body. Tenant isolation is app-layer (Prisma connects as table owner and bypasses RLS); RLS is enabled deny-all on all public tables purely to close the PostgREST surface (`scripts/enable-rls.sql`).
+- **All client→API calls go through `lib/api-fetch.ts`** (`apiFetch`, `fetchJsonWithAuthRetry`,
+  `fetchJsonCached`). A bare `fetch('/api/...')` works on web and silently breaks on device.
+  `fetchJsonWithAuthRetry` absorbs the anonymous-sign-in bootstrap race (retries 401s);
+  `fetchJsonCached` adds a per-child localStorage fallback so played packs work offline.
+- `middleware.ts` refreshes the Supabase session on every request and adds CORS for the three
+  native origins. Auth *decisions* never live there — they live in `lib/auth.ts`.
+- The web `kd_child` cookie is set **server-side** by `POST /api/children/active`; Safari ITP
+  evicts JS-written cookies after 7 days. `lib/child-cookie.ts` handles both platforms — use it.
 
-**Question Types:** `PictureChoice.tsx` handles three exercise types:
-- `audio_to_picture` – Hear Chinese → pick picture
-- `picture_to_chinese` – See picture → pick Chinese character
-- `english_to_chinese` – See English → pick Chinese character
+### Auth funnel
 
-**Emoji Fallbacks:** When no image is available, a hardcoded emoji map in `PictureChoice.tsx` provides 50+ vocabulary emoji fallbacks.
+Supabase Auth, guest-first: `components/auth/AuthBootstrap.tsx` calls `signInAnonymously()`
+on first visit; parents later claim the account via magic link (`updateUser({ email })` keeps
+the same user id, so no data migration).
 
-**Chinese TTS:** `lib/tts.ts` uses the Web Speech API (`utterance.lang = 'zh-CN'`). `VoicePreloader.tsx` warms up voices on mount to avoid first-utterance silence on iOS/Safari.
+`lib/auth.ts` is the only funnel. `requireChild()` validates the JWT (`getUser()`, **never**
+`getSession()` server-side), verifies the hinted child belongs to the account, and is the ONLY
+way a handler obtains a `childId`. **Handlers must never accept a childId from a request body
+or query string.** Two subtleties encoded there: anonymous users report `email` as `""` not
+`null` (must normalize, `Account.email` is unique), and account provisioning is create-then-
+recover-on-P2002 because Prisma's upsert isn't atomic with a second unique column.
 
-**SM-2 Algorithm:** `pickWordsForSession()` in `lib/spaced-repetition.ts` selects 8 items: prioritizes overdue items, then new items, then random. `updateSM2()` applies the SM-2 formula after each answer.
+Tenant isolation is app-layer — Prisma connects as the table owner and bypasses RLS. RLS is
+enabled deny-all on public tables purely to close the PostgREST surface (`scripts/enable-rls.sql`).
 
-## Data
+### Data model
 
-Chinese vocabulary packs live as JSON in `data/packs/` (13 packs: animals, colors, numbers, food, family, body, feelings, home, actions, nature, greetings, pronouns, words). `prisma/seed.ts` reads these and upserts into the DB.
+- **Account** — one row per Supabase auth user (`id == auth.users.id`); `isGuest` until claimed;
+  `plan` (`free` | `lifetime`)
+- **Child** — nickname + avatar emoji only, no PII; holds hearts/streak
+- **Pack** — vocabulary pack, sentence track, or math topic (`subject`, emoji, color, sortOrder)
+- **Word / Sentence / MathProblem** — the three content types
+- **ChineseProgress / SentenceProgress / MathProgress** — SM-2 state per child × item
+- **AnswerEvent** — answer history for parent reports
+- **GeneratedQuestion** — legacy pre-cached questions; no longer written to
 
-Math problems are generated programmatically in `prisma/seed-math.ts` covering addition 1–100.
+Gotchas: `ChineseProgress` is `@@map("WordProgress")` and `AnswerEvent.itemId` is
+`@map("wordId")` — the table/column names lag the model names. Prisma client is generated to
+`lib/generated/prisma`, not `node_modules`.
 
-## Environment
+**Prisma runtime:** `@prisma/adapter-pg` (PrismaPg) over a `pg` Pool, singleton in `lib/db.ts`.
+Routes run on the **Node runtime** — `pg` is not edge-compatible. Migrations use the
+session-mode pooler; app runtime uses the transaction-mode pooler.
 
-Supabase project: `odwoxbxkvmjjqvjyynko` (this app's production DB).
-Note: `.env` also references a different Supabase project (`fhdjzktrpcsjleargmrb`) used for an unrelated ai-memory-agent — don't confuse the two.
+### Audio
 
-Deployed on Vercel (`.vercel/` config present).
+Pre-generated MP3 clips are the **primary** path; Web Speech (`zh-CN`) is the fallback for text
+with no clip yet. `lib/tts.ts` looks up `lib/audio-manifest.json` (text → sha1 filename) and
+plays from `public/audio/zh/`.
 
-## Content invariant
+- Voices: `zh-CN-XiaoyiNeural` teaches, `zh-CN-YunxiaNeural` cheers (bake-off winners).
+- **Native playback uses `HTMLAudioElement`, never WebAudio.** WKWebView's WebAudio output was
+  silent in iOS builds 2–3; the media channel plays regardless of the ring/silent switch and
+  needs no `AVAudioSession` override. Don't "fix" this back to the shared AudioContext.
+- Web playback goes through the shared AudioContext in `lib/sounds.ts` (first-gesture unlock —
+  the fix for the June 2026 total-silence bug, `docs/2026-06-20-no-sound-total-silence.md`).
+- `scripts/generate-audio.py` is idempotent and mirrors the praise list in `lib/encouragement.ts` —
+  update `PRAISE` there when that list changes. It uses edge-tts (free Edge endpoint), which is
+  **dev-only**; swap to a licensed Azure key (same voice names) before wide promotion.
 
-**Every word must have a visual** (illustration in `lib/word-images.json`, emoji in its data `image` field, or an EMOJI_FALLBACKS entry). Verify with `python3 scripts/audit-visuals.py` after any content batch and before any iOS build — 14 body-pack words shipped text-only on 2026-08-21 and Jenny caught it in TestFlight.
+### Question generation
 
-## Recent changes
+Questions are assembled **server-side**, in `app/api/questions/[packId]/route.ts`. That one
+route does SM-2 selection (recently-wrong → due → never-seen → not-due, capped at 8), then per
+word: use a `GeneratedQuestion` row if one exists, otherwise fall back to three random
+same-pack distractors with type `audio_to_picture`. Clients just render what they receive.
 
-- 2026-08-20: Batch C complete — all 360 words across 33 packs now have custom illustrations (216 in lib/word-images.json; some abstract words intentionally stay emoji). Parent progress reports live (`/parent/report/[childId]` + ownership-checked `/api/children/[childId]/report`). Image pipeline note: nanobanana (Gemini) hit its monthly spend cap mid-batch; final 30 images were generated with OpenAI `gpt-image-1` (key in shell env, ~4¢/image, same STYLE prompt from `scripts/generate-images.sh`, style-matches nanobanana closely) + white-point correction for its cream backgrounds — use it as the fallback generator whenever Gemini quota is exhausted.
-- 2026-08-17: Public-relaunch Phase 1 (multi-tenancy) code-complete on `launch/multi-tenancy`: Supabase guest-first auth, Account/Child schema with guarded expand/backfill/contract migration (preserves Julian's 501 hearts + all progress), requireChild() funnel across all API routes, /welcome onboarding, /switch child switcher, rebuilt /parent zone. Four design specs + launch plan + deploy runbook in `docs/plans/`. Note: content-only API routes now require auth too, so the n8n keepalive's HTTP ping gets 401 (harmless — the primary keepalive is direct Postgres).
-- 2026-07-13: Keepalive added — n8n workflow `yDEoYhLvu7gU1kzD` on Oracle (141.148.2.254:5678) runs daily at 9:17: a direct Postgres `SELECT 1` against the Supabase session pooler (n8n credential `PxIdhVm26YrEKjVW`) as the primary keepalive, plus a secondary HTTP ping to `https://kids-duolingo.vercel.app/api/packs?subject=chinese` that can't fail the run. Found the Supabase project (`odwoxbxkvmjjqvjyynko`) already PAUSED from the June idle stretch: the Vercel site loads (HTTP 200) but `/api/packs` returns 500 "DB error" until the project is restored via the Supabase dashboard.
-- 2026-06-20: Audio hardening (shared AudioContext, first-gesture unlock, iOS speech priming) + Sentence practice feature (tap-to-build, dedicated pack + route). Investigation trail for the audio work is in `docs/2026-06-20-no-sound-total-silence.md`.
+Ollama-based pre-generation was retired (commit `f479a43`) — the runtime same-pack fallback is
+the official path, so don't re-run `db:generate-questions`. `lib/exercise-generator.ts` is
+**dead code** (no callers; still references `/api/generate-options`) — don't build on it or
+mistake it for the live path.
 
-## Open questions
+`components/exercise/PictureChoice.tsx` renders three Chinese exercise types (`audio_to_picture`,
+`picture_to_chinese`, `english_to_chinese`) with an illustration → emoji → text fallback chain.
 
-- ~~Has Jenny restored the paused Supabase project?~~ Resolved 2026-07-14: restored via dashboard, `/api/packs` returns 200, and a live n8n keepalive run (execution 24175) completed successfully. The daily keepalive prevents future pauses.
-- Is the audio fix actually live in production? The Vercel site is confirmed live (verified 2026-07-13), but audio behavior hasn't been re-tested on a device. (Will be superseded by Phase 3 pre-generated audio anyway.)
-- ~~Is active development resuming, or is this parked?~~ Resumed 2026-08-17: public relaunch underway (see Status).
-- App name: "Julian's Chinese" must be replaced before Phase 2 branding. Candidates + availability checks in `docs/plans/naming.md` (recommended: Tangram Tots). Awaiting Jenny's pick.
+### iOS build
+
+`scripts/build-ios.sh` temporarily moves `app/api` and `middleware.ts` aside (static export
+refuses to build with them present), runs `CAP_BUILD=1 next build`, then `cap sync ios`. The
+`trap` restores them even on failure — if a build dies weirdly, check for a stray `.cap-hidden/`.
+`CAP_BUILD=1` also injects `NEXT_PUBLIC_API_BASE` (defaults to `https://mandarineer.com`), which
+is how the bundled app reaches the live backend.
+
+### Payments (dormant)
+
+`lib/plan.ts` is the single switch point. While `NEXT_PUBLIC_PAYMENTS_ENABLED !== 'true'`,
+`/unlock` shows free early access and `/api/stripe/checkout` 404s. **Content gating is not
+implemented** — everything is free. When gating lands, it must import `FREE_PACK_IDS` /
+`hasLifetime()` from `lib/plan.ts` rather than hardcoding a boundary elsewhere.
+
+## Where things go
+
+Added 2026-10-09. Maintained by `mng-apps`; see sbrain `20_SKILLS/_shared/manager-contract.md`, job 4. **Follow these rather than inventing a location.** Every path below exists today.
+
+**New code.** Routes and API handlers in `app/`. React components in `components/`, inside the domain folder that already fits — `auth`, `celebration`, `design`, `exercise`, `home` — and a new domain folder only when none of those do. Shared helpers in `lib/`. Database schema in `prisma/`. One-off tooling in `scripts/`.
+
+**Learning content.** `data/packs` and `data/sentences`. Content is data, never hard-coded into a component.
+
+**Documents.** `docs/`. Design in `docs/design/`, plans in `docs/plans/`. **An investigation gets a dated file at `docs/` root**, named `YYYY-MM-DD-what-broke.md`, the way `2026-06-20-no-sound-total-silence.md` records the silence bug. That convention is worth keeping: it is the only place a debugging trail survives.
+
+**App Store assets.** `store/`, which is tracked: `listing.md` for copy, `store/screenshots/` for composed images. Staged assets here are not a submission.
+
+**The iOS wrap.** `ios/`, via Capacitor. `ios/App` is tracked.
+
+**Static assets.** `public/`. Audio under `public/audio`, images under `public/images`.
+
+**Outputs, all ignored, none ever committed.** `build/`, `out/`, `node_modules/`, `.image-work/`.
+
+### Never create
+
+- **A backup beside a live file.** No `.new`, `.old`, `.bak`, `.before-rewrite`, no `-2` or `-copy` suffix. Git holds history; a sibling file is a second source of truth that someone will later read as current.
+- **A second home for something that has one.** If a document fits `docs/design` or `docs/plans`, it goes there rather than into a new folder.
+- **A status block outside `STATE.md`.** Current state belongs in one file. The block at the top of this one is the exception that proves it, and it is dated.
+- **A plan file at the repository root.** `PLAN.md` is there and was last touched 2026-02-22; treat it as history, do not add siblings to it.
+
+## Content rules
+
+Vocabulary lives as JSON in `data/packs/` (33 packs, ~360 words, plus sentence tracks) and
+`data/sentences/`. `prisma/seed.ts` upserts words and sentences; math is generated in
+`prisma/seed-math.ts`.
+
+**Never mutate an existing pack's content.** Mastery is `practiced / total items in pack`, so
+adding items to a shipped pack drops a child from 100% to 60% and steals earned progress.
+New content always gets a **new pack id**. (Full rule, including the FK-safe delete order
+MathProgress/ChineseProgress → AnswerEvent → MathProblem/Word → Pack, is in
+`.cursor/rules/content-packs.mdc`.)
+
+**Every word must have a visual** — an illustration in `lib/word-images.json`, an emoji in its
+data `image` field, or an `EMOJI_FALLBACKS` entry in `PictureChoice.tsx`. Run
+`python3 scripts/audit-visuals.py` after any content batch and before any iOS build; 14 body-pack
+words shipped text-only on 2026-08-21 and Jenny caught it in TestFlight.
+
+Image pipeline: nanobanana (Gemini) is the default generator; when its quota is exhausted, fall
+back to OpenAI `gpt-image-1` (~4¢/image, key in shell env) with the same `STYLE` prompt from
+`scripts/generate-images.sh` plus white-point correction for its cream backgrounds.
+
+## Environment & infrastructure
+
+- Supabase project **`odwoxbxkvmjjqvjyynko`** is this app's production DB. `.env` also
+  references `fhdjzktrpcsjleargmrb`, which belongs to an unrelated ai-memory-agent — do not
+  confuse the two.
+- Deployed on Vercel; domain `mandarineer.com` (Cloudflare, registered 2026-08-20).
+- **Keepalive** (prevents Supabase free-tier idle pause): n8n workflow `yDEoYhLvu7gU1kzD` on
+  Oracle (`141.148.2.254:5678`), daily at 9:17 — a direct Postgres `SELECT 1` via the session
+  pooler is the primary check; a secondary HTTP ping to `/api/packs` cannot fail the run and now
+  returns 401 by design (content routes require auth).
+- `build/` holds local Xcode archives and `out/` the static export — both gitignored.
+
+## Recent history
+
+- 2026-08-21 → 08-27: iOS Capacitor shell shipped through build 5 — static export, header auth
+  transport + CORS, offline cache, haptics; native audio fixed twice (clip loader read
+  Capacitor's status-0 local responses as failure; then WebAudio → HTMLAudioElement); App Store
+  listing copy and composed screenshots; content-visual invariant + audit script.
+- 2026-08-20: Batch C content complete (33 packs, all 360 words illustrated); parent progress
+  reports (`/parent/report` + ownership-checked report API); name locked to Mandarineer.
+- 2026-08-19/20: Phase 3 audio (355 clips, clip-first playback); PWA install, OG image,
+  robots/sitemap, guest-cleanup cron, trust pages.
+- 2026-08-17: Phase 1 multi-tenancy — Supabase guest-first auth, Account/Child schema with the
+  guarded expand/backfill/contract migration (preserved Julian's 501 hearts), `requireChild()`
+  funnel, `/welcome`, `/switch`, rebuilt `/parent`.
+- 2026-06-20: Audio hardening (shared AudioContext, first-gesture unlock) + sentence practice.
+  Investigation trail: `docs/2026-06-20-no-sound-total-silence.md`.
