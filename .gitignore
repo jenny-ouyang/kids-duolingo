@@ -56,3 +56,11 @@ ios/App/App/public/
 *.save
 *~
 *.before-*
+
+# environment files — cover the whole family, not named variants.
+# Added 2026-10-09. Enumerating names is how `.env.local.bak` reached VCB's
+# history and how `.env.vercel-prod` sat unignored in qvn-mcp.
+.env*
+!.env.example
+!.env*.example
+!.env.sample
