@@ -45,3 +45,14 @@ next-env.d.ts
 .cap-hidden/
 out/
 ios/App/App/public/
+
+# backup and scratch copies — git holds history, a sibling file does not.
+# Added 2026-10-09. A suffixed copy also defeats earlier patterns:
+# `.env*.local` does not match `.env.local.bak`.
+*.bak
+*.new
+*.old
+*.orig
+*.save
+*~
+*.before-*
