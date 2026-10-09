@@ -7,7 +7,7 @@ Scope: Take kids-duolingo from single-family ("julian" hardcoded everywhere, zer
 Ground truth this spec was written against:
 
 - `prisma/schema.prisma` — every progress model carries `childName String @default("julian")`; `ChildProfile` is keyed by `name`; `ChineseProgress` is `@@map`-ed to the physical table `WordProgress`; `AnswerEvent.itemId` is `@map`-ed to column `wordId`.
-- `lib/db.ts` — Prisma 7 + `@prisma/adapter-pg` over a `pg` Pool on `DATABASE_URL` (Supabase transaction pooler). This is the **Node** runtime (the `pg` driver is not edge-compatible), despite CLAUDE.md saying "edge runtime". Auth design below assumes Node route handlers.
+- `lib/db.ts` — Prisma 7 + `@prisma/adapter-pg` over a `pg` Pool on `DATABASE_URL` (Supabase transaction pooler). This is the **Node** runtime (the `pg` driver is not edge-compatible), despite AGENTS.md saying "edge runtime". Auth design below assumes Node route handlers.
 - `lib/progress.ts` — a legacy localStorage progress store (`julian-progress` key). Current pages use the API routes, not this file. It gets deleted, not migrated.
 - 10 routes under `app/api/` (enumerated in §3). Every child-scoped one has `const CHILD = 'julian'` at the top.
 - No auth packages installed. `package.json` has no `@supabase/*` deps.
@@ -226,7 +226,7 @@ Pages touched: `app/page.tsx` ("Hi, Julian!" → active child's name + avatar, p
 | 8 | Client: anonymous-auth bootstrap on first visit; "Who's learning?" child creation screen; child switcher + `kd_child` cookie; de-Julianize `app/page.tsx` and practice/celebrate copy; delete `lib/progress.ts` | 6–8 h |
 | 9 | Parent zone (`/parent`): children management, claim-account flow (magic link / Google via `updateUser`/`linkIdentity`), sign out, adult gate | 4–6 h |
 | 10 | Security lockdown: enable RLS (deny-all) on all public tables; disable/verify PostgREST Data API exposure; confirm n8n keepalive still green | 1 h |
-| 11 | QA pass on real devices (guest flow, claim flow, two-children switching, iOS Safari audio still primed post-auth-redirects); update CLAUDE.md architecture notes | 3–4 h |
+| 11 | QA pass on real devices (guest flow, claim flow, two-children switching, iOS Safari audio still primed post-auth-redirects); update AGENTS.md architecture notes | 3–4 h |
 | 12 | (Deferred, pre-iOS-wrap) Apple OAuth, `plan` gating for one-time purchase, guest-cleanup cron per retention DECISION POINT | — |
 
 Total: roughly **30–37 focused hours** to public-launch-ready (tasks 1–11).

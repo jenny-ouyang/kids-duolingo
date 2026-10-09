@@ -115,7 +115,7 @@ Changes, all inside `lib/` (call sites keep calling `speakChinese(text)` unchang
 | 4 | Run full generation (223 clips, < $0.02), listen to a sample spot-check, commit `public/audio/zh/` + manifest (**DECISION 2** confirmed here) | ~0.5 h |
 | 5 | Runtime: export shared context from `lib/sounds.ts`; clip playback + buffer cache + fallback in `lib/tts.ts`; session preload hook in the two practice pages | ~2–3 h |
 | 6 | Device verification pass (the June doc's method: AnalyserNode probe + trusted gestures) on desktop Chrome AND a real iPhone/iPad Safari — confirm dings, clip audio, sentence readback, celebrate-on-mount all play; confirm fallback fires when a clip is renamed away | ~1–2 h |
-| 7 | Add a manifest-completeness check to `npm run lint` or a tiny `audio:check` script; update `CLAUDE.md` (commands + "new vocab needs `audio:generate`") | ~0.5 h |
+| 7 | Add a manifest-completeness check to `npm run lint` or a tiny `audio:check` script; update `AGENTS.md` (commands + "new vocab needs `audio:generate`") | ~0.5 h |
 
 **Total: roughly one focused day** (~8–10 h), of which the only irreversible choice is the voice — and that costs cents to redo entirely if Jenny changes her mind later (delete `public/audio/zh/`, rerun with a new voice constant).
 

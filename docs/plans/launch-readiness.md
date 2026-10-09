@@ -38,7 +38,7 @@ A stranger gets: someone else's child's name, no statement of what the app is, w
 
 **New marketing landing at `/`** (server-rendered, indexable):
 - Hero: app name + one-line value prop aimed at the parent, e.g. "8-question Mandarin and math sessions for kids 4–7. No ads, no punishment — wrong answers teach, they don't cost lives."
-- 3 proof blocks: (1) how a session works (hear the word → tap the picture → celebrate), (2) the no-punishment philosophy (already the app's genuine differentiator — it's in CLAUDE.md as core philosophy), (3) spaced repetition in parent terms ("words your kid struggles with come back sooner").
+- 3 proof blocks: (1) how a session works (hear the word → tap the picture → celebrate), (2) the no-punishment philosophy (already the app's genuine differentiator — it's in AGENTS.md as core philosophy), (3) spaced repetition in parent terms ("words your kid struggles with come back sooner").
 - Screenshots or a short looping demo of PictureChoice + celebrate screen (static images, no video hosting needed for v1).
 - Primary CTA: **"Start free — no account needed"** → onboarding flow (Section 3) → kid home.
 - Footer: Privacy, Terms, Contact (Section 5).
@@ -168,7 +168,7 @@ Math is a single topic (addition 1–100). Fine as a bonus subject; don't market
 
 ### Embarrassing / broken-looking things a stranger would hit
 
-1. **API failure = crash, not message.** `app/math/topics/page.tsx` does `fetch('/api/packs?subject=math').then(r => r.json()).then(data => setTopics(data))` — when the API returns `{ error: 'DB error' }` (HTTP 500), a non-array lands in state and `.map` throws a client-side exception. This is not hypothetical: CLAUDE.md records that when the Supabase project auto-paused in July, `/api/packs` returned exactly this 500 while the site stayed up. `app/packs/page.tsx` has the same shape. **Spec: check `res.ok`, and render a kid-friendly error state ("The panda is napping 🐼 — try again in a minute") with a retry button.**
+1. **API failure = crash, not message.** `app/math/topics/page.tsx` does `fetch('/api/packs?subject=math').then(r => r.json()).then(data => setTopics(data))` — when the API returns `{ error: 'DB error' }` (HTTP 500), a non-array lands in state and `.map` throws a client-side exception. This is not hypothetical: AGENTS.md records that when the Supabase project auto-paused in July, `/api/packs` returned exactly this 500 while the site stayed up. `app/packs/page.tsx` has the same shape. **Spec: check `res.ok`, and render a kid-friendly error state ("The panda is napping 🐼 — try again in a minute") with a retry button.**
 2. **Silent dead-end on practice load failure.** Both practice pages (`app/practice/[packId]/page.tsx`, `app/math/practice/[topicId]/page.tsx`) catch fetch errors and just `setLoading(false)` — the user is left on a screen with zero questions. The sentences page (`app/practice/sentences/page.tsx`) is the only one with an explicit empty state ("No sentences available." + Go Back); replicate that pattern (with friendlier copy) in the other two.
 3. **Infrastructure fragility is a product bug now.** The Supabase free-tier pause is currently held off by an n8n keepalive on a personal Oracle box. For a public launch, DB availability can't depend on a hobby cron. Decide: paid Supabase tier, or move keepalive somewhere durable (Vercel cron), and keep the error states from (1) as the safety net.
 4. **Emoji-only "pictures."** `PictureChoice.tsx` uses a hardcoded emoji fallback map instead of images. Honestly: this reads as a deliberate, charming style — not embarrassing. Keep for launch; real illustrations are an iOS-later polish/differentiator.
@@ -194,7 +194,7 @@ Effort: **S** ≤ half a day, **M** ~1–2 days, **L** ~3+ days.
 | 7 | **Privacy policy, terms, contact** pages + footer (D4) | **S** |
 | 8 | **DB reliability** — paid tier or durable keepalive (Vercel cron) so the launch doesn't 500 (decision, then S) | **S** |
 | 9 | Top up **Food** and **Greetings** packs to 12–15 words | **S** |
-| 10 | Real-device smoke test of the June audio fix (open item in CLAUDE.md) before sharing any public link | **S** |
+| 10 | Real-device smoke test of the June audio fix (open item in AGENTS.md) before sharing any public link | **S** |
 
 ### Nice-to-have for web (post-launch fast follows)
 

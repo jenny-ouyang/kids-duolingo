@@ -65,6 +65,6 @@ included in the $9.99 one-time unlock vs. a small separate subscription (custom 
 are an ongoing service, so a sub is defensible despite the no-subscription rule for
 content). Jenny's go-to-market focus: SEO.
 
-## Corrections to CLAUDE.md discovered during design
-- API routes run on the **Node runtime** (`pg` driver), not edge as CLAUDE.md states.
+## Corrections to AGENTS.md discovered during design
+- API routes run on the **Node runtime** (`pg` driver), not edge as AGENTS.md states.
 - Parent dashboard reads legacy localStorage, not the DB — effectively broken for current usage.
