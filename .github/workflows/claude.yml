@@ -1,0 +1,64 @@
+name: Claude
+
+# Claude Code works on an issue when it gets the `claude` label, or when someone
+# with write access writes `@claude` in an issue or PR comment. Rules it must
+# follow live in AGENTS.md ("Rules for Claude running in GitHub Actions").
+# `main` is protected by a ruleset that requires a pull request, so the
+# workflow token cannot push to main even if asked.
+
+on:
+  issues:
+    types: [labeled]
+  issue_comment:
+    types: [created]
+  pull_request_review_comment:
+    types: [created]
+
+permissions: {}
+
+jobs:
+  claude:
+    if: >-
+      (github.event_name == 'issues' && github.event.label.name == 'claude') ||
+      (github.event_name == 'issue_comment' && contains(github.event.comment.body, '@claude')) ||
+      (github.event_name == 'pull_request_review_comment' && contains(github.event.comment.body, '@claude'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+      id-token: write
+      actions: read
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies (postinstall runs prisma generate; no DB connection is made)
+        run: npm ci
+        env:
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+
+      - name: Run Claude Code
+        uses: anthropics/claude-code-action@v1
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          label_trigger: claude
+          trigger_phrase: "@claude"
+          base_branch: main
+          branch_prefix: claude/
+          claude_args: >-
+            --append-system-prompt "Before anything else, read AGENTS.md in the repository root and follow the section 'Rules for Claude running in GitHub Actions' exactly. Work only on the branch the action created. Before finishing: run `npm run lint` and `npx tsc --noEmit`, fix what they report, commit, push the branch, then open a pull request against main with `gh pr create` whose body states the lint and type-check results and references the issue. Never push to main. Never run iOS, Xcode, Capacitor, Prisma migrate, or seed commands. Never edit shipped content under data/packs, data/sentences, public/audio, public/images, lib/audio-manifest.json, or lib/word-images.json."
+            --allowedTools "Bash(npm run lint),Bash(npx tsc --noEmit),Bash(npx tsc:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin claude/*),Bash(git checkout:*),Bash(git branch:*)"

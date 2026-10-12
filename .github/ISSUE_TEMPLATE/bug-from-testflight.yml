@@ -1,0 +1,39 @@
+name: Bug from TestFlight
+description: Something went wrong in a TestFlight or App Store build of Mandarineer
+title: "[TestFlight] "
+labels: ["bug", "ios"]
+body:
+  - type: input
+    id: device
+    attributes:
+      label: Device
+      description: Model and iOS version, from Settings → General → About
+      placeholder: iPhone 15, iOS 26.0
+    validations:
+      required: true
+  - type: input
+    id: build
+    attributes:
+      label: Build number
+      description: Shown in the TestFlight app under Mandarineer, for example 1.0 (6)
+      placeholder: "1.0 (6)"
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened
+      description: What you did, what you expected, and what you saw instead. One step per line.
+      placeholder: |
+        1. Opened the Animals pack
+        2. Tapped the picture of the cat
+        3. Expected the word to play; nothing played
+    validations:
+      required: true
+  - type: textarea
+    id: screenshot
+    attributes:
+      label: Screenshot
+      description: Drag a screenshot or screen recording into this box.
+    validations:
+      required: false

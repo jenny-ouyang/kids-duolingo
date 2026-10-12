@@ -251,3 +251,16 @@ back to OpenAI `gpt-image-1` (~4¢/image, key in shell env) with the same `STYLE
   funnel, `/welcome`, `/switch`, rebuilt `/parent`.
 - 2026-06-20: Audio hardening (shared AudioContext, first-gesture unlock) + sentence practice.
   Investigation trail: `docs/2026-06-20-no-sound-total-silence.md`.
+
+## Rules for Claude running in GitHub Actions
+
+These apply when Claude is started by the `claude` label on an issue or by `@claude` in a comment (`.github/workflows/claude.yml`). They are stricter than the local rules above.
+
+1. **Work on a branch, never on `main`.** The action creates a `claude/...` branch. Push only to that branch. Never push to `main`, never force-push, never merge.
+2. **Before you finish, run `npm run lint` and `npx tsc --noEmit`.** Both must pass. Put their result in the pull request description.
+3. **Open a pull request** against `main` with `gh pr create`. Reference the issue (`Closes #N`). Do not merge it; a human merges.
+4. **No iOS or Xcode steps.** Do not run `scripts/build-ios.sh`, `xcodebuild`, `cap sync`, simulators, or edit anything under `ios/`. The runner is Linux and these steps are Jenny's.
+5. **Never change the content of a shipped pack.** Do not edit any file under `data/packs/` or `data/sentences/` that is already on `main`, and do not edit `lib/audio-manifest.json`, `lib/word-images.json`, `public/audio/`, or `public/images/`. Mastery is `practiced / total items`, so changing a shipped pack steals earned progress. New content always goes in a new pack id, and only when the issue asks for it.
+6. **No database commands.** Do not run `prisma migrate`, `db:seed`, or anything that needs `DATABASE_URL`. The runner has no production credentials, and it must stay that way.
+7. **No secrets in output.** Do not print environment variables or tokens in logs, commits, or comments.
+8. If the issue asks for something these rules forbid, say so in a comment and stop.
