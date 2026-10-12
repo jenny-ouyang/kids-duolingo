@@ -48,6 +48,7 @@ jobs:
           DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
 
       - name: Run Claude Code
+        id: claude
         uses: anthropics/claude-code-action@v1
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -62,3 +63,23 @@ jobs:
           claude_args: >-
             --append-system-prompt "Before anything else, read AGENTS.md in the repository root and follow the section 'Rules for Claude running in GitHub Actions' exactly. Work only on the branch the action created. Before finishing: run `npm run lint` and `npx tsc --noEmit`, fix what they report, commit, push the branch, then open a pull request against main with `gh pr create` whose body states the lint and type-check results and references the issue. Never push to main. Never run iOS, Xcode, Capacitor, Prisma migrate, or seed commands. Never edit shipped content under data/packs, data/sentences, public/audio, public/images, lib/audio-manifest.json, or lib/word-images.json."
             --allowedTools "Bash(npm run lint),Bash(npx tsc --noEmit),Bash(npx tsc:*),Bash(gh pr create:*),Bash(gh pr view:*),Bash(gh issue view:*),Bash(git status:*),Bash(git diff:*),Bash(git log:*),Bash(git add:*),Bash(git commit:*),Bash(git push origin claude/*),Bash(git checkout:*),Bash(git branch:*)"
+
+      # Claude sometimes leaves a "Create PR" link instead of opening the PR.
+      # This step makes the pull request a guarantee: if Claude pushed a branch
+      # and no PR exists for it yet, open one against main.
+      - name: Ensure a pull request exists
+        if: always() && steps.claude.outputs.branch_name != ''
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          BRANCH: ${{ steps.claude.outputs.branch_name }}
+          ISSUE: ${{ github.event.issue.number }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          git fetch origin "$BRANCH" --quiet || { echo "branch $BRANCH not on origin; nothing to open"; exit 0; }
+          if [ "$(git rev-list --count origin/main..origin/$BRANCH)" = "0" ]; then echo "no commits on $BRANCH beyond main; nothing to open"; exit 0; fi
+          if [ -n "$(gh pr list --head "$BRANCH" --state open --json number --jq '.[].number')" ]; then echo "PR already open for $BRANCH"; exit 0; fi
+          TITLE="$(git log -1 --format=%s "origin/$BRANCH")"
+          BODY="$(git log -1 --format=%b "origin/$BRANCH")"
+          printf '%s\n\nCloses #%s\n\nOpened automatically by the Claude workflow: %s\n' "$BODY" "$ISSUE" "$RUN_URL" > /tmp/pr-body.md
+          gh pr create --base main --head "$BRANCH" --title "$TITLE" --body-file /tmp/pr-body.md
