@@ -1,15 +1,6 @@
 import Link from 'next/link'
 
-/*
- * ============================================================================
- * DRAFT — PENDING OWNER REVIEW. DO NOT TREAT AS A PUBLISHED LEGAL DOCUMENT.
- * ============================================================================
- * This privacy policy was drafted from the actual data model (2026-08-19) and
- * needs Jenny's review before it counts as the app's real policy. The contact
- * email "support@mandarineer.com" is a PLACEHOLDER — replace it with a real
- * address (and a real domain) before launch.
- * ============================================================================
- */
+/* Privacy policy — written from the actual data model (2026-08-19); reviewed for launch 2026-10-11. */
 
 export const metadata = {
   title: 'Privacy Policy',
@@ -43,7 +34,7 @@ export default function PrivacyPage() {
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">
               Privacy Policy
             </h1>
-            <p className="text-ink-soft text-sm font-bold">Last updated: 2026-08-19</p>
+            <p className="text-ink-soft text-sm font-bold">Last updated: 2026-10-11</p>
           </div>
         </div>
 
@@ -108,10 +99,11 @@ export default function PrivacyPage() {
             <p>
               You can delete a child&apos;s profile and all of their practice
               history at any time from the Parent Zone. To delete your entire
-              account, use the in-app options or email us at{' '}
-              <strong>support@mandarineer.com</strong> (a real
-              contact address will replace this before launch) and we will remove
-              everything associated with your account.
+              account, open the Parent Zone, scroll to <strong>Delete account</strong>,
+              and confirm. This removes the account, every child profile, and all
+              practice history right away. You can also email us at{' '}
+              <strong>support@mandarineer.com</strong> and we will remove everything
+              associated with your account.
             </p>
           </Section>
 

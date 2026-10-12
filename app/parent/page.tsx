@@ -526,6 +526,32 @@ function AccountSection() {
     window.location.assign('/')
   }
 
+  // Delete account (App Store 5.1.1(v)): type DELETE to confirm, then the server
+  // removes the account, every child, all progress, and the auth user.
+  const [deleteOpen, setDeleteOpen] = useState(false)
+  const [deleteText, setDeleteText] = useState('')
+  const [deleteStatus, setDeleteStatus] = useState<'idle' | 'deleting' | 'error'>('idle')
+
+  async function handleDeleteAccount() {
+    if (deleteText !== 'DELETE' || deleteStatus === 'deleting') return
+    setDeleteStatus('deleting')
+    try {
+      const res = await apiFetch('/api/account', { method: 'DELETE' })
+      if (!res.ok) {
+        setDeleteStatus('error')
+        return
+      }
+    } catch {
+      setDeleteStatus('error')
+      return
+    }
+    // The auth user is gone; local session cleanup must not block the redirect.
+    await clearActiveChild().catch(() => {})
+    const supabase = createSupabaseBrowser()
+    await supabase.auth.signOut().catch(() => {})
+    window.location.assign('/')
+  }
+
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-extrabold text-ink">Account</h2>
@@ -648,6 +674,66 @@ function AccountSection() {
           >
             Sign out
           </button>
+        </div>
+      )}
+
+      {!loading && account && (
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
+          <div>
+            <h3 className="font-extrabold text-ink">Delete account</h3>
+            <p className="text-ink-soft text-sm font-bold mt-1">
+              Permanently removes this account, every child profile, and all practice
+              history. This cannot be undone.
+            </p>
+          </div>
+          {!deleteOpen ? (
+            <button
+              onClick={() => setDeleteOpen(true)}
+              className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip self-start"
+            >
+              Delete my account…
+            </button>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <p className="text-ink text-sm font-bold">
+                Type <strong>DELETE</strong> to confirm.
+              </p>
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={deleteText}
+                  onChange={(e) => setDeleteText(e.target.value)}
+                  placeholder="DELETE"
+                  autoCapitalize="characters"
+                  autoCorrect="off"
+                  className={`${inputClass} flex-1 min-w-0`}
+                />
+                <button
+                  onClick={handleDeleteAccount}
+                  disabled={deleteText !== 'DELETE' || deleteStatus === 'deleting'}
+                  className="pressable min-h-[56px] bg-chinese text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-chinese disabled:opacity-50"
+                >
+                  {deleteStatus === 'deleting' ? 'Deleting…' : 'Delete forever'}
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  setDeleteOpen(false)
+                  setDeleteText('')
+                  setDeleteStatus('idle')
+                }}
+                className="text-ink-soft text-sm font-bold underline underline-offset-2 self-start"
+              >
+                Keep my account
+              </button>
+              {deleteStatus === 'error' && (
+                <p className="text-ink text-sm font-bold">
+                  We couldn&apos;t delete the account. Please try again, or email{' '}
+                  <strong>support@mandarineer.com</strong>.
+                </p>
+              )}
+            </div>
+          )}
         </div>
       )}
     </section>

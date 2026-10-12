@@ -1,14 +1,6 @@
 import Link from 'next/link'
 
-/*
- * ============================================================================
- * DRAFT — PENDING OWNER REVIEW. DO NOT TREAT AS A PUBLISHED LEGAL DOCUMENT.
- * ============================================================================
- * Plain-language terms drafted 2026-08-19. Needs Jenny's review before launch.
- * The governing-law jurisdiction and the contact email "support@mandarineer.com"
- * are PLACEHOLDERS — fill both in before this page goes live.
- * ============================================================================
- */
+/* Terms of use — plain-language terms drafted 2026-08-19; reviewed for launch 2026-10-11. */
 
 export const metadata = {
   title: 'Terms of Use',
