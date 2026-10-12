@@ -545,10 +545,12 @@ function AccountSection() {
       setDeleteStatus('error')
       return
     }
-    // The auth user is gone; local session cleanup must not block the redirect.
+    // The auth user is already gone server-side. scope:'local' skips the server
+    // call (which would 401/403) and always clears the stored session — on native
+    // that session lives in localStorage and a leftover dead token 401s every call.
     await clearActiveChild().catch(() => {})
     const supabase = createSupabaseBrowser()
-    await supabase.auth.signOut().catch(() => {})
+    await supabase.auth.signOut({ scope: 'local' }).catch(() => {})
     window.location.assign('/')
   }
 
