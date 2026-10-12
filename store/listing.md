@@ -28,7 +28,7 @@ WHAT MAKES IT KIND
 
 WHAT'S INSIDE
 • 33 word packs: animals, food, colors, numbers, family, weather, vehicles, jobs, and more
-• 360 words, each with native-speaker audio and a friendly illustration
+• 360 words, each with native-speaker audio and a friendly picture
 • Sentence practice with measure words and question patterns
 • Early math: addition from single digits to 100
 • Progress reports for parents: what's mastered, what's wobbly, what to practice together
@@ -62,7 +62,7 @@ Free (all territories)
 Mandarineer is a children's Mandarin vocabulary app. No account is needed to review: the app signs in silently as a guest on first launch. Tap "Let's go!" after picking a buddy and a name, then tap any pack to practice.
 
 Native functionality beyond the website (guideline 4.2):
-1. All 484 Mandarin audio clips and all 360 word illustrations are bundled in the app and play with no network connection.
+1. All 484 Mandarin audio clips and every word picture (230 custom illustrations; the rest are emoji) are bundled in the app and play with no network connection.
 2. Offline practice: once a pack has been played, its questions are cached on the device. To verify, play one pack, turn on Airplane Mode, and replay the same pack.
 3. Haptic feedback on correct and incorrect answers and on the end-of-session celebration.
 4. Native splash screen and status bar.
