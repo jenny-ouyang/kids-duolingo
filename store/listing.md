@@ -59,4 +59,14 @@ Primary: Education · Secondary: (none)
 Free (all territories)
 
 ## Review notes
-Mandarineer is a children's Mandarin vocabulary app. No account is needed to review: the app signs in silently as a guest on first launch — tap "Let's go!" after picking a buddy and a name, then any pack to practice. The Parent Dashboard sits behind a grown-ups-only multiplication gate (any adult can pass it). Account deletion (guideline 5.1.1(v)) lives in the Parent Zone → Account → "Delete account": type DELETE to confirm, and the account, every child profile, and all progress are removed immediately. Audio: all Chinese words play pre-recorded audio bundled in the app.
+Mandarineer is a children's Mandarin vocabulary app. No account is needed to review: the app signs in silently as a guest on first launch. Tap "Let's go!" after picking a buddy and a name, then tap any pack to practice.
+
+Native functionality beyond the website (guideline 4.2):
+1. All 484 Mandarin audio clips and all 360 word illustrations are bundled in the app and play with no network connection.
+2. Offline practice: once a pack has been played, its questions are cached on the device. To verify, play one pack, turn on Airplane Mode, and replay the same pack.
+3. Haptic feedback on correct and incorrect answers and on the end-of-session celebration.
+4. Native splash screen and status bar.
+
+The Parent Zone sits behind a grown-ups-only multiplication gate (any adult can pass it). Account deletion (guideline 5.1.1(v)): Parent Zone → Account → "Delete account" → type DELETE. This removes the account, every child profile, and all progress immediately.
+
+No third-party SDKs, no ads, no analytics, no tracking. A child profile holds only a nickname and an emoji avatar.

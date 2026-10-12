@@ -208,3 +208,17 @@ Prerequisite reality check: the current app has **no auth** (single-child, per-d
 - [Apple forums: WKWebView voice list gaps](https://developer.apple.com/forums/thread/723503) · [Mandarin/Cantonese voice bug](https://developer.apple.com/forums/thread/768259)
 - [FTC COPPA six-step plan](https://www.ftc.gov/business-guidance/resources/childrens-online-privacy-protection-rule-six-step-compliance-plan-your-business) · [COPPA 2025 practitioner guide](https://blog.promise.legal/startup-central/coppa-compliance-in-2025-a-practical-guide-for-tech-edtech-and-kids-apps/)
 - [Runway live review times](https://www.runway.team/appreviewtimes) · [Aerious 2026 review windows](https://aerious.uk/blog/app-store-review-time-in-2026-expected-approval-windows-and-delays) · [PTKD TestFlight backlog](https://ptkd.com/journal/testflight-external-testing-approved-2026-backlog)
+
+
+---
+
+## Status 2026-10-12 — what shipped vs. this plan
+
+- **Wrapper:** Capacitor 8, bundled static export (never remote URL). ✔
+- **4.2 package actually in build 6:** bundled audio (484 clips) + bundled illustrations (360), offline question cache per child (`fetchJsonCached` in `lib/api-fetch.ts`, used by practice/math sessions and pack lists), haptics (`lib/haptics.ts`, wired in PictureChoice, CountAndChoose, celebrate), native splash + status bar. **Not built:** native TTS plugin (unnecessary — clips are pre-generated, so WKWebView speechSynthesis is only a fallback for uncovered text) and local notifications (deferred to 1.1; see GitHub issue #7).
+- **Monetization:** v1 ships free with no IAP (Stripe layer dormant). The IAP plan above is deferred until content gating exists.
+- **Category:** plain Education, 4+ (decision D2 revised 2026-08-19). Kids Category not used.
+- **Account deletion (5.1.1(v)):** `DELETE /api/account` + Parent Zone card, shipped 2026-10-11.
+- **Privacy manifest:** app-level `ios/App/App/PrivacyInfo.xcprivacy` added 2026-10-12 (no tracking, four first-party data types, no required-reason APIs; Capacitor ships its own manifests).
+- **Audio licensing:** Jenny decided 2026-10-12 to ship with the edge-tts clips and swap to a licensed Azure key in 1.0.1 (issue #10).
+- Tracking: GitHub issues labelled `ios-rollout`.
