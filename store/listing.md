@@ -70,3 +70,42 @@ Native functionality beyond the website (guideline 4.2):
 The Parent Zone sits behind a grown-ups-only multiplication gate (any adult can pass it). Account deletion (guideline 5.1.1(v)): Parent Zone → Account → "Delete account" → type DELETE. This removes the account, every child profile, and all progress immediately.
 
 No third-party SDKs, no ads, no analytics, no tracking. A child profile holds only a nickname and an emoji avatar.
+
+## Age rating questionnaire (App Store Connect → App Information → Age Rating)
+Answers prepared 2026-10-12 from Apple's "Age ratings values and definitions" (new 2025 questionnaire). Expected result: **4+**.
+
+| Section | Question | Answer | Why |
+|---|---|---|---|
+| In-App Controls | Parental controls | No | The Parent Zone gate is a kid filter, not a tool that restricts a child's access to in-app content or features. (Answering Yes would not raise the rating, but it must be true.) |
+| In-App Controls | Age assurance | No | No age verification or Declared Age Range API. |
+| Capabilities | Unrestricted web access | No | No in-app browser; no external links reachable from kid screens. |
+| Capabilities | User-generated content | No | — |
+| Capabilities | Messaging and chat | No | — |
+| Capabilities | Social media / Social media disabled under 13 | No | — |
+| Capabilities | Advertising | No | No ads of any kind. |
+| Mature themes | Profanity or crude humor | None | — |
+| Mature themes | Horror or fear themes | None | — |
+| Mature themes | Alcohol, tobacco, or drug use or references | None | — |
+| Medical or Wellness | Medical or treatment information | None | — |
+| Medical or Wellness | Health or wellness topics | No | Body-parts vocabulary pack is language content, not health guidance. |
+| Sexuality or Nudity | Mature or suggestive themes | None | — |
+| Sexuality or Nudity | Sexual content or nudity | None | — |
+| Violence | Cartoon or fantasy violence | None | — |
+| Violence | Realistic violence | None | — |
+| Violence | Guns or other weapons | None | "Tools" pack has hammer/saw etc. (tools, not weapons). |
+| Chance-based | Contests | None | — |
+| Chance-based | Simulated gambling / Gambling / Loot boxes | None | — |
+| Minimum age override | Set a higher minimum age? | No | Leave at the computed rating. |
+
+## App Privacy label (App Store Connect → App Privacy)
+"Do you or your third-party partners collect data from this app?" → **Yes**. Data is first-party only (Supabase is our processor; no third-party SDKs).
+
+| Data type | Collected | Linked to the user | Used for tracking | Purpose |
+|---|---|---|---|---|
+| Contact Info → Email Address | Yes (only when a parent claims the guest account) | Yes | No | App Functionality |
+| Contact Info → Name (child nickname, entered by the parent) | Yes | Yes | No | App Functionality |
+| Identifiers → User ID (internal account/child IDs) | Yes | Yes | No | App Functionality |
+| Usage Data → Product Interaction (answers, hearts, streaks) | Yes | Yes | No | App Functionality |
+| Everything else (location, contacts, photos, browsing, purchases, diagnostics, advertising data, device ID) | No | — | — | — |
+
+"Data Used to Track You" must stay empty. This matches ios/App/App/PrivacyInfo.xcprivacy.
