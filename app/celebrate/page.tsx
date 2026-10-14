@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
 import Confetti from '@/components/celebration/Confetti'
 import Mascot from '@/components/design/Mascot'
+import PinyinToggle from '@/components/exercise/PinyinToggle'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { speakChinese } from '@/lib/tts'
 import { playCelebrationSound, playStarSound } from '@/lib/sounds'
@@ -28,6 +29,7 @@ function CelebrationContent() {
   const stars = correct <= 2 ? 1 : correct <= 5 ? 2 : correct <= 7 ? 3 : 4
 
   const [enc, setEnc] = useState<Encouragement | null>(null)
+  const [showPinyin, setShowPinyin] = useState(false)
 
   useEffect(() => {
     let sessionData: SessionData = {
@@ -106,6 +108,7 @@ function CelebrationContent() {
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
+          className="flex flex-col items-center gap-2"
         >
           <button
             onClick={() => speakChinese(enc.chinesePhrase)}
@@ -114,11 +117,15 @@ function CelebrationContent() {
             <span className="font-hanzi text-4xl text-ink border-b-[6px] border-gold pb-0.5">
               {enc.chinesePhrase}
             </span>
-            <span className="text-base font-bold text-chinese">{enc.chinesePinyin}</span>
+            <span className={`text-base font-bold text-chinese ${showPinyin ? '' : 'invisible'}`}>
+              {enc.chinesePinyin}
+            </span>
             <span className="text-sm font-bold text-ink-soft">
               {enc.chineseMeaning} <span className="font-emoji">🔊</span>
             </span>
           </button>
+          {/* Separate control: tapping the phrase plays audio, so reveal can't share that tap */}
+          <PinyinToggle on={showPinyin} onToggle={() => setShowPinyin((v) => !v)} />
         </motion.div>
 
         {/* Score */}
