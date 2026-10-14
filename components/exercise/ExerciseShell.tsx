@@ -5,10 +5,12 @@ import { motion } from 'framer-motion'
 interface ExerciseShellProps {
   current: number
   total: number
+  /** Optional control on the counter row (e.g. the pinyin toggle) */
+  headerAction?: React.ReactNode
   children: React.ReactNode
 }
 
-export default function ExerciseShell({ current, total, children }: ExerciseShellProps) {
+export default function ExerciseShell({ current, total, headerAction, children }: ExerciseShellProps) {
   const progress = (current / total) * 100
 
   return (
@@ -30,9 +32,12 @@ export default function ExerciseShell({ current, total, children }: ExerciseShel
         </motion.div>
       </div>
 
-      {/* Question counter chip */}
-      <div className="self-center bg-white rounded-full px-5 py-1.5 shadow-press-chip text-sm font-extrabold text-ink tracking-wide">
-        {current} / {total}
+      {/* Question counter chip — optional action pinned right, counter stays centered */}
+      <div className="relative flex justify-center">
+        <div className="bg-white rounded-full px-5 py-1.5 shadow-press-chip text-sm font-extrabold text-ink tracking-wide">
+          {current} / {total}
+        </div>
+        {headerAction && <div className="absolute right-0 top-1/2 -translate-y-1/2">{headerAction}</div>}
       </div>
 
       {children}
