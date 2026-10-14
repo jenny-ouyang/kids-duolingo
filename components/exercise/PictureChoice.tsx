@@ -11,6 +11,8 @@ import wordImageIds from '@/lib/word-images.json'
 interface PictureChoiceProps {
   question: ExerciseQuestion
   onAnswer: (correct: boolean) => void
+  /** Child pressed the "pīn" toggle for this question */
+  showPinyin: boolean
 }
 
 type AnswerState = 'idle' | 'correct' | 'wrong'
@@ -138,10 +140,12 @@ function PictureCard({
 }
 
 function ChineseCard({
-  word, state, shaking, isCorrect, onClick, disabled, edgeClass,
+  word, state, shaking, isCorrect, onClick, disabled, edgeClass, showPinyin,
 }: {
-  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
+  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string; showPinyin: boolean
 }) {
+  // Pinyin is a hint, not a crutch: hidden until asked for, or shown on the solved tile
+  const pinyinVisible = showPinyin || (state !== 'idle' && isCorrect)
   return (
     <motion.button
       onClick={onClick}
@@ -152,7 +156,7 @@ function ChineseCard({
       style={{ minHeight: 130 }}
     >
       <span className="font-hanzi text-4xl text-ink">{word.chinese}</span>
-      <span className="text-base font-bold text-ink-soft">{word.pinyin}</span>
+      <span className={`text-base font-bold text-ink-soft ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
       <AnimatePresence>
         {state !== 'idle' && isCorrect && <CorrectBadge />}
       </AnimatePresence>
@@ -162,7 +166,7 @@ function ChineseCard({
 
 // ─── Prompt variants (Hanzi hero block — DESIGN.md) ──────────────────────────
 
-function AudioPrompt({ word }: { word: Word }) {
+function AudioPrompt({ word, pinyinVisible }: { word: Word; pinyinVisible: boolean }) {
   return (
     <div className="text-center">
       <button
@@ -176,7 +180,7 @@ function AudioPrompt({ word }: { word: Word }) {
           {word.chinese}
         </span>
         <span className="flex items-center gap-2">
-          <span className="text-lg font-bold text-chinese">{word.pinyin}</span>
+          <span className={`text-lg font-bold text-chinese ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
           <span className="bg-gold rounded-full px-3 py-1 shadow-press-gold">
             <span className="font-emoji text-xl">🔊</span>
           </span>
@@ -233,7 +237,7 @@ function EnglishPrompt({ word }: { word: Word }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function PictureChoice({ question, onAnswer }: PictureChoiceProps) {
+export default function PictureChoice({ question, onAnswer, showPinyin }: PictureChoiceProps) {
   // Stay-until-right: wrong taps gray out and the question waits for the correct
   // tap. Only the FIRST tap feeds the memory system (onAnswer), so retry kindness
   // never corrupts the spaced-repetition data.
@@ -284,7 +288,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
   return (
     <div className="flex flex-col items-center gap-5 w-full">
       {/* Prompt */}
-      {question.type === 'audio_to_picture' && <AudioPrompt word={question.word} />}
+      {question.type === 'audio_to_picture' && <AudioPrompt word={question.word} pinyinVisible={showPinyin || solved} />}
       {question.type === 'picture_to_chinese' && <PicturePrompt word={question.word} />}
       {question.type === 'english_to_chinese' && <EnglishPrompt word={question.word} />}
 
@@ -324,6 +328,7 @@ export default function PictureChoice({ question, onAnswer }: PictureChoiceProps
               onClick={() => handleSelect(word.id)}
               disabled={cardDisabled}
               edgeClass={edgeClass}
+              showPinyin={showPinyin}
             />
           ) : (
             <PictureCard

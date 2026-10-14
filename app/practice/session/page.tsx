@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import PictureChoice from '@/components/exercise/PictureChoice'
+import PinyinToggle from '@/components/exercise/PinyinToggle'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { ExerciseQuestion, WordProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
@@ -45,6 +46,10 @@ function PracticeSession() {
   const [packEmoji, setPackEmoji] = useState('📦')
   const [questions, setQuestions] = useState<ExerciseQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  // Which question index the child revealed pinyin on. Derived, not reset by an
+  // effect: moving to the next index hides pinyin in the same render.
+  const [pinyinIndex, setPinyinIndex] = useState<number | null>(null)
+  const showPinyin = pinyinIndex === currentIndex
   const [correctCount, setCorrectCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
@@ -235,7 +240,16 @@ function PracticeSession() {
           </div>
         </div>
 
-        <ExerciseShell current={currentIndex + 1} total={questions.length}>
+        <ExerciseShell
+          current={currentIndex + 1}
+          total={questions.length}
+          headerAction={
+            <PinyinToggle
+              on={showPinyin}
+              onToggle={() => setPinyinIndex(showPinyin ? null : currentIndex)}
+            />
+          }
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -244,7 +258,7 @@ function PracticeSession() {
               exit={{ opacity: 0, x: -40 }}
               transition={{ duration: 0.25 }}
             >
-              <PictureChoice question={currentQuestion} onAnswer={handleAnswer} />
+              <PictureChoice question={currentQuestion} onAnswer={handleAnswer} showPinyin={showPinyin} />
             </motion.div>
           </AnimatePresence>
         </ExerciseShell>
