@@ -12,16 +12,18 @@ const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold
 interface Props {
   question: SentenceQuestion
   onAnswer: (correct: boolean) => void
+  /** Child pressed the "pīn" toggle for this question */
+  showPinyin: boolean
 }
 
-export default function SentenceBuild({ question, onAnswer }: Props) {
+export default function SentenceBuild({ question, onAnswer, showPinyin }: Props) {
   const { sentence, tiles } = question
   const slotCount = sentence.chinese.length
 
   const [placed, setPlaced] = useState<string[]>([])
   const [bank, setBank] = useState<string[]>(tiles)
   const [shaking, setShaking] = useState(false)
-  const [showPinyin, setShowPinyin] = useState(false)
+  const [solved, setSolved] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
 
   const pendingTimers = useRef<ReturnType<typeof setTimeout>[]>([])
@@ -35,7 +37,7 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
   }
 
   function tapBankTile(tile: string, bankIndex: number) {
-    if (placed.length >= slotCount || shaking || showPinyin) return
+    if (placed.length >= slotCount || shaking || solved) return
     speakChinese(tile)
 
     const newPlaced = [...placed, tile]
@@ -48,7 +50,7 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
       if (correct) {
         playCorrectSound()
         setIsCorrect(true)
-        setShowPinyin(true)
+        setSolved(true)
         schedule(() => speakChinese(sentence.chinese.join('')), 300)
         schedule(() => onAnswer(true), 1500)
       } else {
@@ -64,7 +66,7 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
   }
 
   function tapPlacedTile(tile: string, placedIndex: number) {
-    if (shaking || showPinyin) return
+    if (shaking || solved) return
     setPlaced(placed.filter((_, i) => i !== placedIndex))
     setBank([...bank, tile])
   }
@@ -140,9 +142,9 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
         })}
       </motion.div>
 
-      {/* Pinyin — appears on correct */}
+      {/* Pinyin — appears when the child asks (pīn toggle) or on correct */}
       <AnimatePresence>
-        {showPinyin && (
+        {(showPinyin || solved) && (
           <motion.div
             initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -174,7 +176,7 @@ export default function SentenceBuild({ question, onAnswer }: Props) {
                 whileTap={{ scale: 0.94, y: 4 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
                 onClick={() => tapBankTile(tile, i)}
-                disabled={shaking || showPinyin}
+                disabled={shaking || solved}
                 className={`
                   w-[72px] h-[72px] rounded-2xl flex items-center justify-center
                   bg-white text-ink ${edgeClass}

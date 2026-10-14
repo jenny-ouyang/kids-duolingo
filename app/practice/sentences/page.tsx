@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
 import SentenceBuild from '@/components/exercise/SentenceBuild'
+import PinyinToggle from '@/components/exercise/PinyinToggle'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { SentenceQuestion } from '@/lib/types'
 
@@ -27,6 +28,10 @@ export default function SentencesPractice() {
 
   const [questions, setQuestions] = useState<SentenceQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
+  // Which question index the child revealed pinyin on. Derived, not reset by an
+  // effect: moving to the next index hides pinyin in the same render.
+  const [pinyinIndex, setPinyinIndex] = useState<number | null>(null)
+  const showPinyin = pinyinIndex === currentIndex
   const [correctCount, setCorrectCount] = useState(0)
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
@@ -163,7 +168,16 @@ export default function SentencesPractice() {
           </div>
         </div>
 
-        <ExerciseShell current={currentIndex + 1} total={questions.length}>
+        <ExerciseShell
+          current={currentIndex + 1}
+          total={questions.length}
+          headerAction={
+            <PinyinToggle
+              on={showPinyin}
+              onToggle={() => setPinyinIndex(showPinyin ? null : currentIndex)}
+            />
+          }
+        >
           <AnimatePresence mode="wait">
             <motion.div
               key={currentIndex}
@@ -174,7 +188,12 @@ export default function SentencesPractice() {
             >
               {/* key forces a clean remount per question — SentenceBuild seeds
                   its tile bank from props once, so reuse shows stale tiles */}
-              <SentenceBuild key={currentQuestion.sentence.id} question={currentQuestion} onAnswer={handleAnswer} />
+              <SentenceBuild
+                key={currentQuestion.sentence.id}
+                question={currentQuestion}
+                onAnswer={handleAnswer}
+                showPinyin={showPinyin}
+              />
             </motion.div>
           </AnimatePresence>
         </ExerciseShell>
