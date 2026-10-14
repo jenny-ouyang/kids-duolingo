@@ -112,7 +112,9 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
               key={i}
               onClick={() => tile && tapPlacedTile(tile, i)}
               animate={isCorrect && tile ? { scale: [1, 1.2, 0.95, 1.05, 1] } : { scale: 1 }}
-              transition={{ delay: isCorrect ? i * 0.08 : 0, duration: 0.5, type: 'spring' }}
+              // Keyframes already shape the bounce; spring only supports two keyframes
+              // and throws in dev (froze the session on the first correct sentence)
+              transition={{ delay: isCorrect ? i * 0.08 : 0, duration: 0.5, ease: 'easeOut' }}
               className={`
                 relative w-[72px] h-[72px] rounded-2xl flex items-center justify-center
                 font-hanzi text-3xl select-none
