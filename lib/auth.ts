@@ -3,7 +3,7 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { createSupabaseServer } from '@/lib/supabase-server'
 import { Prisma } from '@/lib/generated/prisma'
-import type { Child } from '@/lib/generated/prisma'
+import type { Account, Child } from '@/lib/generated/prisma'
 
 function isUniqueViolation(err: unknown): boolean {
   return err instanceof Prisma.PrismaClientKnownRequestError && err.code === 'P2002'
@@ -26,7 +26,7 @@ export class AuthError extends Error {
  * Validates the Supabase JWT (getUser(), never getSession(), which is spoofable
  * server-side) and ensures an Account row exists. Returns the auth user id.
  */
-export async function getAuthContext(): Promise<{ userId: string }> {
+export async function getAuthContext(): Promise<{ userId: string; account: Account }> {
   const supabase = createSupabaseServer()
   // The native (Capacitor) app is cross-origin, so its session arrives as a
   // Bearer token instead of cookies. getUser(jwt) validates it the same way.
@@ -60,7 +60,7 @@ export async function getAuthContext(): Promise<{ userId: string }> {
   if (existing.isGuest && !isGuest) {
     // Guest just claimed the account (magic link / OAuth) — record it.
     try {
-      await prisma.account.update({
+      existing = await prisma.account.update({
         where: { id: user.id },
         data: { email: userEmail ?? existing.email, isGuest: false },
       })
@@ -68,14 +68,14 @@ export async function getAuthContext(): Promise<{ userId: string }> {
       if (!isUniqueViolation(err)) throw err
       // Email already on another Account row — still flip isGuest so this
       // branch doesn't re-fire (and fail) on every subsequent request.
-      await prisma.account.update({
+      existing = await prisma.account.update({
         where: { id: user.id },
         data: { isGuest: false },
       })
     }
   }
 
-  return { userId: user.id }
+  return { userId: user.id, account: existing }
 }
 
 /**
@@ -84,8 +84,8 @@ export async function getAuthContext(): Promise<{ userId: string }> {
  * child if the cookie is missing or stale. Handlers must never accept a childId
  * from the request body or query string.
  */
-export async function requireChild(): Promise<{ userId: string; child: Child }> {
-  const { userId } = await getAuthContext()
+export async function requireChild(): Promise<{ userId: string; account: Account; child: Child }> {
+  const { userId, account } = await getAuthContext()
 
   // Active-child hint: x-child-id header (native app) or kd_child cookie (web).
   // Either way it is only a hint — ownership is verified against the account.
@@ -105,7 +105,7 @@ export async function requireChild(): Promise<{ userId: string; child: Child }> 
   }
   if (!child) throw new AuthError(403, 'no-child')
 
-  return { userId, child }
+  return { userId, account, child }
 }
 
 /** Standard error → response mapping for route handlers. */
