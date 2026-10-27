@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 import { Word } from '@/lib/types'
 
 const SESSION_SIZE = 8
@@ -18,7 +19,8 @@ export async function GET(
   const { packId } = params
 
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
+    assertPackAccess(account, packId)
     const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
         where: { id: packId },
@@ -117,6 +119,8 @@ export async function GET(
 
     return NextResponse.json({ questions, wordProgress })
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     console.error('[questions GET]', err)
