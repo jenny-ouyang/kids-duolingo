@@ -2,8 +2,46 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
 import { getAuthContext, authErrorResponse, CHILD_COOKIE } from '@/lib/auth'
+import { hasLifetime, isPackFree, paymentsEnabled } from '@/lib/plan'
 
 export const runtime = 'nodejs'
+
+/**
+ * GET /api/account — what the Parent Zone needs to render the unlock card.
+ * Plan state comes from the validated session only. No childId involved.
+ */
+export async function GET() {
+  try {
+    const { account } = await getAuthContext()
+
+    const packs = await prisma.pack.findMany({
+      select: {
+        id: true,
+        _count: { select: { words: true, problems: true, sentences: true } },
+      },
+    })
+    const withContent = packs.filter(
+      (p) => p.id !== 'sentences' && p._count.words + p._count.problems + p._count.sentences > 0
+    )
+    const freePackCount = withContent.filter((p) => isPackFree(p.id)).length
+
+    return NextResponse.json({
+      plan: account.plan,
+      lifetime: hasLifetime(account),
+      isFounder: account.isFounder,
+      isGuest: account.isGuest,
+      email: account.email,
+      paymentsEnabled: paymentsEnabled(),
+      freePackCount,
+      totalPackCount: withContent.length,
+    })
+  } catch (err) {
+    const authErr = authErrorResponse(err)
+    if (authErr) return authErr
+    console.error('[account GET]', err)
+    return NextResponse.json({ error: 'DB error' }, { status: 500 })
+  }
+}
 
 /**
  * DELETE /api/account — permanently deletes the signed-in account.
