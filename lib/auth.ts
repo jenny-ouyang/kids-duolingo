@@ -24,7 +24,7 @@ export class AuthError extends Error {
 
 /**
  * Validates the Supabase JWT (getUser(), never getSession(), which is spoofable
- * server-side) and ensures an Account row exists. Returns the auth user id.
+ * server-side) and ensures an Account row exists. Returns the auth user id and the up-to-date Account row.
  */
 export async function getAuthContext(): Promise<{ userId: string; account: Account }> {
   const supabase = createSupabaseServer()

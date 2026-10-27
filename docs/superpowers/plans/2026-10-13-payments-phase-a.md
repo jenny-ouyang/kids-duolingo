@@ -68,7 +68,7 @@
   - `LIFETIME_PRICE_DISPLAY = '$9.99'` (unchanged)
   - `PAYMENTS_ENABLED` constant is **removed**.
 
-- [ ] **Step 1: Install vitest and add the test script**
+- [x] **Step 1: Install vitest and add the test script**
 
 ```bash
 cd /Users/jennyouyang/Documents/apps/kids-duolingo
@@ -95,7 +95,7 @@ export default defineConfig({
 })
 ```
 
-- [ ] **Step 2: Write the failing tests**
+- [x] **Step 2: Write the failing tests**
 
 Create `lib/plan.test.ts`:
 
@@ -167,12 +167,12 @@ describe('canAccessPack', () => {
 })
 ```
 
-- [ ] **Step 3: Run the tests to see them fail**
+- [x] **Step 3: Run the tests to see them fail**
 
 Run: `npm test`
 Expected: FAIL — `isPackFree`, `paymentsEnabled`, `canAccessPack` are not exported; the free-list test fails on the missing `math_add_singles` and `sentences`.
 
-- [ ] **Step 4: Rewrite `lib/plan.ts`**
+- [x] **Step 4: Rewrite `lib/plan.ts`**
 
 Replace the whole file with:
 
@@ -226,7 +226,7 @@ export function canAccessPack(account: { plan: string }, packId: string): boolea
 }
 ```
 
-- [ ] **Step 5: Run the tests and the type check**
+- [x] **Step 5: Run the tests and the type check**
 
 Run: `npm test`
 Expected: PASS (6 tests).
@@ -255,7 +255,7 @@ and the line `if (!PAYMENTS_ENABLED) return <FreeEarlyAccess />` to
 Run: `npx tsc --noEmit && npm run lint`
 Expected: clean (the `if (true)` line may produce a lint warning `no-constant-condition`; if it does, use `const EARLY_ACCESS = true` above the component and `if (EARLY_ACCESS)` instead).
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add package.json package-lock.json vitest.config.ts lib/plan.ts lib/plan.test.ts app/unlock/page.tsx app/api/stripe/checkout/route.ts
@@ -273,7 +273,7 @@ git commit -m "feat(plan): server-side payments switch, free list incl. math_add
 **Interfaces:**
 - Produces on `Account`: `planSource: String?`, `planGrantedAt: DateTime?`, `isFounder: Boolean @default(false)`, `stripeCheckoutSessionId: String? @unique`, `stripePaymentIntentId: String?`, `appleOriginalTransactionId: String? @unique`.
 
-- [ ] **Step 1: Edit the Prisma model**
+- [x] **Step 1: Edit the Prisma model**
 
 Replace the `Account` model with:
 
@@ -298,7 +298,7 @@ model Account {
 }
 ```
 
-- [ ] **Step 2: Write the migration SQL by hand**
+- [x] **Step 2: Write the migration SQL by hand**
 
 Create `prisma/migrations/20261013120000_payments_fields/migration.sql`:
 
@@ -316,7 +316,7 @@ CREATE UNIQUE INDEX "Account_stripeCheckoutSessionId_key" ON "Account"("stripeCh
 CREATE UNIQUE INDEX "Account_appleOriginalTransactionId_key" ON "Account"("appleOriginalTransactionId");
 ```
 
-- [ ] **Step 3: Apply and regenerate**
+- [x] **Step 3: Apply and regenerate**
 
 Run: `npx prisma migrate deploy`
 Expected: `1 migration found … Applying migration 20261013120000_payments_fields … All migrations have been successfully applied.`
@@ -327,7 +327,7 @@ Expected: `Generated Prisma Client … to ./lib/generated/prisma`
 Run: `npx prisma migrate status`
 Expected: `Database schema is up to date!`
 
-- [ ] **Step 4: Verify the columns exist**
+- [x] **Step 4: Verify the columns exist**
 
 Run:
 ```bash
@@ -340,7 +340,7 @@ console.log(r.rows.map(x=>x.column_name).join(', ')); await c.end();"
 ```
 Expected output includes: `planSource, planGrantedAt, isFounder, stripeCheckoutSessionId, stripePaymentIntentId, appleOriginalTransactionId`.
 
-- [ ] **Step 5: Type check and commit**
+- [x] **Step 5: Type check and commit**
 
 Run: `npx tsc --noEmit`
 Expected: clean.
@@ -360,7 +360,7 @@ git commit -m "feat(db): Account entitlement fields — planSource, planGrantedA
 **Interfaces:**
 - Produces: `getAuthContext(): Promise<{ userId: string; account: Account }>` and `requireChild(): Promise<{ userId: string; account: Account; child: Child }>` where `Account` is the Prisma model type from `@/lib/generated/prisma`. Existing callers that destructure `{ userId }` or `{ child }` keep working.
 
-- [ ] **Step 1: Return the row the function already has**
+- [x] **Step 1: Return the row the function already has**
 
 In `lib/auth.ts`:
 
@@ -439,12 +439,12 @@ export async function requireChild(): Promise<{ userId: string; account: Account
 ```
 and its last line `return { userId, child }` to `return { userId, account, child }`.
 
-- [ ] **Step 2: Type check, lint, tests**
+- [x] **Step 2: Type check, lint, tests**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: all clean. (No caller breaks: every existing destructure is a subset.)
 
-- [ ] **Step 3: Commit**
+- [x] **Step 3: Commit**
 
 ```bash
 git add lib/auth.ts
@@ -462,7 +462,7 @@ git commit -m "feat(auth): getAuthContext/requireChild return the Account row fo
 **Interfaces:**
 - Consumes: nothing new. The route stays `GET` with the bearer check.
 
-- [ ] **Step 1: Write the failing test**
+- [x] **Step 1: Write the failing test**
 
 Create `app/api/cron/cleanup-guests/route.test.ts`:
 
@@ -520,12 +520,12 @@ describe('cleanup-guests', () => {
 })
 ```
 
-- [ ] **Step 2: Run it to see it fail**
+- [x] **Step 2: Run it to see it fail**
 
 Run: `npm test`
 Expected: FAIL on `expect(where.plan).toBe('free')` — received `undefined`.
 
-- [ ] **Step 3: Add the guard**
+- [x] **Step 3: Add the guard**
 
 In `app/api/cron/cleanup-guests/route.ts`, change the where clause to:
 
@@ -542,12 +542,12 @@ In `app/api/cron/cleanup-guests/route.ts`, change the where clause to:
 
 Also update the doc comment line `Claimed accounts are never touched.` to `Claimed accounts and paid accounts are never touched.`
 
-- [ ] **Step 4: Run tests, type check, lint**
+- [x] **Step 4: Run tests, type check, lint**
 
 Run: `npm test && npx tsc --noEmit && npm run lint`
 Expected: PASS (9 tests), clean.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/api/cron/cleanup-guests/route.ts app/api/cron/cleanup-guests/route.test.ts
@@ -570,7 +570,7 @@ git commit -m "fix(cron): never delete a paid guest account"
   - `packLockedResponse(err: unknown): NextResponse | null` — `402 { error: 'locked', packId }` for a `PackLockedError`, else `null` (same shape as `authErrorResponse`)
   - `accessibleSentencePackIds(account, allPackIds: string[]): string[]`
 
-- [ ] **Step 1: Write the failing tests**
+- [x] **Step 1: Write the failing tests**
 
 Create `lib/pack-gate.test.ts`:
 
@@ -630,12 +630,12 @@ describe('accessibleSentencePackIds', () => {
 })
 ```
 
-- [ ] **Step 2: Run to see them fail**
+- [x] **Step 2: Run to see them fail**
 
 Run: `npm test`
 Expected: FAIL — cannot resolve `@/lib/pack-gate`.
 
-- [ ] **Step 3: Create `lib/pack-gate.ts`**
+- [x] **Step 3: Create `lib/pack-gate.ts`**
 
 ```ts
 import { NextResponse } from 'next/server'
@@ -672,12 +672,12 @@ export function accessibleSentencePackIds(account: { plan: string }, allPackIds:
 }
 ```
 
-- [ ] **Step 4: Run the unit tests**
+- [x] **Step 4: Run the unit tests**
 
 Run: `npm test`
 Expected: PASS (17 tests).
 
-- [ ] **Step 5: Apply the gate in `app/api/questions/[packId]/route.ts`**
+- [x] **Step 5: Apply the gate in `app/api/questions/[packId]/route.ts`**
 
 Add the import after the auth import:
 ```ts
@@ -698,11 +698,11 @@ In the `catch`, before `const authErr = authErrorResponse(err)`, add:
     if (locked) return locked
 ```
 
-- [ ] **Step 6: Apply the gate in `app/api/math/questions/[topicId]/route.ts`**
+- [x] **Step 6: Apply the gate in `app/api/math/questions/[topicId]/route.ts`**
 
 Same three edits. The handler's parameter is `{ params }: { params: { topicId: string } }`; use `assertPackAccess(account, params.topicId)` (or the local `topicId` variable if the handler already destructures it — read the handler body first and match its name). Add the same `packLockedResponse` lines at the top of the `catch`.
 
-- [ ] **Step 7: Apply the gate in `app/api/sentences/[packId]/route.ts`**
+- [x] **Step 7: Apply the gate in `app/api/sentences/[packId]/route.ts`**
 
 This route uses `getAuthContext()` (no child). Find the `GET` handler's auth call; change it to
 ```ts
@@ -711,7 +711,7 @@ This route uses `getAuthContext()` (no child). Find the `GET` handler's auth cal
 ```
 (match the existing param name — the handler signature is `GET(_req, { params }: { params: { packId: string } })`). Add the import and the `packLockedResponse` lines at the top of its `catch`. If the handler's try/catch only wraps the auth call (like `sentences/all`), widen the `try` so the assert is inside it.
 
-- [ ] **Step 8: Filter `app/api/sentences/all/route.ts`**
+- [x] **Step 8: Filter `app/api/sentences/all/route.ts`**
 
 Replace the `ALL_SENTENCES` constant with a map keyed by source pack, and filter at request time:
 
@@ -747,7 +747,7 @@ In `GET`, capture the account and build the pool:
 ```
 Keep the rest of the handler as is (it slices 8 and maps to questions). Delete the old `ALL_SENTENCES` array.
 
-- [ ] **Step 9: Gate the two writes**
+- [x] **Step 9: Gate the two writes**
 
 `app/api/progress/route.ts`, in `POST` only (the `GET` stays open — reading progress of a locked pack is harmless and the parent report needs it):
 ```ts
@@ -766,12 +766,12 @@ Place the assert right after the destructure of `packId`, before any `upsert`. A
 ```
 Add the import and the `packLockedResponse` lines at the top of the POST `catch`.
 
-- [ ] **Step 10: Type check, lint, tests**
+- [x] **Step 10: Type check, lint, tests**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: clean, 17 tests pass.
 
-- [ ] **Step 11: Smoke the open state against the dev server**
+- [x] **Step 11: Smoke the open state against the dev server**
 
 Run: `npm run dev` in one terminal. In another:
 ```bash
@@ -779,7 +779,7 @@ curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/api/questions/foo
 ```
 Expected: `401` (no auth; proves the route still loads — the full locked/open behaviour is Task 9).
 
-- [ ] **Step 12: Commit**
+- [x] **Step 12: Commit**
 
 ```bash
 git add lib/pack-gate.ts lib/pack-gate.test.ts "app/api/questions/[packId]/route.ts" "app/api/math/questions/[topicId]/route.ts" "app/api/sentences/[packId]/route.ts" app/api/sentences/all/route.ts app/api/progress/route.ts app/api/answers/route.ts
@@ -800,7 +800,7 @@ git commit -m "feat(gate): 402 locked on question, sentence, progress and answer
   - `GET /api/packs` element gains `locked: boolean`.
   - `GET /api/account` → `{ plan: string; isFounder: boolean; isGuest: boolean; email: string | null; paymentsEnabled: boolean; lifetime: boolean; freePackCount: number; totalPackCount: number }`. `totalPackCount` counts packs with content (same filter as `/api/packs`), excluding the `sentences` pseudo-pack; `freePackCount` counts those that are free.
 
-- [ ] **Step 1: Add `locked` to the pack list**
+- [x] **Step 1: Add `locked` to the pack list**
 
 In `app/api/packs/route.ts`:
 
@@ -815,7 +815,7 @@ In the `.map((pack) => ({ … }))`, add after `masteryPct`:
         locked: !canAccessPack(account, pack.id),
 ```
 
-- [ ] **Step 2: Create `app/api/account/route.ts`**
+- [x] **Step 2: Create `app/api/account/route.ts`**
 
 ```ts
 import { NextResponse } from 'next/server'
@@ -863,12 +863,12 @@ export async function GET() {
 }
 ```
 
-- [ ] **Step 3: Type check, lint, tests**
+- [x] **Step 3: Type check, lint, tests**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: clean.
 
-- [ ] **Step 4: Check the shapes on the dev server**
+- [x] **Step 4: Check the shapes on the dev server**
 
 With `npm run dev` running and a browser session signed in (open http://localhost:3000 once in Chrome so a guest exists), there is no cookie in curl, so check the 401 path only here:
 ```bash
@@ -876,7 +876,7 @@ curl -s http://localhost:3000/api/account; echo
 ```
 Expected: `{"error":"unauthenticated"}`. Full shape is verified in Task 9.
 
-- [ ] **Step 5: Commit**
+- [x] **Step 5: Commit**
 
 ```bash
 git add app/api/packs/route.ts app/api/account/route.ts
@@ -895,7 +895,7 @@ git commit -m "feat(api): locked flag on pack list; GET /api/account for the Par
 - Consumes: `locked` from `/api/packs` (Task 6); 402 from the session routes (Task 5).
 - Produces: `AskGrownUp({ onClose?: () => void })` — a full-screen kid card: panda, "Ask a grown-up to unlock 🔒", one "Grown-ups" button → `/parent`, optional "Back" when `onClose` is given.
 
-- [ ] **Step 1: Create the card**
+- [x] **Step 1: Create the card**
 
 `components/kid/AskGrownUp.tsx`:
 
@@ -944,7 +944,7 @@ export default function AskGrownUp({ onClose }: { onClose?: () => void }) {
 }
 ```
 
-- [ ] **Step 2: Packs page — badge + card on tap**
+- [x] **Step 2: Packs page — badge + card on tap**
 
 In `app/packs/page.tsx`:
 
@@ -987,11 +987,11 @@ Render the card when `asking` is true. Change the `return (` of the ready state 
       )}
 ```
 
-- [ ] **Step 3: Math topics page — same treatment**
+- [x] **Step 3: Math topics page — same treatment**
 
 In `app/math/topics/page.tsx`: add `locked?: boolean` to `TopicMeta`; import `AskGrownUp`; add `const [asking, setAsking] = useState(false)` after `status`; wrap the topic button's `onClick` with the same `if (topic.locked) { setAsking(true); return }`; add `aria-label` and the `opacity-70` class the same way; add the 🔒 span before `<MasteryRing …/>`; add the same overlay block after `<Hills />` in the ready-state return.
 
-- [ ] **Step 4: Chinese session — 402 shows the card**
+- [x] **Step 4: Chinese session — 402 shows the card**
 
 In `app/practice/session/page.tsx`:
 
@@ -1023,22 +1023,22 @@ Directly before the `if (questions.length === 0) {` block, add:
 ```
 (`PracticeCanvas` and `router` already exist in this file; keep their current definitions.)
 
-- [ ] **Step 5: Math session — same**
+- [x] **Step 5: Math session — same**
 
 In `app/math/practice/session/page.tsx`: import `AskGrownUp`; add `const [locked, setLocked] = useState(false)`; add the same `status === 402` branch in `loadSession`; add the same `if (locked)` return before the "taking a nap" block, with `onClose={() => router.push('/math/topics')}`.
 
-- [ ] **Step 6: Type check, lint, tests**
+- [x] **Step 6: Type check, lint, tests**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: clean.
 
-- [ ] **Step 7: Look at it**
+- [x] **Step 7: Look at it**
 
 With `npm run dev` running and `PAYMENTS_ENABLED=true npm run dev` **not** yet used (payments off), open http://localhost:3000/packs in the browser: no badges, no change. Then stop the server and start it with `PAYMENTS_ENABLED=true npm run dev`; reload `/packs` as a guest: Animals, Colors, Numbers, and Sentences have no badge; every other pack shows 🔒 at 70% opacity; tapping Food shows the panda card; "Grown-ups" goes to `/parent`; "Back" closes it. Open `/practice/session?pack=food` directly: the card shows instead of "taking a nap". Repeat for `/math/topics` (Single Digits open, the other three locked). Stop the server and restart it without the variable before continuing.
 
 If the Chrome extension or playwright is not available, use the headless capture from the iPad audit (`scratchpad/pw/shots.mjs` pattern) at 430×900 to screenshot `/packs`, `/math/topics`, and `/practice/session?pack=food` with `PAYMENTS_ENABLED=true`.
 
-- [ ] **Step 8: Commit**
+- [x] **Step 8: Commit**
 
 ```bash
 git add components/kid/AskGrownUp.tsx app/packs/page.tsx app/math/topics/page.tsx app/practice/session/page.tsx app/math/practice/session/page.tsx
@@ -1058,7 +1058,7 @@ git commit -m "feat(kid): lock badge on paid packs, Ask-a-grown-up card, 402 han
 - Consumes: `GET /api/account` (Task 6); `POST /api/stripe/checkout` (existing; returns `{ url }`, `404` while dormant, `409 already unlocked`, new `403 claim-first`).
 - Produces: `UnlockSection()` component inside `app/parent/page.tsx`; `/unlock` → `router.replace('/parent')`.
 
-- [ ] **Step 1: Guest refusal in the checkout route**
+- [x] **Step 1: Guest refusal in the checkout route**
 
 In `app/api/stripe/checkout/route.ts`, after the `hasLifetime` 409 check, add:
 ```ts
@@ -1070,7 +1070,7 @@ In `app/api/stripe/checkout/route.ts`, after the `hasLifetime` 409 check, add:
 ```
 Update the file's doc comment: replace the sentence starting `Guests CAN buy` with `Guests must claim the account (add an email) before buying — see the 403 below.` Remove the `wasGuestAtPurchase` metadata key (it can no longer be true): delete the line `wasGuestAtPurchase: account.isGuest ? 'true' : 'false',`.
 
-- [ ] **Step 2: Add `UnlockSection` to the Parent Zone**
+- [x] **Step 2: Add `UnlockSection` to the Parent Zone**
 
 In `app/parent/page.tsx`, add the import near the top: `import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'`.
 
@@ -1188,7 +1188,7 @@ to
         <AccountSection />
 ```
 
-- [ ] **Step 3: `/unlock` becomes a redirect**
+- [x] **Step 3: `/unlock` becomes a redirect**
 
 Replace the whole of `app/unlock/page.tsx` with:
 
@@ -1212,16 +1212,16 @@ export default function UnlockPage() {
 ```
 Leave `app/unlock/thanks/page.tsx` untouched (it is Stripe's success URL).
 
-- [ ] **Step 4: Type check, lint, tests**
+- [x] **Step 4: Type check, lint, tests**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: clean. (The `EARLY_ACCESS` shim from Task 1 is gone with the page body.)
 
-- [ ] **Step 5: Look at it**
+- [x] **Step 5: Look at it**
 
 `PAYMENTS_ENABLED=true npm run dev`; open `/parent`, pass the gate. As a guest: the "Unlock everything" section shows the pack counts, the email hint, and a disabled button. Restart without the variable: the section is absent. Open `/unlock`: it lands on `/parent`.
 
-- [ ] **Step 6: Commit**
+- [x] **Step 6: Commit**
 
 ```bash
 git add app/parent/page.tsx app/unlock/page.tsx app/api/stripe/checkout/route.ts
@@ -1239,7 +1239,7 @@ git commit -m "feat(parent): Unlock everything card (web path), /unlock redirect
 - Consumes: the running dev server at `http://localhost:3000` started with `PAYMENTS_ENABLED=true`; `.env` (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `DIRECT_URL`/`DATABASE_URL`).
 - Produces: a script that creates a throwaway guest (same anonymous sign-in the app uses), exercises every gated path for free and lifetime plans, and deletes the guest at the end. It prints one line per check and exits non-zero on the first failure.
 
-- [ ] **Step 1: Write the script**
+- [x] **Step 1: Write the script**
 
 `scripts/e2e-gate.mjs`:
 
@@ -1335,19 +1335,19 @@ console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAI
 process.exit(failures === 0 ? 0 : 1)
 ```
 
-- [ ] **Step 2: Run it with payments on**
+- [x] **Step 2: Run it with payments on**
 
 Terminal 1: `PAYMENTS_ENABLED=true npm run dev`
 Terminal 2: `node scripts/e2e-gate.mjs`
 Expected: every line `PASS`, then `ALL CHECKS PASSED`, exit 0.
 
-- [ ] **Step 3: Run it with payments off (the dormant state that ships)**
+- [x] **Step 3: Run it with payments off (the dormant state that ships)**
 
 Terminal 1: restart `npm run dev` without the variable.
 Terminal 2: `node scripts/e2e-gate.mjs`
 Expected: the first `account: paymentsEnabled true` line FAILs and the locked-expecting lines FAIL; the `→ 200` lines PASS. This is the correct dormant behaviour. (The script is written for the on-state; do not "fix" it to pass here.)
 
-- [ ] **Step 4: Commit**
+- [x] **Step 4: Commit**
 
 ```bash
 git add scripts/e2e-gate.mjs
@@ -1363,7 +1363,7 @@ git commit -m "test(e2e): scripted gate check against the dev server — free vs
 - Modify: `docs/superpowers/specs/2026-10-13-payments-design.md` (two amendments)
 - Modify: `lib/plan.ts` doc comment is already accurate (Task 1)
 
-- [ ] **Step 1: Amend the spec to match what was built**
+- [x] **Step 1: Amend the spec to match what was built**
 
 In `docs/superpowers/specs/2026-10-13-payments-design.md`:
 
@@ -1376,7 +1376,7 @@ Section 1, after the sentence `Pack-attached sentences … follow their pack's s
 The `sentences` practice mode (DB pack id `sentences`, served by `/api/sentences/all`) is always reachable; its pool is filtered to sentences whose source pack the account can access, so a free account practices Animals sentences only.
 ```
 
-- [ ] **Step 2: Update the project instructions**
+- [x] **Step 2: Update the project instructions**
 
 In both `CLAUDE.md` and `AGENTS.md`, replace the "Payments (dormant)" section with:
 
@@ -1398,7 +1398,7 @@ promo/refunds) and Phase C (Apple StoreKit) have their own plans. `npm test` (vi
 `node scripts/e2e-gate.mjs` checks the gate against a dev server started with `PAYMENTS_ENABLED=true`.
 ```
 
-- [ ] **Step 3: Final gates and the pull request**
+- [x] **Step 3: Final gates and the pull request**
 
 Run: `npx tsc --noEmit && npm run lint && npm test`
 Expected: clean.

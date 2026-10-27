@@ -12,7 +12,7 @@ export const runtime = 'nodejs'
  *
  * Idempotent: setting plan="lifetime" twice is a no-op, so Stripe retries and
  * duplicate deliveries are safe. Intentionally NOT gated on
- * NEXT_PUBLIC_PAYMENTS_ENABLED — a purchase completed moments before the flag
+ * PAYMENTS_ENABLED — a purchase completed moments before the flag
  * flipped off must still be recorded; without STRIPE_WEBHOOK_SECRET the route
  * is inert (404).
  */
