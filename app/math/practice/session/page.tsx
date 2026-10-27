@@ -9,6 +9,7 @@ import { Hills, Sparkles } from '@/components/design/Scenery'
 import { MathQuestion, BaseProgress } from '@/lib/types'
 import { updateSM2 } from '@/lib/spaced-repetition'
 import { apiFetch, fetchJsonCached } from '@/lib/api-fetch'
+import AskGrownUp from '@/components/kid/AskGrownUp'
 
 const MAX_HEARTS = 5
 
@@ -47,6 +48,7 @@ function MathPracticeSession() {
   const [currentIndex, setCurrentIndex] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [locked, setLocked] = useState(false)
   const [transitioning, setTransitioning] = useState(false)
 
   const [heartsEarned, setHeartsEarned] = useState(0)
@@ -63,6 +65,11 @@ function MathPracticeSession() {
         fetchJsonCached<{ name?: string; emoji?: string }>(`/api/packs/${topicId}`),
       ])
 
+      if (sessionRes.status === 402) {
+        setLocked(true)
+        setLoading(false)
+        return
+      }
       if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
       const session = sessionRes.data
       progressRef.current = session.progress ?? {}
@@ -161,6 +168,14 @@ function MathPracticeSession() {
           🌟
         </motion.div>
         <p className="text-2xl font-extrabold text-ink-soft mt-4">Getting ready...</p>
+      </PracticeCanvas>
+    )
+  }
+
+  if (locked) {
+    return (
+      <PracticeCanvas>
+        <AskGrownUp onClose={() => router.push('/math/topics')} />
       </PracticeCanvas>
     )
   }

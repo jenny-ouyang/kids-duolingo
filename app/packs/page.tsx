@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import { fetchJsonCached } from '@/lib/api-fetch'
+import AskGrownUp from '@/components/kid/AskGrownUp'
 
 interface PackMeta {
   id: string
@@ -15,6 +16,7 @@ interface PackMeta {
   color: string
   wordCount: number
   masteryPct: number
+  locked?: boolean
 }
 
 /** Mastery ring per DESIGN.md: conic success on chip-track, ink % on a white core */
@@ -38,6 +40,7 @@ export default function PacksPage() {
   const [packs, setPacks] = useState<PackMeta[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [tab, setTab] = useState<'learning' | 'mastered'>('learning')
+  const [asking, setAsking] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -97,6 +100,11 @@ export default function PacksPage() {
       <Sun scale={0.8} />
       <Sparkles positions="sparse" />
       <Hills />
+      {asking && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-black/20">
+          <AskGrownUp onClose={() => setAsking(false)} />
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-md flex flex-col gap-5">
         {/* Header */}
@@ -161,10 +169,17 @@ export default function PacksPage() {
                   transition={{ delay: i * 0.06 }}
                 >
                   <button
-                    onClick={() =>
+                    onClick={() => {
+                      if (pack.locked) {
+                        setAsking(true)
+                        return
+                      }
                       router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
-                    }
-                    className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
+                    }}
+                    aria-label={pack.locked ? `${pack.name}, locked` : pack.name}
+                    className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
+                      pack.locked ? 'opacity-70' : ''
+                    }`}
                   >
                     <span className="font-emoji text-[34px] leading-none bg-[#FFF3D6] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]">
                       {pack.emoji}
@@ -180,6 +195,9 @@ export default function PacksPage() {
                         {pack.id === 'sentences' ? `${pack.wordCount} sentences` : `${pack.wordCount} words`}
                       </span>
                     </span>
+                    {pack.locked && (
+                      <span className="font-emoji text-lg leading-none" aria-hidden>🔒</span>
+                    )}
                     <MasteryRing percent={pack.masteryPct} />
                   </button>
                 </motion.div>

@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import { fetchJsonCached } from '@/lib/api-fetch'
+import AskGrownUp from '@/components/kid/AskGrownUp'
 
 interface TopicMeta {
   id: string
@@ -14,6 +15,7 @@ interface TopicMeta {
   color: string
   wordCount: number
   masteryPct: number
+  locked?: boolean
 }
 
 /** Mastery ring per DESIGN.md: conic success on chip-track, ink % on a white core */
@@ -36,6 +38,7 @@ export default function MathTopicsPage() {
   const router = useRouter()
   const [topics, setTopics] = useState<TopicMeta[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
+  const [asking, setAsking] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -91,6 +94,11 @@ export default function MathTopicsPage() {
       <Sun scale={0.8} />
       <Sparkles positions="sparse" />
       <Hills />
+      {asking && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-black/20">
+          <AskGrownUp onClose={() => setAsking(false)} />
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-md flex flex-col gap-5">
         {/* Header */}
@@ -117,8 +125,17 @@ export default function MathTopicsPage() {
               transition={{ delay: i * 0.08 }}
             >
               <button
-                onClick={() => router.push(`/math/practice/session?topic=${topic.id}`)}
-                className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
+                onClick={() => {
+                  if (topic.locked) {
+                    setAsking(true)
+                    return
+                  }
+                  router.push(`/math/practice/session?topic=${topic.id}`)
+                }}
+                aria-label={topic.locked ? `${topic.name}, locked` : topic.name}
+                className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
+                  topic.locked ? 'opacity-70' : ''
+                }`}
               >
                 <span className="font-emoji text-[34px] leading-none bg-[#E4EFFD] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]">
                   {topic.emoji}
@@ -129,6 +146,9 @@ export default function MathTopicsPage() {
                   </span>
                   <span className="text-xs font-bold text-ink-soft">{topic.wordCount} problems</span>
                 </span>
+                {topic.locked && (
+                  <span className="font-emoji text-lg leading-none" aria-hidden>🔒</span>
+                )}
                 <MasteryRing percent={topic.masteryPct} />
               </button>
             </motion.div>
