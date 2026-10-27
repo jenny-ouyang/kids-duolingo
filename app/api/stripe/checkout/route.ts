@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import Stripe from 'stripe'
 import { prisma } from '@/lib/db'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
-import { PAYMENTS_ENABLED, hasLifetime } from '@/lib/plan'
+import { paymentsEnabled, hasLifetime } from '@/lib/plan'
 
 export const runtime = 'nodejs'
 
@@ -19,7 +19,7 @@ export async function POST() {
   // Dormant: pretend this endpoint doesn't exist.
   const secretKey = process.env.STRIPE_SECRET_KEY
   const priceId = process.env.STRIPE_PRICE_ID
-  if (!PAYMENTS_ENABLED || !secretKey || !priceId) {
+  if (!paymentsEnabled() || !secretKey || !priceId) {
     return NextResponse.json({ error: 'not found' }, { status: 404 })
   }
 

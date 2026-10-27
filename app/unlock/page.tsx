@@ -4,7 +4,7 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
-import { PAYMENTS_ENABLED, LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
+import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
 
 /* Calm variant of Sunrise Playground (parent-facing): same palette, warm ink,
    press physics — no mascot, no hills, no sparkles (per DESIGN.md). */
@@ -70,7 +70,7 @@ export default function UnlockPage() {
   const [buying, setBuying] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  if (!PAYMENTS_ENABLED) return <FreeEarlyAccess />
+  if (true) return <FreeEarlyAccess /> // Task 8 replaces this page with a redirect
 
   async function handleBuy() {
     if (buying) return
