@@ -110,6 +110,10 @@ const OFFLINE_CACHE_PREFIX = 'kd_cache:'
 export async function fetchJsonCached<T = unknown>(url: string): Promise<ApiFetchResult<T>> {
   const cacheKey = `${OFFLINE_CACHE_PREFIX}${getNativeChildId() ?? 'web'}:${url}`
   const result = await fetchJsonWithAuthRetry<T>(url)
+  if (result.status === 402) {
+    // A locked pack must not keep replaying from a pre-go-live cache.
+    try { localStorage.removeItem(cacheKey) } catch {}
+  }
   if (result.ok && result.data !== null) {
     try {
       localStorage.setItem(cacheKey, JSON.stringify(result.data))

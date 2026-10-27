@@ -108,7 +108,7 @@ No suite exists today. Add `vitest` (dev dependency, `npm test`) scoped to the m
 
 ## 10. Phases and ownership
 
-**Phase A (Claude, mergeable now, dormant):** Prisma migration for the new fields; `lib/plan.ts` helpers and the server-side switch; 402 gating on the three read routes and two write routes; `locked`/`paymentsEnabled` in `/api/packs`; cleanup-cron fix; kid lock badge + "Ask a grown-up" card; Parent Zone unlock card (web path); `/unlock` redirect; vitest with the plan and webhook tests.
+**Phase A (Claude, mergeable now, dormant):** Prisma migration for the new fields; `lib/plan.ts` helpers and the server-side switch; 402 gating on the three read routes and two write routes; `locked`/`paymentsEnabled` in `/api/packs`; cleanup-cron fix; kid lock badge + "Ask a grown-up" card; Parent Zone unlock card (web path); `/unlock` redirect; vitest with the plan, gate, cleanup, and checkout-guard tests (webhook tests move to Phase B).
 
 **Phase B (Claude + Jenny):** promo codes, founder detection, refund webhook; Stripe objects created via MCP with Jenny's go; Jenny pastes the three Stripe keys into Vercel; end-to-end test-mode run.
 

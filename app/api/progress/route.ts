@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
     }
 
     const { packId, wordId, easiness, interval, repetitions, nextReview, subject = 'chinese' } = body
+    if (typeof packId !== 'string' || !packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
     assertPackAccess(account, packId)
 
     if (subject === 'math') {

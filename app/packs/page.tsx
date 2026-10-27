@@ -176,7 +176,7 @@ export default function PacksPage() {
                       }
                       router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
                     }}
-                    aria-label={pack.locked ? `${pack.name}, locked` : pack.name}
+                    aria-label={pack.locked ? `${pack.name}, locked` : undefined}
                     className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
                       pack.locked ? 'opacity-70' : ''
                     }`}

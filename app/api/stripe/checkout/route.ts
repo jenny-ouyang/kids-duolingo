@@ -12,6 +12,10 @@ export const runtime = 'nodejs'
  * returns { url }. DORMANT by default: 404 unless PAYMENTS_ENABLED
  * is "true" AND Stripe env vars are configured.
  *
+ * One open session per account: the session id is stored on the Account, and a
+ * still-open session is reused instead of creating a second one. New sessions
+ * expire after 30 minutes (Stripe's minimum). Promotion codes are allowed.
+ *
  * Guests must claim the account (add an email) before buying — see the 403 below.
  */
 export async function POST() {
@@ -23,13 +27,7 @@ export async function POST() {
   }
 
   try {
-    const { userId } = await getAuthContext()
-
-    const account = await prisma.account.findUnique({ where: { id: userId } })
-    if (!account) {
-      // getAuthContext provisions the row, so this should never happen.
-      return NextResponse.json({ error: 'account not found' }, { status: 500 })
-    }
+    const { userId, account } = await getAuthContext()
     if (hasLifetime(account)) {
       return NextResponse.json({ error: 'already unlocked' }, { status: 409 })
     }
@@ -40,17 +38,36 @@ export async function POST() {
     }
 
     const stripe = new Stripe(secretKey)
+
+    if (account.stripeCheckoutSessionId) {
+      try {
+        const existing = await stripe.checkout.sessions.retrieve(account.stripeCheckoutSessionId)
+        if (existing.status === 'open' && existing.url) {
+          return NextResponse.json({ url: existing.url })
+        }
+      } catch {
+        // Could not look up the old session: fall through and create a new one.
+      }
+    }
+
     const session = await stripe.checkout.sessions.create({
       mode: 'payment',
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: 'https://mandarineer.com/unlock/thanks',
       cancel_url: 'https://mandarineer.com/unlock',
+      allow_promotion_codes: true,
+      expires_at: Math.floor(Date.now() / 1000) + 30 * 60,
       // The webhook reads this to know WHICH account to upgrade.
       client_reference_id: userId,
       ...(account.email ? { customer_email: account.email } : {}),
       metadata: {
         accountId: userId,
       },
+    })
+
+    await prisma.account.update({
+      where: { id: userId },
+      data: { stripeCheckoutSessionId: session.id },
     })
 
     if (!session.url) {

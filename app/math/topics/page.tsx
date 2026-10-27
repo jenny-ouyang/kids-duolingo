@@ -132,7 +132,7 @@ export default function MathTopicsPage() {
                   }
                   router.push(`/math/practice/session?topic=${topic.id}`)
                 }}
-                aria-label={topic.locked ? `${topic.name}, locked` : topic.name}
+                aria-label={topic.locked ? `${topic.name}, locked` : undefined}
                 className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
                   topic.locked ? 'opacity-70' : ''
                 }`}

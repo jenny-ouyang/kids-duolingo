@@ -4,6 +4,7 @@
 // Creates a throwaway guest via the same anonymous sign-in the app uses,
 // drives the API with the native Bearer transport, flips the plan in the DB,
 // and deletes the guest (Account + auth.users) at the end — even on failure.
+// Mutates the database named by DIRECT_URL/DATABASE_URL in .env (production for this repo): it creates and deletes only its own throwaway guest.
 import pg from 'pg'
 import fs from 'fs'
 
@@ -12,6 +13,10 @@ const get = (k) => (env.match(new RegExp('^' + k + '="?([^"\\n]+)"?', 'm')) || [
 const SB = get('NEXT_PUBLIC_SUPABASE_URL'), KEY = get('NEXT_PUBLIC_SUPABASE_ANON_KEY')
 const DB = get('DIRECT_URL') || get('DATABASE_URL')
 const API = process.env.API_BASE || 'http://localhost:3000'
+if (!['localhost', '127.0.0.1'].includes(new URL(API).hostname)) {
+  console.error('Refusing to run: API_BASE must point at localhost or 127.0.0.1, got ' + API)
+  process.exit(2)
+}
 
 let failures = 0
 const check = (label, ok, extra = '') => {
@@ -19,15 +24,20 @@ const check = (label, ok, extra = '') => {
   if (!ok) failures++
 }
 
-const signup = await fetch(`${SB}/auth/v1/signup`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: '{}' })
-const session = await signup.json()
-if (!session.access_token) throw new Error('anonymous sign-in failed: ' + JSON.stringify(session))
-const uid = session.user.id
-const H = { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
-const db = new pg.Client({ connectionString: DB })
-await db.connect()
+let db = null
+let uid = null
 
 try {
+  db = new pg.Client({ connectionString: DB })
+  await db.connect()
+
+  const signup = await fetch(`${SB}/auth/v1/signup`, { method: 'POST', headers: { apikey: KEY, 'Content-Type': 'application/json' }, body: '{}' })
+  const session = await signup.json()
+  if (!session.access_token) throw new Error('anonymous sign-in failed: ' + JSON.stringify(session))
+  uid = session.user.id
+  console.log('throwaway guest', uid)
+  const H = { Authorization: `Bearer ${session.access_token}`, 'Content-Type': 'application/json' }
+
   const child = await (await fetch(`${API}/api/children`, { method: 'POST', headers: H, body: JSON.stringify({ name: 'GateTest', avatar: '🐼' }) })).json()
   const HC = { ...H, 'x-child-id': child.id }
   const j = async (path, init = {}) => { const r = await fetch(API + path, { headers: HC, ...init }); return { status: r.status, body: await r.json().catch(() => null) } }
@@ -80,9 +90,11 @@ try {
   const stale = await db.query(`select count(*)::int as n from "Account" where id=$1 and "isGuest"=true and plan='free' and "createdAt" < now() - interval '90 days'`, [uid])
   check('cleanup filter would skip the paid guest', stale.rows[0].n === 0)
 } finally {
-  await db.query('delete from "Account" where id=$1', [uid])
-  await db.query('delete from auth.users where id=$1::uuid and is_anonymous = true', [uid])
-  await db.end()
+  if (uid && db) {
+    await db.query('delete from "Account" where id=$1', [uid])
+    await db.query('delete from auth.users where id=$1::uuid and is_anonymous = true', [uid])
+  }
+  if (db) await db.end()
 }
 
 console.log(failures === 0 ? '\nALL CHECKS PASSED' : `\n${failures} CHECK(S) FAILED`)

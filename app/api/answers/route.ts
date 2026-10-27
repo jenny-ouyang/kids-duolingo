@@ -17,6 +17,7 @@ export async function POST(req: NextRequest) {
       wordId: string
       correct: boolean
     }
+    if (typeof body.packId !== 'string' || !body.packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
     assertPackAccess(account, body.packId)
 
     await prisma.answerEvent.create({

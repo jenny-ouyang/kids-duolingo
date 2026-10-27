@@ -20,6 +20,7 @@ export async function GET() {
         _count: { select: { words: true, problems: true, sentences: true } },
       },
     })
+    // The 'sentences' pseudo-pack is a practice mode, not content: excluded from both counts (matches /api/packs' free-count semantics).
     const withContent = packs.filter(
       (p) => p.id !== 'sentences' && p._count.words + p._count.problems + p._count.sentences > 0
     )

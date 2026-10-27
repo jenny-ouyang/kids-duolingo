@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
-import { apiFetch, fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
 import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
 import type { User } from '@supabase/supabase-js'
@@ -493,6 +493,9 @@ function UnlockSection() {
       cancelled = true
     }
   }, [])
+
+  // Phase C replaces this with the StoreKit card; a web purchase link must never render inside the iPhone app (App Store 3.1.1).
+  if (isNativeApp()) return null
 
   if (!status || !status.paymentsEnabled) return null
 

@@ -46,7 +46,7 @@
 | `app/practice/session/page.tsx`, `app/math/practice/session/page.tsx` | 402 → AskGrownUp | 7 |
 | `app/parent/page.tsx` (new `UnlockSection`), `app/unlock/page.tsx`, `app/api/stripe/checkout/route.ts` | Parent Zone unlock card (web path), `/unlock` redirect, server switch + guest refusal | 8 |
 | `scripts/e2e-gate.mjs` | end-to-end check against the dev server | 9 |
-| `CLAUDE.md`, `AGENTS.md`, spec amendments, PR | docs | 10 |
+| `AGENTS.md`, spec amendments, PR | docs | 10 |
 
 ---
 
