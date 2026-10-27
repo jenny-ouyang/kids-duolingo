@@ -9,11 +9,10 @@ export const runtime = 'nodejs'
 /**
  * POST /api/stripe/checkout
  * Creates a Stripe-hosted Checkout Session for the one-time lifetime unlock and
- * returns { url }. DORMANT by default: 404 unless NEXT_PUBLIC_PAYMENTS_ENABLED
+ * returns { url }. DORMANT by default: 404 unless PAYMENTS_ENABLED
  * is "true" AND Stripe env vars are configured.
  *
- * Guests CAN buy — their Account row persists and the purchase lands on it; a
- * metadata flag records that the buyer was still a guest at purchase time.
+ * Guests must claim the account (add an email) before buying — see the 403 below.
  */
 export async function POST() {
   // Dormant: pretend this endpoint doesn't exist.
@@ -34,6 +33,11 @@ export async function POST() {
     if (hasLifetime(account)) {
       return NextResponse.json({ error: 'already unlocked' }, { status: 409 })
     }
+    if (account.isGuest) {
+      // Email is the only way to restore a web purchase on a new device
+      // (spec 2026-10-13 §7 rule 6). The Parent Zone card asks for it first.
+      return NextResponse.json({ error: 'claim-first' }, { status: 403 })
+    }
 
     const stripe = new Stripe(secretKey)
     const session = await stripe.checkout.sessions.create({
@@ -46,7 +50,6 @@ export async function POST() {
       ...(account.email ? { customer_email: account.email } : {}),
       metadata: {
         accountId: userId,
-        wasGuestAtPurchase: account.isGuest ? 'true' : 'false',
       },
     })
 
