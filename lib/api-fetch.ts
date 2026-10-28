@@ -18,17 +18,8 @@ export function isNativeApp(): boolean {
   return cap?.isNativePlatform?.() ?? false
 }
 
-/**
- * Test builds only: a TestFlight build pointed at a Vercel preview (behind
- * Vercel login) passes the project's protection-bypass secret on every call.
- * Unset in every normal web and App Store build.
- */
-const VERCEL_BYPASS = process.env.NEXT_PUBLIC_VERCEL_BYPASS ?? ''
-
 export function apiUrl(path: string): string {
-  if (!VERCEL_BYPASS) return `${API_BASE}${path}`
-  const sep = path.includes('?') ? '&' : '?'
-  return `${API_BASE}${path}${sep}x-vercel-protection-bypass=${VERCEL_BYPASS}`
+  return `${API_BASE}${path}`
 }
 
 const NATIVE_CHILD_KEY = 'kd_child_native'

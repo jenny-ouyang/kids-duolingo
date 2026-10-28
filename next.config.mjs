@@ -11,8 +11,6 @@ const nextConfig = capBuild
       env: {
         NEXT_PUBLIC_CAP_BUILD: '1',
         NEXT_PUBLIC_API_BASE: process.env.NEXT_PUBLIC_API_BASE ?? 'https://mandarineer.com',
-        // Test builds against a protected Vercel preview only (lib/api-fetch.ts)
-        NEXT_PUBLIC_VERCEL_BYPASS: process.env.NEXT_PUBLIC_VERCEL_BYPASS ?? '',
       },
     }
   : {}
