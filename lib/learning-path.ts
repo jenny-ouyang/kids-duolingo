@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/db'
+import { canAccessPack } from '@/lib/plan'
 
 export interface NextPack {
   id: string
@@ -47,14 +48,17 @@ export function todayIndex(tzOffsetMinutes: number): number {
 /**
  * The pack each child should play next: the first word pack (in sortOrder) the
  * child has started and not finished, else the first one not started. Only a
- * suggestion — every pack stays open.
+ * suggestion — the order never locks a pack. Packs this account cannot open
+ * (paid, with payments on) are never suggested.
  */
-export async function getNextPacks(childIds: string[]): Promise<Record<string, NextPack | null>> {
-  const packs = await prisma.pack.findMany({
-    where: { subject: 'chinese', words: { some: {} } },
-    orderBy: { sortOrder: 'asc' },
-    select: { id: true, name: true, nameZh: true, emoji: true, words: { select: { id: true } } },
-  })
+export async function getNextPacks(childIds: string[], account: { plan: string }): Promise<Record<string, NextPack | null>> {
+  const packs = (
+    await prisma.pack.findMany({
+      where: { subject: 'chinese', words: { some: {} } },
+      orderBy: { sortOrder: 'asc' },
+      select: { id: true, name: true, nameZh: true, emoji: true, words: { select: { id: true } } },
+    })
+  ).filter((p) => canAccessPack(account, p.id))
   const rows = await prisma.chineseProgress.findMany({
     where: { childId: { in: childIds }, repetitions: { gte: 1 } },
     select: { childId: true, packId: true },

@@ -8,7 +8,7 @@ const RETENTION_DAYS = GUEST_RETENTION_DAYS
  * GET /api/cron/cleanup-guests — Vercel Cron (vercel.json), daily.
  * Deletes guest accounts whose family hasn't practiced in RETENTION_DAYS
  * (or that never created a child and are RETENTION_DAYS old). Cascades wipe
- * children + progress. Claimed accounts are never touched.
+ * children + progress. Claimed accounts and paid accounts are never touched.
  * Auth: Authorization: Bearer <CRON_SECRET> (Vercel sends it automatically).
  */
 export async function GET(req: NextRequest) {
@@ -22,6 +22,9 @@ export async function GET(req: NextRequest) {
   const stale = await prisma.account.findMany({
     where: {
       isGuest: true,
+      // Never delete a paid account (spec 2026-10-13 §7 rule 2). A guest who
+      // bought the unlock keeps it even if they never add an email.
+      plan: 'free',
       createdAt: { lt: cutoff },
       children: { none: { lastPracticed: { gte: cutoff } } },
     },

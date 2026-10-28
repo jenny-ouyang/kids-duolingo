@@ -7,6 +7,7 @@ import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import { fetchJsonCached } from '@/lib/api-fetch'
 import PackPath, { suggestedIndex } from '@/components/home/PackPath'
+import AskGrownUp from '@/components/kid/AskGrownUp'
 
 interface PackMeta {
   id: string
@@ -17,6 +18,8 @@ interface PackMeta {
   wordCount: number
   learned: number
   masteryPct: number
+  /** Paid pack and payments are on (the server decides) */
+  locked?: boolean
 }
 
 /** Mastery ring per DESIGN.md: conic success on chip-track, ink % on a white core */
@@ -42,6 +45,8 @@ export default function PacksPage() {
   const [tab, setTab] = useState<'learning' | 'mastered'>('learning')
   // The path is the default view; "See all" opens the full list with its tabs
   const [showAll, setShowAll] = useState(false)
+  // A locked (paid) pack opens the Ask-a-grown-up card, never a price
+  const [asking, setAsking] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -92,8 +97,13 @@ export default function PacksPage() {
     )
   }
 
-  const openPack = (pack: { id: string }) =>
+  const openPack = (pack: { id: string; locked?: boolean }) => {
+    if (pack.locked) {
+      setAsking(true)
+      return
+    }
     router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
+  }
   const next = suggestedIndex(packs)
   // 7 stops around the suggested one: one behind, the rest ahead
   const windowStart = Math.max(0, Math.min(next - 1, packs.length - 7))
@@ -108,6 +118,11 @@ export default function PacksPage() {
       <Sun scale={0.8} />
       <Sparkles positions="sparse" />
       <Hills />
+      {asking && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-[#6B4423]/30">
+          <AskGrownUp onClose={() => setAsking(false)} />
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-md flex flex-col gap-5">
         {/* Header */}
@@ -190,7 +205,10 @@ export default function PacksPage() {
                 >
                   <button
                     onClick={() => openPack(pack)}
-                    className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
+                    aria-label={pack.locked ? `${pack.name}, locked` : undefined}
+                    className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
+                      pack.locked ? 'opacity-70' : ''
+                    }`}
                   >
                     <span className="font-emoji text-[34px] leading-none bg-[#FFF3D6] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]">
                       {pack.emoji}
@@ -206,6 +224,9 @@ export default function PacksPage() {
                         {pack.id === 'sentences' ? `${pack.wordCount} sentences` : `${pack.wordCount} words`}
                       </span>
                     </span>
+                    {pack.locked && (
+                      <span className="font-emoji text-lg leading-none" aria-hidden>🔒</span>
+                    )}
                     <MasteryRing percent={pack.masteryPct} />
                   </button>
                 </motion.div>

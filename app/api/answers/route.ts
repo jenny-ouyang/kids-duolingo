@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 
 /**
  * POST /api/answers
@@ -10,12 +11,14 @@ import { requireChild, authErrorResponse } from '@/lib/auth'
  */
 export async function POST(req: NextRequest) {
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
     const body = await req.json() as {
       packId: string
       wordId: string
       correct: boolean
     }
+    if (typeof body.packId !== 'string' || !body.packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
+    assertPackAccess(account, body.packId)
 
     await prisma.answerEvent.create({
       data: {
@@ -28,6 +31,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     console.error('[answers POST]', err)

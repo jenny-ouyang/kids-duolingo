@@ -173,12 +173,21 @@ refuses to build with them present), runs `CAP_BUILD=1 next build`, then `cap sy
 `CAP_BUILD=1` also injects `NEXT_PUBLIC_API_BASE` (defaults to `https://mandarineer.com`), which
 is how the bundled app reaches the live backend.
 
-### Payments (dormant)
+### Payments (dormant until go-live)
 
-`lib/plan.ts` is the single switch point. While `NEXT_PUBLIC_PAYMENTS_ENABLED !== 'true'`,
-`/unlock` shows free early access and `/api/stripe/checkout` 404s. **Content gating is not
-implemented** — everything is free. When gating lands, it must import `FREE_PACK_IDS` /
-`hasLifetime()` from `lib/plan.ts` rather than hardcoding a boundary elsewhere.
+`lib/plan.ts` is the single switch point. The switch is **server-side only**: `PAYMENTS_ENABLED=true` in the
+server env (never `NEXT_PUBLIC_` — the iOS bundle would freeze it at build time). While off, every pack is
+open, `/api/packs` reports `locked: false` everywhere, and the Parent Zone shows no unlock card.
+
+Free forever: `animals`, `colors`, `numbers`, `math_add_singles`, plus the `sentences` practice mode (content
+filtered per source pack). Everything else is paid once `PAYMENTS_ENABLED` is on. The rule is
+`canAccessPack()`; routes enforce it through `lib/pack-gate.ts` (`402 { error: 'locked', packId }`) on
+questions, math questions, sentences, progress writes and answer writes. `GET /api/account` feeds the
+Parent Zone unlock card. The cleanup cron never deletes an account whose plan is not `free`.
+
+Design: `docs/superpowers/specs/2026-10-13-payments-design.md`. Phase A (gate + UI) is built; Phase B (Stripe
+promo/refunds) and Phase C (Apple StoreKit) have their own plans. `npm test` (vitest) covers the money paths;
+`node scripts/e2e-gate.mjs` checks the gate against a dev server started with `PAYMENTS_ENABLED=true`.
 
 ## Where things go
 

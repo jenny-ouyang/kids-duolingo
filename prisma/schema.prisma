@@ -10,13 +10,22 @@ datasource db {
 /// One row per Supabase auth user. id == auth.users.id (uuid string).
 /// Guests (anonymous sign-ins) get a row too; isGuest flips false when claimed.
 model Account {
-  id        String   @id
-  email     String?  @unique
-  isGuest   Boolean  @default(true)
-  plan      String   @default("free")
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  children  Child[]
+  id                         String    @id
+  email                      String?   @unique
+  isGuest                    Boolean   @default(true)
+  plan                       String    @default("free")
+  /// 'stripe' | 'apple' | 'manual' — which system granted `plan`. Refunds downgrade only when the source matches.
+  planSource                 String?
+  planGrantedAt              DateTime?
+  /// Founder promise (spec 2026-10-13 §1): every future pack and upgrade free, forever. Never cleared by a refund of another source.
+  isFounder                  Boolean   @default(false)
+  stripeCheckoutSessionId    String?   @unique
+  stripePaymentIntentId      String?
+  /// One Apple purchase binds to at most one account at a time (restore moves it).
+  appleOriginalTransactionId String?   @unique
+  createdAt                  DateTime  @default(now())
+  updatedAt                  DateTime  @updatedAt
+  children                   Child[]
 }
 
 /// Replaces ChildProfile. One account, many children. Nickname + avatar only — no PII.

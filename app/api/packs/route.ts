@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { canAccessPack } from '@/lib/plan'
 
 /**
  * GET /api/packs              → Chinese packs (backward compatible, no change needed on client)
@@ -12,7 +13,7 @@ export async function GET(req: NextRequest) {
   const subject = req.nextUrl.searchParams.get('subject') ?? 'chinese'
 
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
     const packs = await prisma.pack.findMany({
       where: { subject },
       include: {
@@ -80,6 +81,7 @@ export async function GET(req: NextRequest) {
           : pack.problems.length,
         masteryPct: masteryByPack[pack.id] ?? 0,
         learned: learnedByPack[pack.id] ?? 0,
+        locked: !canAccessPack(account, pack.id),
       }))
       .filter((pack) => pack.wordCount > 0)
 

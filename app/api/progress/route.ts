@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 
 /**
  * GET /api/progress?packId=animals
@@ -62,7 +63,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
     const body = await req.json() as {
       packId: string
       wordId: string
@@ -74,6 +75,8 @@ export async function POST(req: NextRequest) {
     }
 
     const { packId, wordId, easiness, interval, repetitions, nextReview, subject = 'chinese' } = body
+    if (typeof packId !== 'string' || !packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
+    assertPackAccess(account, packId)
 
     if (subject === 'math') {
       await prisma.mathProgress.upsert({
@@ -91,6 +94,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ ok: true })
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     console.error('[progress POST]', err)

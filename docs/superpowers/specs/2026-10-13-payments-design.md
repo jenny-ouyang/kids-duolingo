@@ -8,7 +8,7 @@
 ## 1. Product
 
 - **One purchase.** $9.99, one time, lifetime. No subscription, no consumable, no second tier. It unlocks every pack that exists now and every pack added later, on the web and in the iPhone app, under one account.
-- **Free forever (4 packs):** Chinese `animals`, `colors`, `numbers`; math `math_add_singles` (Single Digits). Everything else is paid, including the three sentence tracks `s1-this-is`, `s2-colors-counts`, `s3-where-have`. Pack-attached sentences (the `sentences` array inside a pack file such as `animals.json`) follow their pack's state.
+- **Free forever (4 packs):** Chinese `animals`, `colors`, `numbers`; math `math_add_singles` (Single Digits). Everything else is paid, including the three sentence tracks `s1-this-is`, `s2-colors-counts`, `s3-where-have`. Pack-attached sentences (the `sentences` array inside a pack file such as `animals.json`) follow their pack's state. The `sentences` practice mode (DB pack id `sentences`, served by `/api/sentences/all`) is always reachable; its pool is filtered to sentences whose source pack the account can access, so a free account practices Animals sentences only.
 - **Founder deal (web only):** promo code `FOUNDER` at Stripe Checkout gives a fixed price of $1.00. Cap: 100 redemptions. End date: set by Jenny when she creates it; default 60 days after go-live. Founders receive the same lifetime plan plus `isFounder = true`.
 - **Founder promise, recorded here:** founders get every future pack and every upgrade for free, forever. If a paid add-on ever ships (for example Custom Family Packs as a subscription), accounts with `isFounder = true` are grandfathered in at no charge. Code that introduces any future paid feature must check `isFounder` and skip the charge.
 - **No coupon on the iPhone in 1.0.1.** The iPhone product is $9.99 with no code. Apple offer codes for one-time purchases are not verified for this product type; a founder buys on the web and the unlock appears on the phone through the account.
@@ -44,7 +44,7 @@ export function paymentsEnabled(): boolean   // server-side: process.env.PAYMENT
 - **The switch is server-side.** `PAYMENTS_ENABLED` (not `NEXT_PUBLIC_`) is read on the server only. The existing `NEXT_PUBLIC_PAYMENTS_ENABLED` constant is removed from client code; the iPhone bundle must never freeze the switch at build time. Go-live is one Vercel env change after Apple approves 1.0.1. The web and the phone switch on at the same moment.
 - When `paymentsEnabled()` is false, `canAccessPack` returns true for everything (today's behaviour).
 - **Gated routes** (all return `402 { error: 'locked', packId }` when `!canAccessPack`): `GET /api/questions/[packId]`, `GET /api/math/questions/[topicId]`, `GET /api/sentences/[packId]`. `GET /api/sentences/all` filters locked tracks out of its result. Progress and answer writes (`POST /api/progress`, `POST /api/answers`) refuse writes for a locked pack with the same 402.
-- **The pack list keeps every pack.** `GET /api/packs` adds two fields: per pack `locked: boolean`, and at the top level `paymentsEnabled: boolean`. The client renders from these fields. Mastery math is unchanged.
+- **The pack list keeps every pack and its array shape.** `GET /api/packs` stays an array (build 6 in the field parses it as one) and each element gains `locked: boolean`. The payments-on state and plan details for the Parent Zone come from a new `GET /api/account` (`plan`, `lifetime`, `isFounder`, `isGuest`, `email`, `paymentsEnabled`, `freePackCount`, `totalPackCount`). Mastery math is unchanged.
 - **Caching:** `fetchJsonCached` only stores successful responses, so a 402 never pollutes the offline cache, and a pack cached while unlocked stays playable offline (acceptable: it was paid for).
 - **Field behaviour after go-live for an outdated client:** build 6 users see the existing "Oops! This topic is taking a nap" screen on a locked pack until they update. No server workaround; 1.0.1 is required for the lock UI.
 
@@ -108,7 +108,7 @@ No suite exists today. Add `vitest` (dev dependency, `npm test`) scoped to the m
 
 ## 10. Phases and ownership
 
-**Phase A (Claude, mergeable now, dormant):** Prisma migration for the new fields; `lib/plan.ts` helpers and the server-side switch; 402 gating on the three read routes and two write routes; `locked`/`paymentsEnabled` in `/api/packs`; cleanup-cron fix; kid lock badge + "Ask a grown-up" card; Parent Zone unlock card (web path); `/unlock` redirect; vitest with the plan and webhook tests.
+**Phase A (Claude, mergeable now, dormant):** Prisma migration for the new fields; `lib/plan.ts` helpers and the server-side switch; 402 gating on the three read routes and two write routes; `locked`/`paymentsEnabled` in `/api/packs`; cleanup-cron fix; kid lock badge + "Ask a grown-up" card; Parent Zone unlock card (web path); `/unlock` redirect; vitest with the plan, gate, cleanup, and checkout-guard tests (webhook tests move to Phase B).
 
 **Phase B (Claude + Jenny):** promo codes, founder detection, refund webhook; Stripe objects created via MCP with Jenny's go; Jenny pastes the three Stripe keys into Vercel; end-to-end test-mode run.
 

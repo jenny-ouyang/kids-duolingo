@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 import { MathProblem, MathQuestion, BaseProgress } from '@/lib/types'
 import { pickWordsForSession } from '@/lib/spaced-repetition'
 
@@ -43,7 +44,8 @@ export async function GET(
   const { topicId } = params
 
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
+    assertPackAccess(account, topicId)
     // Phase 1: IDs only (avoids loading thousands of full rows)
     const [pack, progressRows, recentWrong] = await Promise.all([
       prisma.pack.findUnique({
@@ -123,6 +125,8 @@ export async function GET(
 
     return NextResponse.json({ questions, progress: progressMap })
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     console.error('[math/questions GET]', err)

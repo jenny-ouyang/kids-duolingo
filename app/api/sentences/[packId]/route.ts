@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 import { Sentence, SentenceQuestion } from '@/lib/types'
 
 // Static imports — bundled by webpack at build time, works on Vercel serverless
@@ -49,8 +50,11 @@ export async function GET(
   const { packId } = await params
 
   try {
-    await getAuthContext()
+    const { account } = await getAuthContext()
+    assertPackAccess(account, packId)
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     throw err

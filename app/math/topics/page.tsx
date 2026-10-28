@@ -7,6 +7,7 @@ import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import { fetchJsonCached } from '@/lib/api-fetch'
 import { suggestedIndex } from '@/components/home/PackPath'
 import type { MathQuestion } from '@/lib/types'
+import AskGrownUp from '@/components/kid/AskGrownUp'
 
 interface TopicMeta {
   id: string
@@ -16,6 +17,7 @@ interface TopicMeta {
   wordCount: number
   learned: number
   masteryPct: number
+  locked?: boolean
 }
 
 function stateLine(t: TopicMeta, isNext: boolean): string {
@@ -30,6 +32,7 @@ export default function MathTopicsPage() {
   const [topics, setTopics] = useState<TopicMeta[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [sample, setSample] = useState<MathQuestion['problem'] | null>(null)
+  const [asking, setAsking] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -95,6 +98,11 @@ export default function MathTopicsPage() {
       <Sun scale={0.8} />
       <Sparkles positions="sparse" />
       <Hills />
+      {asking && (
+        <div className="fixed inset-0 z-20 flex items-center justify-center p-4 bg-[#6B4423]/30">
+          <AskGrownUp onClose={() => setAsking(false)} />
+        </div>
+      )}
 
       <div className="relative z-10 w-full max-w-md flex flex-col gap-5">
         {/* Header */}
@@ -146,8 +154,8 @@ export default function MathTopicsPage() {
             return (
               <li key={topic.id} className="relative flex items-center gap-4">
                 <button
-                  onClick={() => router.push(`/math/practice/session?topic=${topic.id}`)}
-                  aria-label={`${topic.name}, ${stateLine(topic, isNext)}`}
+                  onClick={() => (topic.locked ? setAsking(true) : router.push(`/math/practice/session?topic=${topic.id}`))}
+                  aria-label={`${topic.name}, ${topic.locked ? 'locked' : stateLine(topic, isNext)}`}
                   className={`pressable shrink-0 w-16 h-16 rounded-full flex items-center justify-center font-emoji text-[30px] ${
                     isNext
                       ? 'bg-[#E4EFFD] ring-[5px] ring-math shadow-press-math'
@@ -158,8 +166,8 @@ export default function MathTopicsPage() {
                 >
                   {topic.emoji}
                 </button>
-                <p className="text-[19px] font-extrabold text-ink leading-tight min-w-0">
-                  {topic.name}
+                <p className={`text-[19px] font-extrabold text-ink leading-tight min-w-0 ${topic.locked ? 'opacity-70' : ''}`}>
+                  {topic.name} {topic.locked && <span className="font-emoji text-base" aria-hidden>🔒</span>}
                   {isNext && <span className="block text-base text-math-edge">Next up</span>}
                 </p>
               </li>

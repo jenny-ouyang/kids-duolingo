@@ -8,6 +8,7 @@ export interface PathPack {
   wordCount: number
   learned: number
   masteryPct: number
+  locked?: boolean
 }
 
 const STEP = 112 // vertical distance between stops, px
@@ -17,7 +18,7 @@ const X = [30, 68] // stop centers alternate left and right, % of the width
 export function suggestedIndex(packs: PathPack[]): number {
   // Same rule as the home's Play next (lib/learning-path.ts): word packs only,
   // so the sentences pack (no words, mastery always 0) is never the suggestion
-  const isWordPack = (p: PathPack) => p.id !== 'sentences'
+  const isWordPack = (p: PathPack) => p.id !== 'sentences' && !p.locked
   const started = packs.findIndex((p) => isWordPack(p) && p.masteryPct > 0 && p.masteryPct < 100)
   if (started >= 0) return started
   const fresh = packs.findIndex((p) => isWordPack(p) && p.masteryPct === 0)
@@ -57,7 +58,7 @@ function Ring({ pct, size }: { pct: number; size: number }) {
 /**
  * Packs as stops on a dotted trail, in sortOrder (6-B). One stop says
  * "Start here". No stop is locked: every stop is a button that opens its
- * session. Under each stop only the name shows (calm screen); the state in
+ * session — only payment can lock a pack (🔒, then Ask a grown-up). Under each stop only the name shows (calm screen); the state in
  * words is in the button's label, and the ring and ✓ show it by shape.
  */
 export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[]; nextId: string; onOpen: (pack: PathPack) => void }) {
@@ -91,7 +92,7 @@ export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[];
           >
             <button
               onClick={() => onOpen(pack)}
-              aria-label={`${pack.name}, ${stateWords(pack, isNext)}${isNext ? ', start here' : ''}`}
+              aria-label={`${pack.name}, ${pack.locked ? 'locked' : stateWords(pack, isNext)}${isNext ? ', start here' : ''}`}
               className={`pressable relative rounded-full flex items-center justify-center font-emoji leading-none ${
                 isNext
                   ? 'bg-chinese shadow-press-chinese text-[40px]'
@@ -99,10 +100,15 @@ export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[];
                     ? 'bg-success-bg shadow-press-success text-[32px]'
                     : 'bg-white shadow-press-card text-[32px]'
               }`}
-              style={{ width: disc, height: disc }}
+              style={{ width: disc, height: disc, opacity: pack.locked ? 0.7 : 1 }}
             >
               <Ring pct={pack.masteryPct} size={disc + 12} />
               <span className="relative">{pack.emoji}</span>
+              {pack.locked && (
+                <span aria-hidden className="absolute -bottom-1 -right-1 w-[28px] h-[28px] rounded-full bg-white shadow-press-chip text-[15px] flex items-center justify-center font-emoji">
+                  🔒
+                </span>
+              )}
               {done && (
                 <span aria-hidden className="absolute -top-1 -right-1 w-[26px] h-[26px] rounded-full bg-go text-white text-[15px] font-extrabold flex items-center justify-center">
                   ✓

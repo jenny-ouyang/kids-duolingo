@@ -18,7 +18,7 @@ function sanitizeName(raw: unknown): string | null {
  */
 export async function GET(req: NextRequest) {
   try {
-    const { userId } = await getAuthContext()
+    const { userId, account } = await getAuthContext()
     const children = await prisma.child.findMany({
       where: { accountId: userId },
       orderBy: { createdAt: 'asc' },
@@ -27,7 +27,7 @@ export async function GET(req: NextRequest) {
     const tz = parseTz(req.nextUrl.searchParams.get('tz'))
     const ids = children.map((c) => c.id)
     const [weekDays, nextPacks] = ids.length
-      ? await Promise.all([getWeekDays(ids, tz), getNextPacks(ids)])
+      ? await Promise.all([getWeekDays(ids, tz), getNextPacks(ids, account)])
       : [{}, {}]
     const today = todayIndex(tz)
     return NextResponse.json(

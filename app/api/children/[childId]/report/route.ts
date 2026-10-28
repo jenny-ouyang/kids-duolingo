@@ -24,7 +24,7 @@ export async function GET(
   const { childId } = params
 
   try {
-    const { userId } = await getAuthContext()
+    const { userId, account } = await getAuthContext()
     const child = await prisma.child.findFirst({
       where: { id: childId, accountId: userId },
       select: {
@@ -177,7 +177,7 @@ export async function GET(
       rows.reduce((acc, r) => acc + r._count._all, 0)
 
     const tz = parseTz(req.nextUrl.searchParams.get('tz'))
-    const [weekDays, nextPacks] = await Promise.all([getWeekDays([child.id], tz), getNextPacks([child.id])])
+    const [weekDays, nextPacks] = await Promise.all([getWeekDays([child.id], tz), getNextPacks([child.id], account)])
 
     return NextResponse.json({
       child,

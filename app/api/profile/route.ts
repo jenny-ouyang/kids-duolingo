@@ -10,11 +10,11 @@ import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-p
  */
 export async function GET(req: NextRequest) {
   try {
-    const { child } = await requireChild()
+    const { child, account } = await requireChild()
     const tz = parseTz(req.nextUrl.searchParams.get('tz'))
     const [weekDays, nextPacks, stickerCount] = await Promise.all([
       getWeekDays([child.id], tz),
-      getNextPacks([child.id]),
+      getNextPacks([child.id], account),
       prisma.sticker.count({ where: { childId: child.id } }),
     ])
 

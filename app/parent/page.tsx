@@ -5,11 +5,12 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
-import { apiFetch, fetchJsonWithAuthRetry } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
 import { ensureGuestSession, hasSession } from '@/lib/guest-session'
 import { GUEST_RETENTION_DAYS } from '@/lib/retention'
 import WeekDots from '@/components/progress/WeekDots'
+import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
 import type { User } from '@supabase/supabase-js'
 
 const GATE_KEY = 'kd_parent_gate'
@@ -506,6 +507,107 @@ function ChildrenSection({ startAdding = false }: { startAdding?: boolean }) {
   )
 }
 
+interface AccountStatus {
+  plan: string
+  lifetime: boolean
+  isFounder: boolean
+  isGuest: boolean
+  email: string | null
+  paymentsEnabled: boolean
+  freePackCount: number
+  totalPackCount: number
+}
+
+/**
+ * The one buy surface (spec 2026-10-13 §4). Web path only in Phase A; the
+ * native StoreKit path lands in Phase C. Renders nothing while payments are
+ * off, so the Parent Zone is unchanged for everyone until go-live.
+ */
+function UnlockSection() {
+  const [status, setStatus] = useState<AccountStatus | null>(null)
+  const [buying, setBuying] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+    fetchJsonWithAuthRetry<AccountStatus>('/api/account').then(({ ok, data }) => {
+      if (!cancelled && ok && data) setStatus(data)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [])
+
+  // Phase C replaces this with the StoreKit card; a web purchase link must never render inside the iPhone app (App Store 3.1.1).
+  if (isNativeApp()) return null
+
+  if (!status || !status.paymentsEnabled) return null
+
+  async function handleBuy() {
+    if (buying) return
+    setBuying(true)
+    setError(null)
+    const { ok, status: code, data } = await fetchJsonWithAuthRetry<{ url?: string; error?: string }>(
+      '/api/stripe/checkout',
+      { method: 'POST' }
+    )
+    if (ok && data?.url) {
+      window.location.assign(data.url)
+      return
+    }
+    setError(
+      code === 409
+        ? 'Good news — this family already has everything unlocked!'
+        : code === 403
+          ? 'Add your email below first, so the purchase is saved to your account.'
+          : "We couldn't start the checkout. Please try again in a moment."
+    )
+    setBuying(false)
+  }
+
+  if (status.lifetime) {
+    return (
+      <section className="flex flex-col gap-4">
+        <h2 className="text-lg font-extrabold text-ink">Unlock</h2>
+        <div className="bg-white rounded-[22px] p-5 shadow-press-card">
+          <p className="font-extrabold text-ink">Everything is unlocked ✓</p>
+          <p className="text-ink-mid text-base font-bold mt-1">
+            {status.isFounder
+              ? 'Founder — thank you! Every future pack and upgrade is yours, forever.'
+              : 'Every pack, every child in your family, forever.'}
+          </p>
+        </div>
+      </section>
+    )
+  }
+
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-extrabold text-ink">Unlock everything</h2>
+      <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
+        <p className="text-ink-mid text-base font-bold">
+          {status.freePackCount} of {status.totalPackCount} packs are free forever. One purchase opens the rest for every
+          child in your family — pay once, keep it always. No subscription.
+        </p>
+        {status.isGuest && (
+          <p className="text-ink text-base font-bold bg-chip-track rounded-2xl px-4 py-3">
+            Add your email first (below, under Account) so your purchase is safe on every device.
+          </p>
+        )}
+        {error && <p className="text-ink text-base font-bold">{error}</p>}
+        <button
+          onClick={handleBuy}
+          disabled={buying || status.isGuest}
+          className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-base font-extrabold shadow-press-go disabled:opacity-50 self-start"
+        >
+          {buying ? 'Opening checkout…' : `Unlock everything — ${LIFETIME_PRICE_DISPLAY}`}
+        </button>
+        <p className="text-ink-mid text-base font-bold">Have a founder code? Enter it at checkout.</p>
+      </div>
+    </section>
+  )
+}
+
 /** part 'save': only a guest's save card (shown first); part 'rest': everything else */
 function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
   const [account, setAccount] = useState<AccountInfo | null>(null)
@@ -844,6 +946,7 @@ export default function ParentZone() {
 
         {isGuest && <AccountSection part="save" />}
         <ChildrenSection startAdding={startAdding} />
+        <UnlockSection />
         <AccountSection part={isGuest ? 'rest' : 'all'} />
 
         {/* Quiet trust links — parents' surface only */}
