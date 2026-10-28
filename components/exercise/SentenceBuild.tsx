@@ -93,7 +93,7 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
         <p className="text-2xl font-extrabold text-ink leading-snug max-w-xs">
           {sentence.english}
         </p>
-        <p className="text-xs font-extrabold text-ink-soft uppercase tracking-[0.2em]">
+        <p className="text-xs font-extrabold text-ink-mid uppercase tracking-[0.2em]">
           tap the tiles in order
         </p>
       </motion.div>

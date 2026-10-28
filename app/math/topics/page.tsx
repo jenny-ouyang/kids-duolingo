@@ -127,7 +127,7 @@ export default function MathTopicsPage() {
                   <span className="text-lg font-extrabold text-ink leading-tight truncate">
                     {topic.name}
                   </span>
-                  <span className="text-xs font-bold text-ink-soft">{topic.wordCount} problems</span>
+                  <span className="text-xs font-bold text-ink-mid">{topic.wordCount} problems</span>
                 </span>
                 <MasteryRing percent={topic.masteryPct} />
               </button>

@@ -24,7 +24,8 @@ sun:             "#FFCF57"
 
 # Ink (NEVER #000 / gray-900 — warmth is the brand)
 ink:             "#6B4423"   # headings, primary text — warm brown
-ink-soft:        "#B0813F"   # secondary text, prompts
+ink-mid:         "#7E5522"   # secondary text, captions, pinyin labels (5.4:1+ on canvas)
+ink-soft:        "#B0813F"   # decoration only — fails text contrast (2.9–3.3:1)
 ink-on-color:    "#FFFFFF"   # text on coral/blue/teal surfaces
 
 # Subjects — colorblind-safe axis (do NOT change one without re-simulating)
@@ -39,6 +40,8 @@ math-edge:       "#2B5AB0"
 success:         "#1FA88C"   # teal-mint. ALWAYS paired with a ✓ badge + motion
 success-bg:      "#E2F7EE"
 success-edge:    "#147663"
+go:              "#15836C"   # teal for buttons with white text (4.7:1); success is 3.0:1
+go-edge:         "#0E5A4A"
 wrong:           (no red!)   # wrong = tile grays to canvas-mid + gentle shake,
                              # correct answer glows. No-punishment philosophy.
 
@@ -68,7 +71,7 @@ emoji:     "Apple Color Emoji, Noto Color Emoji, Segoe UI Emoji"
 
 Scale (mobile-first): hero greeting 36px/800 · screen title 27px/800 · hanzi hero
 52–60px (largest thing on screen, gold 6px underline, ZCOOL KuaiLe) · card title
-18px/800 · body 15px/700 · caption 14px/800 ink-soft. Baloo 2 is round enough that
+18px/800 · body 15px/700 · caption 16px/800 ink-mid. Baloo 2 is round enough that
 nothing needs letter-spacing tweaks.
 
 ## Depth & Shape — "toy physics"
@@ -121,8 +124,9 @@ reduced:  honor prefers-reduced-motion — idle loops off, presses/pops kept sub
    gold never means anything. Re-run the CVD simulation if any of these hues move.
 2. Color is never the sole signal: correct = fill + ✓ + pop; wrong = gray + shake;
    subjects also differ by emoji, seal text, and position.
-3. Text contrast: ink on canvas ≥ 7:1; white on chinese/math/success base ≥ 4.5:1.
-   ink-soft is for secondary text ≥ 18px only.
+3. Text contrast: ink on canvas ≥ 7:1; ink-mid ≥ 5.4:1. White text sits on `go`
+   (4.7:1), never on `success` (3.0:1). White on coral (3.3:1) and blue (4.0:1) is
+   for large bold button text only (≥ 19px extrabold). ink-soft is never text.
 4. Tap targets ≥ 56px tall for kid-facing controls.
 5. `prefers-reduced-motion`: disable idle loops (bob/sway/twinkle).
 

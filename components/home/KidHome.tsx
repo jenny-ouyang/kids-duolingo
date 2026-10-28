@@ -191,7 +191,7 @@ export default function KidHome() {
               <h1 className="text-[36px] font-extrabold text-ink leading-tight">
                 We&apos;re napping, try again soon <span className="font-emoji">😴</span>
               </h1>
-              <p className="text-lg text-ink-soft font-bold mt-2">
+              <p className="text-lg text-ink-mid font-bold mt-2">
                 Come back in a little bit!
               </p>
             </>
@@ -208,7 +208,7 @@ export default function KidHome() {
                   </>
                 )}
               </h1>
-              <p className="text-[15px] text-ink-soft font-bold mt-1.5">
+              <p className="text-[15px] text-ink-mid font-bold mt-1.5">
                 What do you want to learn today?
               </p>
             </>
@@ -267,7 +267,7 @@ export default function KidHome() {
           >
             <button
               onClick={() => router.push('/parent')}
-              className="text-ink-soft text-sm font-bold text-left"
+              className="text-ink-mid text-sm font-bold text-left"
             >
               <span className="font-emoji">💾</span> Playing as guest — save your
               family&apos;s progress
@@ -275,7 +275,7 @@ export default function KidHome() {
             <button
               onClick={dismissGuestNudge}
               aria-label="Dismiss"
-              className="pressable bg-canvas-top text-ink-soft rounded-full w-8 h-8 flex items-center justify-center text-sm font-extrabold flex-shrink-0"
+              className="pressable bg-canvas-top text-ink-mid rounded-full w-8 h-8 flex items-center justify-center text-sm font-extrabold flex-shrink-0"
             >
               ✕
             </button>
@@ -288,7 +288,7 @@ export default function KidHome() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.9 }}
           onClick={() => router.push('/parent')}
-          className="text-ink-soft text-sm font-bold underline underline-offset-2"
+          className="text-ink-mid text-sm font-bold underline underline-offset-2"
         >
           Parent Dashboard
         </motion.button>

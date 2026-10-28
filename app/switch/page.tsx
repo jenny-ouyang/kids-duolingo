@@ -70,7 +70,7 @@ export default function SwitchPage() {
           <h1 className="text-[27px] font-extrabold text-ink">
             Who&apos;s playing? <span className="font-emoji">🎈</span>
           </h1>
-          <p className="text-[15px] text-ink-soft font-bold mt-1">Tap your buddy!</p>
+          <p className="text-[15px] text-ink-mid font-bold mt-1">Tap your buddy!</p>
         </motion.div>
 
         <div className="grid grid-cols-2 gap-5 w-full">
@@ -91,7 +91,7 @@ export default function SwitchPage() {
                 <span className="text-lg font-extrabold text-ink truncate max-w-full">
                   {child.name}
                 </span>
-                <div className="flex items-center gap-3 text-sm font-extrabold text-ink-soft">
+                <div className="flex items-center gap-3 text-sm font-extrabold text-ink-mid">
                   <span>
                     <span className="font-emoji">❤️</span> {child.totalHearts}
                   </span>
@@ -113,7 +113,7 @@ export default function SwitchPage() {
           >
             <button
               onClick={() => router.push('/welcome')}
-              className="pressable w-full min-h-[128px] h-full rounded-3xl p-5 flex flex-col items-center justify-center gap-1.5 bg-white/60 border-[3px] border-dashed border-gold-edge text-ink-soft"
+              className="pressable w-full min-h-[128px] h-full rounded-3xl p-5 flex flex-col items-center justify-center gap-1.5 bg-white/60 border-[3px] border-dashed border-gold-edge text-ink-mid"
             >
               <span className="text-3xl leading-none font-extrabold">+</span>
               <span className="text-lg font-extrabold">Add</span>

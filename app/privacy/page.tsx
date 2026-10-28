@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">
               Privacy Policy
             </h1>
-            <p className="text-ink-soft text-sm font-bold">Last updated: 2026-10-11</p>
+            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-10-11</p>
           </div>
         </div>
 
@@ -125,13 +125,13 @@ export default function PrivacyPage() {
         <footer className="flex items-center justify-center gap-6 pb-4">
           <Link
             href="/terms"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Terms
           </Link>
           <Link
             href="/parent"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Parent Zone
           </Link>

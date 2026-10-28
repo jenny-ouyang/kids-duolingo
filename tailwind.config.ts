@@ -16,10 +16,13 @@ const config: Config = {
       colors: {
         canvas: { top: '#FFF8E7', mid: '#FFEFD0', bottom: '#FFE6BD' },
         hill: { near: '#9FD8AB', far: '#C0E7C7' },
-        ink: { DEFAULT: '#6B4423', soft: '#B0813F' },
+        // ink-soft fails contrast for text (2.9–3.3:1); use ink-mid (5.4:1+) for secondary text
+        ink: { DEFAULT: '#6B4423', mid: '#7E5522', soft: '#B0813F' },
         chinese: { DEFAULT: '#F4576B', light: '#FF7A82', edge: '#C13A52' },
         math: { DEFAULT: '#3D7DE4', light: '#57A5F5', edge: '#2B5AB0' },
         success: { DEFAULT: '#1FA88C', bg: '#E2F7EE', edge: '#147663' },
+        // 'go' = teal for surfaces with white text (4.7:1); success itself is 3.0:1 with white
+        go: { DEFAULT: '#15836C', edge: '#0E5A4A' },
         gold: { DEFAULT: '#FFCF57', deep: '#F5B93F', edge: '#D9A32C' },
         plum: { DEFAULT: '#9A7BE8', edge: '#7A5BD0' },
         'card-edge': '#F0D8A8',
@@ -43,6 +46,7 @@ const config: Config = {
         'press-gold': '0 6px 0 #D9A32C',
         'press-plum': '0 6px 0 #7A5BD0',
         'press-success': '0 6px 0 #147663',
+        'press-go': '0 6px 0 #0E5A4A',
         'press-card': '0 6px 0 #F0D8A8',
         'press-chip': '0 4px 0 #F0D8A8',
         'press-down': '0 2px 0 rgba(0,0,0,0)',

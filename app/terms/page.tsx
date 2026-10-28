@@ -34,7 +34,7 @@ export default function TermsPage() {
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">
               Terms of Use
             </h1>
-            <p className="text-ink-soft text-sm font-bold">Last updated: 2026-08-19</p>
+            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-08-19</p>
           </div>
         </div>
 
@@ -101,13 +101,13 @@ export default function TermsPage() {
         <footer className="flex items-center justify-center gap-6 pb-4">
           <Link
             href="/privacy"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Privacy
           </Link>
           <Link
             href="/parent"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Parent Zone
           </Link>

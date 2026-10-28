@@ -97,7 +97,7 @@ export default function WelcomePage() {
           <h1 className="text-[27px] font-extrabold text-ink">
             Who&apos;s learning? <span className="font-emoji">🌟</span>
           </h1>
-          <p className="text-[15px] text-ink-soft font-bold mt-1">
+          <p className="text-[15px] text-ink-mid font-bold mt-1">
             Pick a buddy and tell us your name!
           </p>
         </motion.div>
@@ -116,7 +116,7 @@ export default function WelcomePage() {
           maxLength={20}
           placeholder="My name is..."
           autoFocus
-          className="w-full bg-white rounded-3xl px-6 py-4 text-2xl font-extrabold text-ink text-center shadow-press-card placeholder:text-ink-soft/60 focus:outline-none focus:ring-4 focus:ring-gold"
+          className="w-full bg-white rounded-3xl px-6 py-4 text-2xl font-extrabold text-ink text-center shadow-press-card placeholder:text-ink-mid/60 focus:outline-none focus:ring-4 focus:ring-gold"
         />
 
         {/* Avatar picker */}
@@ -149,7 +149,7 @@ export default function WelcomePage() {
                   {selected && (
                     <span
                       aria-hidden
-                      className="absolute -top-2 -right-1.5 w-6 h-6 bg-success text-white rounded-full flex items-center justify-center text-sm font-extrabold shadow-[0_2px_0_#147663]"
+                      className="absolute -top-2 -right-1.5 w-6 h-6 bg-go text-white rounded-full flex items-center justify-center text-sm font-extrabold shadow-[0_2px_0_#0E5A4A]"
                     >
                       ✓
                     </span>
@@ -165,7 +165,7 @@ export default function WelcomePage() {
           <motion.p
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="text-[15px] text-ink-soft font-bold"
+            className="text-[15px] text-ink-mid font-bold"
           >
             One moment… ✨
           </motion.p>
@@ -190,7 +190,7 @@ export default function WelcomePage() {
           <button
             onClick={createChild}
             disabled={!canSubmit}
-            className="pressable w-full min-h-[64px] rounded-[26px] py-5 text-2xl font-extrabold text-white bg-success shadow-press-success disabled:opacity-40"
+            className="pressable w-full min-h-[64px] rounded-[26px] py-5 text-2xl font-extrabold text-white bg-go shadow-press-go disabled:opacity-40"
           >
             {saving ? (
               <>

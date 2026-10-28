@@ -160,7 +160,7 @@ function MathPracticeSession() {
         >
           🌟
         </motion.div>
-        <p className="text-2xl font-extrabold text-ink-soft mt-4">Getting ready...</p>
+        <p className="text-2xl font-extrabold text-ink-mid mt-4">Getting ready...</p>
       </PracticeCanvas>
     )
   }
@@ -172,7 +172,7 @@ function MathPracticeSession() {
         <p className="text-2xl font-extrabold text-ink mt-4 text-center">
           Oops! This topic is taking a nap.
         </p>
-        <p className="text-lg font-bold text-ink-soft mt-1">Let&apos;s try another one!</p>
+        <p className="text-lg font-bold text-ink-mid mt-1">Let&apos;s try another one!</p>
         <button
           onClick={() => router.push('/math/topics')}
           className="pressable mt-6 min-h-[56px] bg-math text-white rounded-3xl px-8 py-4 text-xl font-extrabold shadow-press-math"

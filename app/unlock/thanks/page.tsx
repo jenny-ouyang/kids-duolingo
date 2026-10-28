@@ -11,16 +11,16 @@ export default function ThanksPage() {
         <h1 className="text-[27px] font-extrabold text-ink leading-tight">
           Thank you! <span className="font-emoji">💛</span>
         </h1>
-        <p className="text-ink-soft text-[15px] font-bold mt-3">
+        <p className="text-ink-mid text-[15px] font-bold mt-3">
           Everything is unlocked for your whole family — every pack, every topic,
           and everything we add next. Forever.
         </p>
-        <p className="text-ink-soft text-sm font-bold mt-2">
+        <p className="text-ink-mid text-sm font-bold mt-2">
           A receipt is on its way to your email.
         </p>
         <Link
           href="/"
-          className="pressable inline-flex items-center justify-center min-h-[56px] bg-success text-white rounded-2xl px-8 mt-6 text-[15px] font-extrabold shadow-press-success"
+          className="pressable inline-flex items-center justify-center min-h-[56px] bg-go text-white rounded-2xl px-8 mt-6 text-[15px] font-extrabold shadow-press-go"
         >
           Back to the app
         </Link>

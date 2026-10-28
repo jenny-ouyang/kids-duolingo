@@ -57,7 +57,7 @@ function formatLastPracticed(iso: string | null): string {
    no mascot, no hills, no sparkles (per DESIGN.md, parent zone rule). */
 
 const inputClass =
-  'bg-canvas-top rounded-2xl px-4 min-h-[56px] text-ink font-semibold placeholder:text-ink-soft/60 focus:outline-none focus:ring-4 focus:ring-gold'
+  'bg-canvas-top rounded-2xl px-4 min-h-[56px] text-ink font-semibold placeholder:text-ink-mid/60 focus:outline-none focus:ring-4 focus:ring-gold'
 
 function AdultGate({ onPass }: { onPass: () => void }) {
   const router = useRouter()
@@ -85,7 +85,7 @@ function AdultGate({ onPass }: { onPass: () => void }) {
       >
         <div className="font-emoji text-4xl mb-3">🔒</div>
         <h1 className="text-xl font-extrabold text-ink">Grown-ups only</h1>
-        <p className="text-ink-soft text-sm font-bold mt-1">
+        <p className="text-ink-mid text-sm font-bold mt-1">
           Answer this to open the parent zone.
         </p>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
@@ -101,20 +101,20 @@ function AdultGate({ onPass }: { onPass: () => void }) {
             className={`${inputClass} text-center text-lg`}
           />
           {wrong && (
-            <p className="text-ink-soft text-sm font-bold">
+            <p className="text-ink-mid text-sm font-bold">
               Not quite — try this one instead.
             </p>
           )}
           <button
             type="submit"
-            className="pressable min-h-[56px] bg-success text-white rounded-2xl px-4 font-extrabold shadow-press-success"
+            className="pressable min-h-[56px] bg-go text-white rounded-2xl px-4 font-extrabold shadow-press-go"
           >
             Unlock
           </button>
         </form>
         <button
           onClick={() => router.push('/')}
-          className="mt-5 min-h-[44px] text-ink-soft text-sm font-bold underline underline-offset-2"
+          className="mt-5 min-h-[44px] text-ink-mid text-sm font-bold underline underline-offset-2"
         >
           ← Back to the app
         </button>
@@ -284,7 +284,7 @@ function ChildrenSection() {
               setEditingId(null)
               setDeletingId(null)
             }}
-            className="pressable min-h-[56px] bg-success text-white rounded-2xl px-5 text-[15px] font-extrabold shadow-press-success"
+            className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-[15px] font-extrabold shadow-press-go"
           >
             + Add a child
           </button>
@@ -310,7 +310,7 @@ function ChildrenSection() {
       )}
 
       {children !== null && children.length >= MAX_CHILDREN && (
-        <p className="text-ink-soft text-sm font-bold">
+        <p className="text-ink-mid text-sm font-bold">
           You&apos;ve reached the maximum of {MAX_CHILDREN} children on one account.
         </p>
       )}
@@ -338,14 +338,14 @@ function ChildrenSection() {
               <button
                 type="submit"
                 disabled={!newName.trim() || saving}
-                className="pressable min-h-[56px] bg-success text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-success disabled:opacity-50"
+                className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-go disabled:opacity-50"
               >
                 Add
               </button>
               <button
                 type="button"
                 onClick={() => setShowAdd(false)}
-                className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
+                className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
               >
                 Cancel
               </button>
@@ -355,11 +355,11 @@ function ChildrenSection() {
       </AnimatePresence>
 
       {children === null && (
-        <div className="text-ink-soft text-sm font-bold">Loading…</div>
+        <div className="text-ink-mid text-sm font-bold">Loading…</div>
       )}
 
       {children !== null && children.length === 0 && !loadFailed && (
-        <p className="text-ink-soft text-sm font-bold">
+        <p className="text-ink-mid text-sm font-bold">
           No children yet. Add one to get started.
         </p>
       )}
@@ -386,14 +386,14 @@ function ChildrenSection() {
                 <button
                   type="submit"
                   disabled={!editName.trim() || saving}
-                  className="pressable min-h-[56px] bg-success text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-success disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-go disabled:opacity-50"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingId(null)}
-                  className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
                 >
                   Cancel
                 </button>
@@ -406,7 +406,7 @@ function ChildrenSection() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="font-extrabold text-ink">{child.name}</p>
-                <p className="text-sm font-bold text-ink-soft mt-0.5">
+                <p className="text-sm font-bold text-ink-mid mt-0.5">
                   <span className="font-emoji">❤️</span> {child.totalHearts} hearts ·{' '}
                   <span className="font-emoji">🔥</span> {child.streak} day streak ·{' '}
                   {formatLastPracticed(child.lastPracticed)}
@@ -431,7 +431,7 @@ function ChildrenSection() {
                     setDeleteText('')
                     setEditingId(null)
                   }}
-                  className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
                 >
                   Remove
                 </button>
@@ -566,13 +566,13 @@ function AccountSection() {
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-extrabold text-ink">Account</h2>
 
-      {loading && <div className="text-ink-soft text-sm font-bold">Loading…</div>}
+      {loading && <div className="text-ink-mid text-sm font-bold">Loading…</div>}
 
       {!loading && account && account.isAnonymous && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Save your family&apos;s progress</h3>
-            <p className="text-ink-soft text-sm font-bold mt-1">
+            <p className="text-ink-mid text-sm font-bold mt-1">
               You&apos;re using a guest account right now. Add your email to keep your
               children&apos;s progress safe and use it on other devices.
             </p>
@@ -596,7 +596,7 @@ function AccountSection() {
                 <button
                   type="submit"
                   disabled={!claimEmail.trim() || claimStatus === 'sending'}
-                  className="pressable min-h-[56px] bg-success text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-success disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-go disabled:opacity-50"
                 >
                   {claimStatus === 'sending' ? 'Sending…' : 'Save progress'}
                 </button>
@@ -622,7 +622,7 @@ function AccountSection() {
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Already saved on another device?</h3>
-            <p className="text-ink-soft text-sm font-bold mt-1">
+            <p className="text-ink-mid text-sm font-bold mt-1">
               Sign in with the email you used before and we&apos;ll bring your family&apos;s
               progress to this device.
             </p>
@@ -666,13 +666,13 @@ function AccountSection() {
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-extrabold text-ink truncate">{account.email}</p>
-            <p className="text-ink-soft text-sm font-bold mt-0.5">
+            <p className="text-ink-mid text-sm font-bold mt-0.5">
               Your family&apos;s progress is saved to this account.
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex-shrink-0"
+            className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex-shrink-0"
           >
             Sign out
           </button>
@@ -683,7 +683,7 @@ function AccountSection() {
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Delete account</h3>
-            <p className="text-ink-soft text-sm font-bold mt-1">
+            <p className="text-ink-mid text-sm font-bold mt-1">
               Permanently removes this account, every child profile, and all practice
               history. This cannot be undone.
             </p>
@@ -691,7 +691,7 @@ function AccountSection() {
           {!deleteOpen ? (
             <button
               onClick={() => setDeleteOpen(true)}
-              className="pressable min-h-[56px] bg-canvas-top text-ink-soft rounded-2xl px-4 text-sm font-extrabold shadow-press-chip self-start"
+              className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip self-start"
             >
               Delete my account…
             </button>
@@ -724,7 +724,7 @@ function AccountSection() {
                   setDeleteText('')
                   setDeleteStatus('idle')
                 }}
-                className="text-ink-soft text-sm font-bold underline underline-offset-2 self-start"
+                className="text-ink-mid text-sm font-bold underline underline-offset-2 self-start"
               >
                 Keep my account
               </button>
@@ -783,7 +783,7 @@ export default function ParentZone() {
           </button>
           <div>
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">Parent Zone</h1>
-            <p className="text-ink-soft text-sm font-bold">Manage your children and account</p>
+            <p className="text-ink-mid text-sm font-bold">Manage your children and account</p>
           </div>
         </div>
 
@@ -794,13 +794,13 @@ export default function ParentZone() {
         <footer className="flex items-center justify-center gap-6 pb-4">
           <Link
             href="/privacy"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Privacy
           </Link>
           <Link
             href="/terms"
-            className="text-ink-soft text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-sm font-bold underline underline-offset-2"
           >
             Terms
           </Link>

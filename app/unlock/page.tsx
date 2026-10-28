@@ -30,7 +30,7 @@ function Header() {
       </Link>
       <div>
         <h1 className="text-[27px] font-extrabold text-ink leading-tight">Unlock everything</h1>
-        <p className="text-ink-soft text-sm font-bold">One purchase for the whole family</p>
+        <p className="text-ink-mid text-sm font-bold">One purchase for the whole family</p>
       </div>
     </div>
   )
@@ -50,13 +50,13 @@ function FreeEarlyAccess() {
           <h2 className="text-xl font-extrabold text-ink">
             Everything is free during early access!
           </h2>
-          <p className="text-ink-soft text-sm font-bold mt-2 max-w-md mx-auto">
+          <p className="text-ink-mid text-sm font-bold mt-2 max-w-md mx-auto">
             All packs, sentences, and math topics are open for every family right now.
             Nothing to buy — go practice!
           </p>
           <Link
             href="/"
-            className="pressable inline-flex items-center justify-center min-h-[56px] bg-success text-white rounded-2xl px-8 mt-6 text-[15px] font-extrabold shadow-press-success"
+            className="pressable inline-flex items-center justify-center min-h-[56px] bg-go text-white rounded-2xl px-8 mt-6 text-[15px] font-extrabold shadow-press-go"
           >
             Back to the app
           </Link>
@@ -129,11 +129,11 @@ export default function UnlockPage() {
             <button
               onClick={handleBuy}
               disabled={buying}
-              className="pressable w-full min-h-[64px] bg-success text-white rounded-[22px] px-6 text-lg font-extrabold shadow-press-success disabled:opacity-50"
+              className="pressable w-full min-h-[64px] bg-go text-white rounded-[22px] px-6 text-lg font-extrabold shadow-press-go disabled:opacity-50"
             >
               {buying ? 'Opening checkout…' : `Unlock everything — ${LIFETIME_PRICE_DISPLAY}`}
             </button>
-            <p className="text-ink-soft text-sm font-bold">
+            <p className="text-ink-mid text-sm font-bold">
               One-time purchase · No subscription
             </p>
           </div>

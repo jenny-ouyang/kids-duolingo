@@ -119,8 +119,8 @@ export default function PacksPage() {
             onClick={() => setTab('learning')}
             className={`pressable flex-1 min-h-[56px] rounded-full py-3 text-[15px] font-extrabold ${
               tab === 'learning'
-                ? 'bg-success text-white shadow-press-success'
-                : 'bg-white text-ink-soft shadow-press-chip'
+                ? 'bg-go text-white shadow-press-go'
+                : 'bg-white text-ink-mid shadow-press-chip'
             }`}
           >
             Learning {learning.length > 0 && `(${learning.length})`}
@@ -129,8 +129,8 @@ export default function PacksPage() {
             onClick={() => setTab('mastered')}
             className={`pressable flex-1 min-h-[56px] rounded-full py-3 text-[15px] font-extrabold ${
               tab === 'mastered'
-                ? 'bg-success text-white shadow-press-success'
-                : 'bg-white text-ink-soft shadow-press-chip'
+                ? 'bg-go text-white shadow-press-go'
+                : 'bg-white text-ink-mid shadow-press-chip'
             }`}
           >
             Mastered <span className="font-emoji">⭐</span>{' '}
@@ -149,7 +149,7 @@ export default function PacksPage() {
             className="flex flex-col gap-4"
           >
             {visible.length === 0 ? (
-              <div className="text-center text-ink-soft font-bold py-12 text-[15px]">
+              <div className="text-center text-ink-mid font-bold py-12 text-[15px]">
                 {tab === 'mastered' ? 'No packs mastered yet — keep going! 🌟' : 'All packs mastered! 🎉'}
               </div>
             ) : (
@@ -176,7 +176,7 @@ export default function PacksPage() {
                       <span className="font-hanzi text-[15px] text-chinese leading-tight">
                         {pack.nameZh}
                       </span>
-                      <span className="text-xs font-bold text-ink-soft">
+                      <span className="text-xs font-bold text-ink-mid">
                         {pack.id === 'sentences' ? `${pack.wordCount} sentences` : `${pack.wordCount} words`}
                       </span>
                     </span>

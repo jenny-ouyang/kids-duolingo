@@ -75,7 +75,7 @@ function CorrectBadge() {
       initial={{ scale: 0 }}
       animate={{ scale: 1 }}
       transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-      className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-success text-white text-lg font-extrabold flex items-center justify-center"
+      className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-go text-white text-lg font-extrabold flex items-center justify-center"
     >
       ✓
     </motion.span>
@@ -156,7 +156,7 @@ function ChineseCard({
       style={{ minHeight: 130 }}
     >
       <span className="font-hanzi text-4xl text-ink">{word.chinese}</span>
-      <span className={`text-base font-bold text-ink-soft ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
+      <span className={`text-base font-bold text-ink-mid ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
       <AnimatePresence>
         {state !== 'idle' && isCorrect && <CorrectBadge />}
       </AnimatePresence>
@@ -173,7 +173,7 @@ function AudioPrompt({ word, pinyinVisible }: { word: Word; pinyinVisible: boole
         onClick={() => speakChinese(word.chinese)}
         className="pressable bg-white rounded-3xl shadow-press-card px-7 py-4 flex flex-col items-center gap-2"
       >
-        <span className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+        <span className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
           Which one is
         </span>
         <span className="font-hanzi text-[52px] leading-tight text-ink border-b-[6px] border-gold pb-0.5">
@@ -195,7 +195,7 @@ function PicturePrompt({ word }: { word: Word }) {
   const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
         What is this in Chinese?
       </p>
       {imageSrc ? (
@@ -219,7 +219,7 @@ function EnglishPrompt({ word }: { word: Word }) {
   const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
         How do you say this in Chinese?
       </p>
       <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card flex flex-col items-center gap-2">

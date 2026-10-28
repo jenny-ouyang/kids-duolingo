@@ -120,7 +120,7 @@ function CelebrationContent() {
             <span className={`text-base font-bold text-chinese ${showPinyin ? '' : 'invisible'}`}>
               {enc.chinesePinyin}
             </span>
-            <span className="text-sm font-bold text-ink-soft">
+            <span className="text-sm font-bold text-ink-mid">
               {enc.chineseMeaning} <span className="font-emoji">🔊</span>
             </span>
           </button>
@@ -133,7 +133,7 @@ function CelebrationContent() {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6 }}
-          className="text-xl font-bold text-ink-soft"
+          className="text-xl font-bold text-ink-mid"
         >
           {enc.subMessage}
         </motion.p>

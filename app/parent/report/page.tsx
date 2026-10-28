@@ -80,7 +80,7 @@ function PackRow({ pack }: { pack: ReportPack }) {
         <p className="font-extrabold text-ink text-[15px] truncate">
           {pack.name}
           {pack.nameZh && (
-            <span className="font-hanzi text-ink-soft font-normal ml-2">
+            <span className="font-hanzi text-ink-mid font-normal ml-2">
               {pack.nameZh}
             </span>
           )}
@@ -99,7 +99,7 @@ function PackRow({ pack }: { pack: ReportPack }) {
           />
         </div>
       </div>
-      <p className="text-ink-soft text-sm font-bold flex-shrink-0">
+      <p className="text-ink-mid text-sm font-bold flex-shrink-0">
         {pack.mastered} of {pack.totalWords} {unit}
       </p>
     </div>
@@ -176,7 +176,7 @@ function ChildReport() {
                 <h1 className="text-[27px] font-extrabold text-ink leading-tight truncate">
                   {report.child.name}
                 </h1>
-                <p className="text-ink-soft text-sm font-bold">
+                <p className="text-ink-mid text-sm font-bold">
                   {formatLastPracticed(report.child.lastPracticed)}
                 </p>
               </div>
@@ -200,7 +200,7 @@ function ChildReport() {
         )}
 
         {status === 'loading' && (
-          <div className="text-ink-soft text-sm font-bold">Loading…</div>
+          <div className="text-ink-mid text-sm font-bold">Loading…</div>
         )}
 
         {status === 'failed' && (
@@ -227,7 +227,7 @@ function ChildReport() {
               <p className="text-ink font-bold mt-2">
                 {weekProse(report.totals.answers7d, report.totals.correct7d)}
               </p>
-              <p className="text-ink-soft text-sm font-bold mt-1">
+              <p className="text-ink-mid text-sm font-bold mt-1">
                 {report.totals.wordsStarted} words started ·{' '}
                 {report.totals.wordsMastered} mastered so far
               </p>
@@ -255,13 +255,13 @@ function ChildReport() {
                       <span className="font-hanzi text-chinese text-3xl leading-none flex-shrink-0">
                         {word.chinese}
                       </span>
-                      <span className="text-ink-soft text-sm font-bold flex-shrink-0">
+                      <span className="text-ink-mid text-sm font-bold flex-shrink-0">
                         {word.pinyin}
                       </span>
                       <span className="text-ink text-sm font-bold truncate">
                         {word.english}
                       </span>
-                      <span className="ml-auto text-ink-soft text-xs font-bold flex-shrink-0">
+                      <span className="ml-auto text-ink-mid text-xs font-bold flex-shrink-0">
                         {word.packName}
                       </span>
                     </li>
@@ -282,7 +282,7 @@ function ChildReport() {
                 <PackRow key={pack.packId} pack={pack} />
               ))}
               {report.packs.length === 0 && (
-                <p className="text-ink-soft text-sm font-bold">
+                <p className="text-ink-mid text-sm font-bold">
                   No packs to show yet.
                 </p>
               )}

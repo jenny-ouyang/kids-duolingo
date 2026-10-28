@@ -94,12 +94,12 @@ export default function Landing() {
 
           <Link
             href="/welcome"
-            className="pressable mt-2 inline-flex min-h-[60px] items-center justify-center rounded-full bg-success px-12 py-4 text-xl font-extrabold text-white shadow-press-success"
+            className="pressable mt-2 inline-flex min-h-[60px] items-center justify-center rounded-full bg-go px-12 py-4 text-xl font-extrabold text-white shadow-press-go"
           >
             Play free →
           </Link>
 
-          <p className="text-sm font-extrabold text-ink-soft">
+          <p className="text-sm font-extrabold text-ink-mid">
             Free to play · No sign-up needed · Works on phone, tablet &amp;
             computer
           </p>
@@ -249,7 +249,7 @@ export default function Landing() {
         <div className="mx-auto flex max-w-5xl flex-col items-center gap-3 text-center">
           <nav
             aria-label="Footer"
-            className="flex items-center gap-2 text-sm font-extrabold text-ink-soft"
+            className="flex items-center gap-2 text-sm font-extrabold text-ink-mid"
           >
             <Link href="/privacy" className="underline underline-offset-2">
               Privacy
@@ -263,7 +263,7 @@ export default function Landing() {
               Parent Zone
             </Link>
           </nav>
-          <p className="text-sm font-bold text-ink-soft">
+          <p className="text-sm font-bold text-ink-mid">
             © 2026 Mandarineer · mandarineer.com
           </p>
         </div>

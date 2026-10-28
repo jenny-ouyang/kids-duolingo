@@ -35,7 +35,7 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
   if (problem.operator === 'count') {
     return (
       <div className="flex flex-col items-center gap-3">
-        <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">How many?</p>
+        <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">How many?</p>
         <div className="bg-white rounded-3xl px-6 py-4 shadow-press-card">
           <EmojiGroup emoji={problem.emoji} count={problem.operand1} />
         </div>
@@ -50,7 +50,7 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-soft">
+      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
         What is the answer?
       </p>
       <div className="bg-white rounded-3xl px-8 py-5 shadow-press-card flex items-center gap-4">
@@ -61,7 +61,7 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
         <span className="text-6xl font-extrabold text-ink select-none tabular-nums">
           {problem.operand2}
         </span>
-        <span className="text-5xl font-extrabold text-ink-soft select-none">=</span>
+        <span className="text-5xl font-extrabold text-ink-mid select-none">=</span>
         <span className="text-6xl font-extrabold text-math-light select-none">?</span>
       </div>
     </div>
@@ -157,7 +157,7 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                    className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-success text-white text-lg font-extrabold flex items-center justify-center"
+                    className="absolute -top-2.5 -right-2.5 w-8 h-8 rounded-full bg-go text-white text-lg font-extrabold flex items-center justify-center"
                   >
                     ✓
                   </motion.span>
