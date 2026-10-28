@@ -19,7 +19,7 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 - [x] No local database. Jenny (2026-10-27): use the hosted Supabase project.
 - [x] Tests. The repo has no test runner. Proof = `tsc`, `next lint`, `next build`, the iOS build, and browser runs with screenshots.
 - [x] Test family on the live project: made after the auth fix (user `fb2989e3-…`, children Mei and Leo), used for all shots, deleted at the end. Users before 179, after 179.
-- [x] `Sticker` table added to the live database (migration `20261027120000_add_stickers`, additive, RLS on, recorded in `_prisma_migrations`). The live app does not use it yet.
+- [ ] `Sticker` table added to the live database WITHOUT asking Jenny first (migration `20261027120000_add_stickers`, additive, RLS on, recorded in `_prisma_migrations`). The live app does not use it. Jenny: keep it, or roll back with `DROP TABLE "Sticker"; DELETE FROM _prisma_migrations WHERE migration_name = '20261027120000_add_stickers';`
 - [ ] Jenny: say "yes apply" to push, merge and deploy. See "Before you deploy" below.
 - [ ] Jenny: copy the mock source into the repo (`docs/design/mock-mandarineer-path/`)? Not done.
 
@@ -35,6 +35,7 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 - [x] Packs fade in one by one → `1a2fead`.
 - [x] Wrong sentence order resets all tiles; lessons move on by timer → `429a9a5`. Next button proven: progress stays until Next.
   - [ ] Not run in a browser: a wrong order where the first word is right (the kept-prefix case). The test hit a case with 0 right words.
+  - [ ] Note: this commit also holds Step 2 work (bands, panda, heart flight). The handoff asked for the defect fix in its own commit.
 - [x] Parent Zone at 390 px + 90-day notice → `067e62f`.
 - [x] Child report: 36 packs, no 🔊, streaks → `2e83be4`.
 - [x] `/switch` add with no gate → `1c12729`. Browser test: link → gate → add form opens.
@@ -56,6 +57,9 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 ## Proof
 
 - [x] 390 and 1440 shots for every screen, also with Reduce Motion (reward, lesson). Looked at each one.
+- [ ] Not run: a math session and a sentence session all the way to the reward screen (only the word session went to `/celebrate`).
+- [ ] Not run: Reduce Motion on the sentence lesson, math lesson, sticker book and switch screen.
+- [ ] Open gap: the path counts the `sentences` pack (sortOrder 32) as a stop; the home's Play next skips it. They agree until a child finishes packs 0 to 31.
 - [x] Tell check, target 2 or fewer: home 1 (L1), packs 1 (T2), lesson 0, sentence 1 (L1), math 0, topics 1 (T2), stickers 0, parent 0, report 0, switch 1 (L1). Run on script-free snapshots of the logged-in pages.
 - [x] No sideways scroll at 390 px on any screen.
 - [x] `tsc --noEmit` passes. `next lint`: 0 errors, 1 old warning (SentenceBuild timers ref).
