@@ -64,7 +64,7 @@ export default function PacksPage() {
     return (
       <KidLayout>
         <Hills />
-        <div className="relative z-10 font-emoji text-6xl animate-spin">🌟</div>
+        <div className="relative z-10 font-emoji text-6xl animate-spin motion-reduce:animate-none">🌟</div>
       </KidLayout>
     )
   }

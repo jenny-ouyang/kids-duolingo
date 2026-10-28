@@ -220,7 +220,7 @@ export default function CelebratePage() {
     <div className="sunrise-canvas flex flex-col items-center justify-center p-4 py-10">
       <Hills />
       <Sparkles />
-      <Suspense fallback={<div className="font-emoji text-4xl animate-spin relative z-10">🌟</div>}>
+      <Suspense fallback={<div className="font-emoji text-4xl animate-spin motion-reduce:animate-none relative z-10">🌟</div>}>
         <CelebrationContent />
       </Suspense>
     </div>

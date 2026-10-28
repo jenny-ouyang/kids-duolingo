@@ -753,7 +753,7 @@ export default function ParentZone() {
   if (gate === 'checking') {
     return (
       <div className="min-h-screen bg-canvas-top flex items-center justify-center">
-        <div className="font-emoji text-4xl animate-spin">⏳</div>
+        <div className="font-emoji text-4xl animate-spin motion-reduce:animate-none">⏳</div>
       </div>
     )
   }
