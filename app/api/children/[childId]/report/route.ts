@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-path'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
 
 const WOBBLY_LIMIT = 8
@@ -17,7 +18,7 @@ const RECENT_EVENTS_SCAN = 400
  * "doesn't exist", so ids can't be probed).
  */
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: { childId: string } }
 ) {
   const { childId } = params
@@ -175,8 +176,14 @@ export async function GET(
     const sum = (rows: { _count: { _all: number } }[]) =>
       rows.reduce((acc, r) => acc + r._count._all, 0)
 
+    const tz = parseTz(req.nextUrl.searchParams.get('tz'))
+    const [weekDays, nextPacks] = await Promise.all([getWeekDays([child.id], tz), getNextPacks([child.id])])
+
     return NextResponse.json({
       child,
+      weekDays: weekDays[child.id],
+      today: todayIndex(tz),
+      nextPack: nextPacks[child.id],
       packs: packRows,
       wobbly,
       totals: {
