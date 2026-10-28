@@ -4,6 +4,7 @@ import { Suspense, useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
+import { useLessonFeedback } from '@/components/exercise/useLessonFeedback'
 import CountAndChoose from '@/components/exercise/CountAndChoose'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { MathQuestion, BaseProgress } from '@/lib/types'
@@ -18,9 +19,11 @@ interface MathSessionResponse {
 }
 
 /** Sunrise Playground screen wrapper — scenery behind, content above (z-10) */
-function PracticeCanvas({ children }: { children: React.ReactNode }) {
+function PracticeCanvas({ children, lesson = false }: { children: React.ReactNode; lesson?: boolean }) {
+  // A lesson starts at the top and leaves room under the tiles for the fixed Right band
+  const layout = lesson ? 'justify-start pt-6 pb-64' : 'justify-center'
   return (
-    <div className="sunrise-canvas flex flex-col items-center justify-center p-4">
+    <div className={`sunrise-canvas flex flex-col items-center p-4 ${layout}`}>
       <Hills />
       <Sparkles positions="sparse" />
       <div className="relative z-10 w-full flex flex-col items-center">{children}</div>
@@ -50,7 +53,7 @@ function MathPracticeSession() {
   const [transitioning, setTransitioning] = useState(false)
 
   const [heartsEarned, setHeartsEarned] = useState(0)
-  const [heartPulse, setHeartPulse] = useState(false)
+  const { mood, onFeedback, heartChipRef, flight, landed } = useLessonFeedback(currentIndex, heartsEarned < MAX_HEARTS)
 
   const progressRef = useRef<Record<string, BaseProgress>>({})
   // Problems missed on first try come back once more before the session ends
@@ -114,8 +117,6 @@ function MathPracticeSession() {
     if (correct) {
       newHeartsEarned = Math.min(heartsEarned + 1, MAX_HEARTS)
       setHeartsEarned(newHeartsEarned)
-      setHeartPulse(true)
-      setTimeout(() => setHeartPulse(false), 600)
     }
 
     const newCorrectCount = correct ? correctCount + 1 : correctCount
@@ -186,53 +187,41 @@ function MathPracticeSession() {
   const currentQuestion = questions[currentIndex]
 
   return (
-    <PracticeCanvas>
-      <div className="w-full max-w-2xl flex flex-col gap-6">
-        {/* Header row */}
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/math/topics')}
-              className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl text-ink shadow-press-chip"
-              aria-label="Back to topics"
-            >
-              ←
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="font-emoji text-2xl">{topicEmoji}</span>
-              <span className="text-xl font-extrabold text-ink">{topicName}</span>
-            </div>
-          </div>
-
-          {/* Hearts chip */}
-          <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1.5 shadow-press-chip">
-            {Array.from({ length: MAX_HEARTS }).map((_, i) => (
-              <motion.span
-                key={i}
-                animate={heartPulse && i === heartsEarned - 1 ? { scale: [1, 1.5, 1] } : {}}
-                transition={{ duration: 0.4 }}
-                className="font-emoji text-2xl select-none"
-              >
-                {i < heartsEarned ? '❤️' : '🤍'}
-              </motion.span>
-            ))}
-          </div>
-        </div>
-
-        <ExerciseShell current={currentIndex + 1} total={questions.length}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.25 }}
-            >
-              <CountAndChoose question={currentQuestion} onAnswer={handleAnswer} />
-            </motion.div>
-          </AnimatePresence>
-        </ExerciseShell>
-      </div>
+    <PracticeCanvas lesson>
+      <ExerciseShell
+        current={currentIndex + 1}
+        total={questions.length}
+        hearts={Math.min(heartsEarned + (landed ? 1 : 0), MAX_HEARTS)}
+        heartChipRef={heartChipRef}
+        onClose={() => router.push('/math/topics')}
+        closeLabel="Close the lesson and go back to the math topics"
+        where={
+          <>
+            <span className="font-emoji" aria-hidden>{topicEmoji}</span> {topicName} · question {currentIndex + 1} of{' '}
+            {questions.length}
+          </>
+        }
+        mood={mood}
+        buddySay={mood === 'listen' ? 'Let us count! 👀' : undefined}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.25 }}
+          >
+            <CountAndChoose
+              question={currentQuestion}
+              onAnswer={handleAnswer}
+              position={{ n: currentIndex + 1, total: questions.length }}
+              onFeedback={onFeedback}
+            />
+          </motion.div>
+        </AnimatePresence>
+      </ExerciseShell>
+      {flight}
     </PracticeCanvas>
   )
 }

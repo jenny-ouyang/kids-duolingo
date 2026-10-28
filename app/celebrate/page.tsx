@@ -25,7 +25,6 @@ function CelebrationContent() {
   const playAgainHref = subject === 'math' ? `/math/practice/session?topic=${packId}` : `/practice/session?pack=${packId}`
   const isMath = subject === 'math'
 
-  const allCorrect = correct === total
   const stars = correct <= 2 ? 1 : correct <= 5 ? 2 : correct <= 7 ? 3 : 4
 
   const [enc, setEnc] = useState<Encouragement | null>(null)

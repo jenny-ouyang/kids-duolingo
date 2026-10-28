@@ -5,10 +5,25 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
 import { hapticCorrect, hapticWrong } from '@/lib/haptics'
 import { MathQuestion } from '@/lib/types'
+import { speakChinese } from '@/lib/tts'
+import { numberToChinese } from '@/lib/numbers-zh'
+import { RightBand, NotQuiteBand, LessonFeedback } from './FeedbackBand'
+import TenFrames from './TenFrames'
 
 interface CountAndChooseProps {
   question: MathQuestion
+  /** Called when the child presses Next after the right pick; true = right on the first try */
   onAnswer: (correct: boolean) => void
+  position: { n: number; total: number }
+  onFeedback?: (feedback: LessonFeedback) => void
+}
+
+/** Why a pick was not right, in words a 5-year-old can use */
+function notQuiteReason(question: MathQuestion, picked: number): string {
+  const { operand1: a, operand2: b, operator } = question.problem
+  if (operator === 'count') return `Not ${picked}. Count them one by one with your finger.`
+  const sum = operator === '+' ? `${a} + ${b}` : `${a} − ${b}`
+  return picked < question.correctAnswer ? `${sum} is more than ${picked}.` : `${sum} is less than ${picked}.`
 }
 
 // Rotating press-edge colors by tile index (decorative rhythm — DESIGN.md)
@@ -69,36 +84,36 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
   )
 }
 
-export default function CountAndChoose({ question, onAnswer }: CountAndChooseProps) {
+export default function CountAndChoose({ question, onAnswer, position, onFeedback }: CountAndChooseProps) {
   // Stay-until-right: wrong picks gray out and the problem waits for the correct
   // answer. Only the FIRST pick feeds the memory system (onAnswer).
   const [wrongPicks, setWrongPicks] = useState<number[]>([])
   const [lastWrongPick, setLastWrongPick] = useState<number | null>(null)
   const [solved, setSolved] = useState(false)
 
-  function handleSelect(value: number) {
+  function handleSelect(value: number, e: React.MouseEvent<HTMLButtonElement>) {
     if (solved || wrongPicks.includes(value)) return
     const correct = value === question.correctAnswer
 
     if (correct) {
-      const firstTry = wrongPicks.length === 0
       setSolved(true)
       playCorrectSound()
       hapticCorrect()
-      setTimeout(() => {
-        onAnswer(firstTry)
-        setWrongPicks([])
-        setLastWrongPick(null)
-        setSolved(false)
-      }, 1100)
+      setTimeout(() => speakChinese(numberToChinese(value)), 300)
+      onFeedback?.({ mood: 'yes', earnsHeart: wrongPicks.length === 0, from: e.currentTarget.getBoundingClientRect() })
     } else {
       playWrongSound()
       hapticWrong()
       setWrongPicks((picks) => [...picks, value])
       setLastWrongPick(value)
       setTimeout(() => setLastWrongPick(null), 400)
+      onFeedback?.({ mood: 'listen' })
     }
   }
+
+  const { operand1: a, operand2: b, operator } = question.problem
+  const answerText = operator === 'count' ? `${question.correctAnswer}` : `${a} ${operator === '+' ? '+' : '−'} ${b} = ${question.correctAnswer}`
+  const lastWrong = wrongPicks[wrongPicks.length - 1]
 
   /** Sunrise Playground tile look: white + own-hue edge; success fill + ✓; wrong fades, no red */
   function getButtonStyle(value: number, edgeClass: string): string {
@@ -120,20 +135,6 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
       {/* Problem display */}
       <ProblemDisplay question={question} />
 
-      {/* Wrong answer feedback — warm, no punishment, problem stays until solved */}
-      <AnimatePresence>
-        {wrongPicks.length > 0 && !solved && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="bg-white rounded-full px-5 py-2 shadow-press-chip text-ink font-extrabold text-sm text-center"
-          >
-            Try again — you&apos;ve got this! 🌟
-          </motion.div>
-        )}
-      </AnimatePresence>
-
       {/* 4 number answer buttons in a 2x2 grid */}
       <div className="grid grid-cols-2 gap-4 w-full max-w-xs">
         {question.options.map((value, index) => {
@@ -144,7 +145,8 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
           return (
             <motion.button
               key={value}
-              onClick={() => handleSelect(value)}
+              onClick={(e) => handleSelect(value, e)}
+              aria-label={wrongPicks.includes(value) ? `${value}, already tried` : undefined}
               disabled={solved || wrongPicks.includes(value)}
               animate={isWrongPick ? { x: [-6, 6, -4, 4, 0] } : {}}
               transition={{ duration: 0.3 }}
@@ -168,6 +170,38 @@ export default function CountAndChoose({ question, onAnswer }: CountAndChoosePro
           )
         })}
       </div>
+
+      {/* Wrong pick: real help, not a cheer. The problem waits for the right number. */}
+      {lastWrong !== undefined && !solved && (
+        <NotQuiteBand reason={notQuiteReason(question, lastWrong)}>
+          {operator === '+' && a + b <= 20 && (
+            <>
+              <p className="text-base font-bold text-ink">Let us count it together.</p>
+              <TenFrames a={a} b={b} />
+            </>
+          )}
+        </NotQuiteBand>
+      )}
+
+      <AnimatePresence>
+        {solved && (
+          <RightBand title={`Right! ${answerText}`} onNext={() => onAnswer(wrongPicks.length === 0)}>
+            <div className="flex items-center gap-3">
+              <span className="text-base font-bold text-ink-mid">
+                {position.n} of {position.total} done
+              </span>
+              <button
+                onClick={() => speakChinese(numberToChinese(question.correctAnswer))}
+                aria-label={`Hear ${question.correctAnswer} in Chinese`}
+                className="pressable ml-auto min-h-[48px] rounded-2xl bg-gold shadow-press-gold px-4 flex items-center gap-2 text-lg font-extrabold text-ink"
+              >
+                <span className="font-emoji">🔊</span>
+                <span className="font-hanzi">{numberToChinese(question.correctAnswer)}</span>
+              </button>
+            </div>
+          </RightBand>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

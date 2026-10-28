@@ -113,3 +113,19 @@ export function playStarSound(delayMs = 0): void {
   playNote(ctx, 880, t, 0.08, 0.2, 'sine')
   playNote(ctx, 1108, t + 0.06, 0.1, 0.18, 'sine')
 }
+
+/** One short high ping — a flying heart lands in the hearts chip */
+export function playHeartSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  playNote(ctx, 880, ctx.currentTime, 0.08, 0.2, 'sine')
+}
+
+/** Soft "pop" — a new sticker settles on the reward screen */
+export function playStickerSound(): void {
+  const ctx = getCtx()
+  if (!ctx) return
+  const t = ctx.currentTime
+  playNote(ctx, 784, t, 0.06, 0.25, 'sine')
+  playNote(ctx, 1047, t + 0.06, 0.06, 0.25, 'sine')
+}

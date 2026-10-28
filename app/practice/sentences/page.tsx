@@ -5,6 +5,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import ExerciseShell from '@/components/exercise/ExerciseShell'
+import { useLessonFeedback } from '@/components/exercise/useLessonFeedback'
 import SentenceBuild from '@/components/exercise/SentenceBuild'
 import PinyinToggle from '@/components/exercise/PinyinToggle'
 import { Hills, Sparkles } from '@/components/design/Scenery'
@@ -13,9 +14,11 @@ import { SentenceQuestion } from '@/lib/types'
 const MAX_HEARTS = 5
 
 /** Sunrise Playground screen wrapper — scenery behind, content above (z-10) */
-function PracticeCanvas({ children }: { children: React.ReactNode }) {
+function PracticeCanvas({ children, lesson = false }: { children: React.ReactNode; lesson?: boolean }) {
+  // A lesson starts at the top and leaves room under the tiles for the fixed Right band
+  const layout = lesson ? 'justify-start pt-6 pb-64' : 'justify-center'
   return (
-    <div className="sunrise-canvas flex flex-col items-center justify-center p-4">
+    <div className={`sunrise-canvas flex flex-col items-center p-4 ${layout}`}>
       <Hills />
       <Sparkles positions="sparse" />
       <div className="relative z-10 w-full flex flex-col items-center">{children}</div>
@@ -36,7 +39,7 @@ export default function SentencesPractice() {
   const [loading, setLoading] = useState(true)
   const [transitioning, setTransitioning] = useState(false)
   const [heartsEarned, setHeartsEarned] = useState(0)
-  const [heartPulse, setHeartPulse] = useState(false)
+  const { mood, onFeedback, heartChipRef, flight, landed } = useLessonFeedback(currentIndex, heartsEarned < MAX_HEARTS)
 
   const correctWordsRef = useRef<{ english: string; chinese: string; pinyin: string }[]>([])
 
@@ -67,8 +70,6 @@ export default function SentencesPractice() {
     if (correct) {
       newHeartsEarned = Math.min(heartsEarned + 1, MAX_HEARTS)
       setHeartsEarned(newHeartsEarned)
-      setHeartPulse(true)
-      setTimeout(() => setHeartPulse(false), 600)
       correctWordsRef.current.push({
         english: currentQuestion.sentence.english,
         chinese: currentQuestion.sentence.chinese.join(''),
@@ -134,70 +135,56 @@ export default function SentencesPractice() {
   }
 
   const currentQuestion = questions[currentIndex]
+  const left = questions.length - currentIndex - 1
 
   return (
-    <PracticeCanvas>
-      <div className="w-full max-w-2xl flex flex-col gap-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push('/packs')}
-              className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl text-ink shadow-press-chip"
-              aria-label="Back to packs"
-            >
-              ←
-            </button>
-            <div className="flex items-center gap-2">
-              <span className="font-emoji text-2xl">💬</span>
-              <span className="text-xl font-extrabold text-ink">Simple Sentences</span>
-            </div>
-          </div>
-
-          {/* Hearts chip */}
-          <div className="flex items-center gap-1 bg-white rounded-full px-3 py-1.5 shadow-press-chip">
-            {Array.from({ length: MAX_HEARTS }).map((_, i) => (
-              <motion.span
-                key={i}
-                animate={heartPulse && i === heartsEarned - 1 ? { scale: [1, 1.5, 1] } : {}}
-                transition={{ duration: 0.4 }}
-                className="font-emoji text-2xl select-none"
-              >
-                {i < heartsEarned ? '❤️' : '🤍'}
-              </motion.span>
-            ))}
-          </div>
-        </div>
-
-        <ExerciseShell
-          current={currentIndex + 1}
-          total={questions.length}
-          headerAction={
-            <PinyinToggle
-              on={showPinyin}
-              onToggle={() => setPinyinIndex(showPinyin ? null : currentIndex)}
+    <PracticeCanvas lesson>
+      <ExerciseShell
+        current={currentIndex + 1}
+        total={questions.length}
+        hearts={Math.min(heartsEarned + (landed ? 1 : 0), MAX_HEARTS)}
+        heartChipRef={heartChipRef}
+        onClose={() => router.push('/packs')}
+        closeLabel="Close the lesson and go back to the packs"
+        where={
+          <>
+            <span className="font-emoji" aria-hidden>💬</span> Simple Sentences
+          </>
+        }
+        mood={mood}
+        headerAction={
+          <PinyinToggle
+            on={showPinyin}
+            onToggle={() => setPinyinIndex(showPinyin ? null : currentIndex)}
+          />
+        }
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentIndex}
+            initial={{ opacity: 0, x: 40 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -40 }}
+            transition={{ duration: 0.25 }}
+          >
+            {/* key forces a clean remount per question — SentenceBuild seeds
+                its tile bank from props once, so reuse shows stale tiles */}
+            <SentenceBuild
+              key={currentQuestion.sentence.id}
+              question={currentQuestion}
+              onAnswer={handleAnswer}
+              showPinyin={showPinyin}
+              position={{ n: currentIndex + 1, total: questions.length }}
+              onFeedback={onFeedback}
             />
-          }
-        >
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentIndex}
-              initial={{ opacity: 0, x: 40 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -40 }}
-              transition={{ duration: 0.25 }}
-            >
-              {/* key forces a clean remount per question — SentenceBuild seeds
-                  its tile bank from props once, so reuse shows stale tiles */}
-              <SentenceBuild
-                key={currentQuestion.sentence.id}
-                question={currentQuestion}
-                onAnswer={handleAnswer}
-                showPinyin={showPinyin}
-              />
-            </motion.div>
-          </AnimatePresence>
-        </ExerciseShell>
-      </div>
+          </motion.div>
+        </AnimatePresence>
+        {/* What comes next, always in view */}
+        <p className="text-base font-bold text-ink-mid text-center">
+          {left > 0 ? `Next: ${left} more sentence${left === 1 ? '' : 's'}, then your stars.` : 'Last one! Then your stars.'}
+        </p>
+      </ExerciseShell>
+      {flight}
     </PracticeCanvas>
   )
 }

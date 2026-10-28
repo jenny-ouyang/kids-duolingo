@@ -5,18 +5,32 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { SentenceQuestion } from '@/lib/types'
 import { speakChinese } from '@/lib/tts'
 import { playCorrectSound, playWrongSound } from '@/lib/sounds'
+import { RightBand, NotQuiteBand, SayAgainButton, AnswerRow, LessonFeedback } from './FeedbackBand'
 
 // Rotating press-edge colors for bank tiles (decorative rhythm — DESIGN.md)
 const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
 
 interface Props {
   question: SentenceQuestion
+  /** Called when the child presses Next after building the sentence */
   onAnswer: (correct: boolean) => void
   /** Child pressed the "pīn" toggle for this question */
   showPinyin: boolean
+  position: { n: number; total: number }
+  onFeedback?: (feedback: LessonFeedback) => void
 }
 
-export default function SentenceBuild({ question, onAnswer, showPinyin }: Props) {
+/** Tiles minus one copy of each tile in `used` — the bank after a kept prefix */
+function withoutTiles(tiles: string[], used: string[]): string[] {
+  const left = [...tiles]
+  for (const t of used) {
+    const i = left.indexOf(t)
+    if (i >= 0) left.splice(i, 1)
+  }
+  return left
+}
+
+export default function SentenceBuild({ question, onAnswer, showPinyin, position, onFeedback }: Props) {
   const { sentence, tiles } = question
   const slotCount = sentence.chinese.length
 
@@ -25,6 +39,10 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
   const [shaking, setShaking] = useState(false)
   const [solved, setSolved] = useState(false)
   const [isCorrect, setIsCorrect] = useState(false)
+  // Right tiles kept after the last wrong order; null = no wrong order yet
+  const [keptAfterWrong, setKeptAfterWrong] = useState<number | null>(null)
+  const slotsRef = useRef<HTMLDivElement>(null)
+  const full = sentence.chinese.join('')
 
   const pendingTimers = useRef<ReturnType<typeof setTimeout>[]>([])
   useEffect(() => {
@@ -51,15 +69,21 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
         playCorrectSound()
         setIsCorrect(true)
         setSolved(true)
-        schedule(() => speakChinese(sentence.chinese.join('')), 300)
-        schedule(() => onAnswer(true), 1500)
+        schedule(() => speakChinese(full), 300)
+        onFeedback?.({ mood: 'yes', earnsHeart: true, from: slotsRef.current?.getBoundingClientRect() })
       } else {
         playWrongSound()
         setShaking(true)
+        onFeedback?.({ mood: 'listen' })
+        // Keep the longest right start; only the rest goes back to the bank
+        let keep = 0
+        while (keep < newPlaced.length && newPlaced[keep] === sentence.chinese[keep]) keep++
         schedule(() => {
           setShaking(false)
-          setPlaced([])
-          setBank(tiles)
+          const kept = newPlaced.slice(0, keep)
+          setPlaced(kept)
+          setBank(withoutTiles(tiles, kept))
+          setKeptAfterWrong(keep)
         }, 800)
       }
     }
@@ -98,6 +122,9 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
 
       {/* Answer slots — placed tiles fill math-blue; gentle shake on wrong, no red */}
       <motion.div
+        ref={slotsRef}
+        role="group"
+        aria-label="Your sentence"
         className="flex gap-3 flex-wrap justify-center"
         animate={shaking ? { x: [0, -6, 6, -4, 4, 0] } : {}}
         transition={{ duration: 0.4 }}
@@ -109,6 +136,7 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
             <motion.button
               key={i}
               onClick={() => tile && tapPlacedTile(tile, i)}
+              aria-label={tile ? `Word ${i + 1}: ${tile}, tap to take back` : `Word ${i + 1}, empty`}
               animate={isCorrect && tile ? { scale: [1, 1.2, 0.95, 1.05, 1] } : { scale: 1 }}
               // Keyframes already shape the bounce; spring only supports two keyframes
               // and throws in dev (froze the session on the first correct sentence)
@@ -142,9 +170,9 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
         })}
       </motion.div>
 
-      {/* Pinyin — appears when the child asks (pīn toggle) or on correct */}
+      {/* Pinyin — appears when the child asks (pīn toggle); the Right band shows it on solve */}
       <AnimatePresence>
-        {(showPinyin || solved) && (
+        {showPinyin && !solved && (
           <motion.div
             initial={{ opacity: 0, y: 8, scale: 0.95 }}
             animate={{ opacity: 1, y: 0, scale: 1 }}
@@ -172,7 +200,6 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
                 initial={{ scale: 0.6, opacity: 0, y: 16 }}
                 animate={{ scale: 1, opacity: 1, y: 0 }}
                 exit={{ scale: 0.6, opacity: 0, y: -8 }}
-                whileHover={{ scale: 1.1, y: -4 }}
                 whileTap={{ scale: 0.94, y: 4 }}
                 transition={{ type: 'spring', stiffness: 420, damping: 22 }}
                 onClick={() => tapBankTile(tile, i)}
@@ -192,6 +219,28 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
         </AnimatePresence>
       </div>
 
+      {keptAfterWrong !== null && !solved && (
+        <NotQuiteBand
+          reason={
+            keptAfterWrong > 0
+              ? `The first ${keptAfterWrong === 1 ? 'word is' : `${keptAfterWrong} words are`} right. Listen, then finish the sentence.`
+              : 'Not that order. Listen, then try again.'
+          }
+        >
+          <SayAgainButton label={`Hear ${full} again`} onClick={() => speakChinese(full)}>
+            <span className="font-hanzi">{full}</span>
+          </SayAgainButton>
+        </NotQuiteBand>
+      )}
+
+      <AnimatePresence>
+        {solved && (
+          <RightBand title={`Right! ${position.n} of ${position.total} done`} onNext={() => onAnswer(true)}>
+            <AnswerRow chinese={full} pinyin={sentence.pinyin} onSpeak={() => speakChinese(full)} />
+            <p className="text-base font-bold text-ink-mid">{sentence.english}</p>
+          </RightBand>
+        )}
+      </AnimatePresence>
     </div>
   )
 }

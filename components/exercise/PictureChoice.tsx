@@ -7,12 +7,17 @@ import { playCorrectSound, playWrongSound } from '@/lib/sounds'
 import { hapticCorrect, hapticWrong } from '@/lib/haptics'
 import { Word, ExerciseQuestion } from '@/lib/types'
 import wordImageIds from '@/lib/word-images.json'
+import { RightBand, NotQuiteBand, SayAgainButton, AnswerRow, LessonFeedback } from './FeedbackBand'
 
 interface PictureChoiceProps {
   question: ExerciseQuestion
+  /** Called when the child presses Next after the right tap; true = right on the first try */
   onAnswer: (correct: boolean) => void
   /** Child pressed the "pīn" toggle for this question */
   showPinyin: boolean
+  /** 1-based question number and session length, for "Right! 2 of 8" */
+  position: { n: number; total: number }
+  onFeedback?: (feedback: LessonFeedback) => void
 }
 
 type AnswerState = 'idle' | 'correct' | 'wrong'
@@ -102,7 +107,7 @@ export function wordImageSrc(word: Word): string | null {
 function PictureCard({
   word, state, shaking, isCorrect, onClick, disabled, edgeClass,
 }: {
-  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string
+  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: (e: React.MouseEvent<HTMLButtonElement>) => void; disabled: boolean; edgeClass: string
 }) {
   const emojiIcon = wordEmoji(word)
   const imageSrc = wordImageSrc(word)
@@ -142,7 +147,7 @@ function PictureCard({
 function ChineseCard({
   word, state, shaking, isCorrect, onClick, disabled, edgeClass, showPinyin,
 }: {
-  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: () => void; disabled: boolean; edgeClass: string; showPinyin: boolean
+  word: Word; state: AnswerState; shaking: boolean; isCorrect: boolean; onClick: (e: React.MouseEvent<HTMLButtonElement>) => void; disabled: boolean; edgeClass: string; showPinyin: boolean
 }) {
   // Pinyin is a hint, not a crutch: hidden until asked for, or shown on the solved tile
   const pinyinVisible = showPinyin || (state !== 'idle' && isCorrect)
@@ -189,17 +194,28 @@ function AudioPrompt({ word, pinyinVisible }: { word: Word; pinyinVisible: boole
   )
 }
 
-function PicturePrompt({ word }: { word: Word }) {
+// The word picture hops once on a right answer (a transform: skipped under Reduce Motion)
+const HOP = { y: [0, -8, 0] }
+
+function PicturePrompt({ word, solved }: { word: Word; solved: boolean }) {
   const emojiIcon = wordEmoji(word)
   const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
       <h1 className="text-[22px] font-extrabold text-ink leading-tight">What is this in Chinese?</h1>
       {imageSrc ? (
-        // eslint-disable-next-line @next/next/no-img-element
-        <img src={imageSrc} alt={word.english} className="w-40 h-40 object-contain rounded-3xl" draggable={false} />
+        <motion.img
+          src={imageSrc}
+          alt={word.english}
+          className="w-40 h-40 object-contain rounded-3xl"
+          draggable={false}
+          animate={solved ? HOP : {}}
+          transition={{ duration: 0.3 }}
+        />
       ) : emojiIcon ? (
-        <div className="font-emoji text-8xl leading-none">{emojiIcon}</div>
+        <motion.div className="font-emoji text-8xl leading-none" animate={solved ? HOP : {}} transition={{ duration: 0.3 }}>
+          {emojiIcon}
+        </motion.div>
       ) : (
         <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card">
           <span className="text-4xl font-extrabold text-ink capitalize">{word.english}</span>
@@ -232,13 +248,14 @@ function EnglishPrompt({ word }: { word: Word }) {
 
 // ─── Main component ───────────────────────────────────────────────────────────
 
-export default function PictureChoice({ question, onAnswer, showPinyin }: PictureChoiceProps) {
+export default function PictureChoice({ question, onAnswer, showPinyin, position, onFeedback }: PictureChoiceProps) {
   // Stay-until-right: wrong taps gray out and the question waits for the correct
   // tap. Only the FIRST tap feeds the memory system (onAnswer), so retry kindness
-  // never corrupts the spaced-repetition data.
+  // never corrupts the spaced-repetition data. The page remounts this per question.
   const [wrongIds, setWrongIds] = useState<string[]>([])
   const [lastWrongId, setLastWrongId] = useState<string | null>(null)
   const [solved, setSolved] = useState(false)
+  const target = question.word
 
   // Auto-play audio when question loads (for audio type) or on all types as reinforcement
   useEffect(() => {
@@ -250,22 +267,16 @@ export default function PictureChoice({ question, onAnswer, showPinyin }: Pictur
     return () => clearTimeout(timer)
   }, [question.word.chinese, question.type])
 
-  function handleSelect(wordId: string) {
+  function handleSelect(wordId: string, e: React.MouseEvent<HTMLButtonElement>) {
     if (solved || wrongIds.includes(wordId)) return
     const correct = wordId === question.correctId
 
     if (correct) {
-      const firstTry = wrongIds.length === 0
       setSolved(true)
       playCorrectSound()
       hapticCorrect()
-      setTimeout(() => speakChinese(question.word.chinese), 150)
-      setTimeout(() => {
-        onAnswer(firstTry)
-        setWrongIds([])
-        setLastWrongId(null)
-        setSolved(false)
-      }, 1100)
+      setTimeout(() => speakChinese(target.chinese), 150)
+      onFeedback?.({ mood: 'yes', earnsHeart: wrongIds.length === 0, from: e.currentTarget.getBoundingClientRect() })
     } else {
       playWrongSound()
       hapticWrong()
@@ -273,33 +284,27 @@ export default function PictureChoice({ question, onAnswer, showPinyin }: Pictur
       setLastWrongId(wordId)
       setTimeout(() => setLastWrongId(null), 400)
       // Re-speak the target word — a hint through the ears, not a reveal
-      setTimeout(() => speakChinese(question.word.chinese), 450)
+      setTimeout(() => speakChinese(target.chinese), 450)
+      onFeedback?.({ mood: 'listen' })
     }
   }
 
   const useChineseOptions =
     question.type === 'picture_to_chinese' || question.type === 'english_to_chinese'
 
+  const lastWrong = question.options.find((w) => w.id === wrongIds[wrongIds.length - 1])
+  const reason = lastWrong
+    ? question.type === 'audio_to_picture'
+      ? `That one is ${lastWrong.english}. Listen again and find ${target.chinese}.`
+      : `That one means ${lastWrong.english}. Listen to the right word and try again.`
+    : ''
+
   return (
     <div className="flex flex-col items-center gap-5 w-full">
       {/* Prompt */}
-      {question.type === 'audio_to_picture' && <AudioPrompt word={question.word} pinyinVisible={showPinyin || solved} />}
-      {question.type === 'picture_to_chinese' && <PicturePrompt word={question.word} />}
-      {question.type === 'english_to_chinese' && <EnglishPrompt word={question.word} />}
-
-      {/* Wrong-answer feedback — warm, no punishment, question stays until solved */}
-      <AnimatePresence>
-        {wrongIds.length > 0 && !solved && (
-          <motion.div
-            initial={{ opacity: 0, y: -8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0 }}
-            className="bg-white rounded-full px-5 py-2 shadow-press-chip text-ink font-extrabold text-center text-sm"
-          >
-            Try again — you&apos;ve got this! 🌟
-          </motion.div>
-        )}
-      </AnimatePresence>
+      {question.type === 'audio_to_picture' && <AudioPrompt word={target} pinyinVisible={showPinyin || solved} />}
+      {question.type === 'picture_to_chinese' && <PicturePrompt word={target} solved={solved} />}
+      {question.type === 'english_to_chinese' && <EnglishPrompt word={target} />}
 
       {/* 4 option cards */}
       <div className="grid grid-cols-2 gap-4 w-full">
@@ -320,7 +325,7 @@ export default function PictureChoice({ question, onAnswer, showPinyin }: Pictur
               state={cardState}
               shaking={shaking}
               isCorrect={isCorrect}
-              onClick={() => handleSelect(word.id)}
+              onClick={(e) => handleSelect(word.id, e)}
               disabled={cardDisabled}
               edgeClass={edgeClass}
               showPinyin={showPinyin}
@@ -332,13 +337,36 @@ export default function PictureChoice({ question, onAnswer, showPinyin }: Pictur
               state={cardState}
               shaking={shaking}
               isCorrect={isCorrect}
-              onClick={() => handleSelect(word.id)}
+              onClick={(e) => handleSelect(word.id, e)}
               disabled={cardDisabled}
               edgeClass={edgeClass}
             />
           )
         })}
       </div>
+
+      {/* Wrong tap: a kind band with the reason; the question waits for the right tile */}
+      {wrongIds.length > 0 && !solved && (
+        <NotQuiteBand reason={reason}>
+          <SayAgainButton label={`Hear ${target.chinese} again`} onClick={() => speakChinese(target.chinese)}>
+            <span className="font-hanzi">{target.chinese}</span>
+          </SayAgainButton>
+        </NotQuiteBand>
+      )}
+
+      {/* Right tap: the child reads the word, then presses Next */}
+      <AnimatePresence>
+        {solved && (
+          <RightBand title={`Right! ${position.n} of ${position.total}`} onNext={() => onAnswer(wrongIds.length === 0)}>
+            <AnswerRow
+              chinese={target.chinese}
+              pinyin={target.pinyin}
+              english={target.english}
+              onSpeak={() => speakChinese(target.chinese)}
+            />
+          </RightBand>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
