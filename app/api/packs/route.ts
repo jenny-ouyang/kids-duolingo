@@ -27,6 +27,7 @@ export async function GET(req: NextRequest) {
     const packIds = packs.map((p) => p.id)
 
     const masteryByPack: Record<string, number> = {}
+    const learnedByPack: Record<string, number> = {}
 
     if (subject === 'chinese') {
       const rows = await prisma.chineseProgress.findMany({
@@ -41,6 +42,7 @@ export async function GET(req: NextRequest) {
       for (const pack of packs) {
         const pp = progressByPack[pack.id] ?? {}
         const practiced = pack.words.filter((w) => (pp[w.id] ?? 0) >= 1).length
+        learnedByPack[pack.id] = practiced
         masteryByPack[pack.id] = pack.words.length > 0
           ? Math.round((practiced / pack.words.length) * 100)
           : 0
@@ -58,6 +60,7 @@ export async function GET(req: NextRequest) {
       for (const pack of packs) {
         const pp = progressByPack[pack.id] ?? {}
         const practiced = pack.problems.filter((p) => (pp[p.id] ?? 0) >= 1).length
+        learnedByPack[pack.id] = practiced
         masteryByPack[pack.id] = pack.problems.length > 0
           ? Math.round((practiced / pack.problems.length) * 100)
           : 0
@@ -76,6 +79,7 @@ export async function GET(req: NextRequest) {
           ? (pack.sentences.length > 0 && pack.words.length === 0 ? pack.sentences.length : pack.words.length)
           : pack.problems.length,
         masteryPct: masteryByPack[pack.id] ?? 0,
+        learned: learnedByPack[pack.id] ?? 0,
       }))
       .filter((pack) => pack.wordCount > 0)
 

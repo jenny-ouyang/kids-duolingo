@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import { fetchJsonCached } from '@/lib/api-fetch'
+import PackPath, { suggestedIndex } from '@/components/home/PackPath'
 
 interface PackMeta {
   id: string
@@ -14,6 +15,7 @@ interface PackMeta {
   emoji: string
   color: string
   wordCount: number
+  learned: number
   masteryPct: number
 }
 
@@ -38,6 +40,8 @@ export default function PacksPage() {
   const [packs, setPacks] = useState<PackMeta[]>([])
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [tab, setTab] = useState<'learning' | 'mastered'>('learning')
+  // The path is the default view; "See all" opens the full list with its tabs
+  const [showAll, setShowAll] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -88,6 +92,14 @@ export default function PacksPage() {
     )
   }
 
+  const openPack = (pack: { id: string }) =>
+    router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
+  const next = suggestedIndex(packs)
+  // 7 stops around the suggested one: one behind, the rest ahead
+  const windowStart = Math.max(0, Math.min(next - 1, packs.length - 7))
+  const pathPacks = packs.slice(windowStart, windowStart + 7)
+  const doneCount = packs.filter((p) => p.masteryPct === 100).length
+
   const learning = packs.filter((p) => p.masteryPct < 100)
   const mastered = packs.filter((p) => p.masteryPct === 100)
   const visible = tab === 'learning' ? learning : mastered
@@ -102,17 +114,38 @@ export default function PacksPage() {
         {/* Header */}
         <div className="flex items-center gap-3">
           <button
-            onClick={() => router.push('/')}
-            aria-label="Back to home"
+            onClick={() => (showAll ? setShowAll(false) : router.push('/'))}
+            aria-label={showAll ? 'Back to the path' : 'Back to home'}
             className="pressable bg-white rounded-2xl w-14 h-14 flex items-center justify-center text-2xl text-ink shadow-press-chip"
           >
             ←
           </button>
           <h1 className="text-[27px] font-extrabold text-ink">
-            Choose a Pack <span className="font-hanzi text-xl text-chinese font-normal">中文</span>
+            {showAll ? 'All packs' : 'Chinese path'}{' '}
+            <span className="font-hanzi text-xl text-chinese-edge font-normal">中文</span>
           </h1>
         </div>
 
+        {!showAll && packs.length > 0 && (
+          <>
+            <p className="text-base font-bold text-ink-mid">
+              Every pack is open. The path only suggests the order.{' '}
+              <b className="text-ink">
+                {doneCount} of {packs.length} done.
+              </b>
+            </p>
+            <PackPath packs={pathPacks} nextId={packs[next].id} onOpen={openPack} />
+            <button
+              onClick={() => setShowAll(true)}
+              className="pressable w-full min-h-[56px] rounded-[22px] bg-white text-ink text-lg font-extrabold shadow-press-card"
+            >
+              See all {packs.length} packs
+            </button>
+          </>
+        )}
+
+        {showAll && (
+        <>
         {/* Tabs */}
         <div className="flex gap-3">
           <button
@@ -163,9 +196,7 @@ export default function PacksPage() {
                   transition={i < 6 ? { delay: i * 0.06 } : undefined}
                 >
                   <button
-                    onClick={() =>
-                      router.push(pack.id === 'sentences' ? '/practice/sentences' : `/practice/session?pack=${pack.id}`)
-                    }
+                    onClick={() => openPack(pack)}
                     className="pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card"
                   >
                     <span className="font-emoji text-[34px] leading-none bg-[#FFF3D6] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]">
@@ -175,10 +206,10 @@ export default function PacksPage() {
                       <span className="text-lg font-extrabold text-ink leading-tight truncate">
                         {pack.name}
                       </span>
-                      <span className="font-hanzi text-[15px] text-chinese leading-tight">
+                      <span className="font-hanzi text-[15px] text-chinese-edge leading-tight">
                         {pack.nameZh}
                       </span>
-                      <span className="text-xs font-bold text-ink-mid">
+                      <span className="text-base font-bold text-ink-mid">
                         {pack.id === 'sentences' ? `${pack.wordCount} sentences` : `${pack.wordCount} words`}
                       </span>
                     </span>
@@ -189,6 +220,8 @@ export default function PacksPage() {
             )}
           </motion.div>
         </AnimatePresence>
+        </>
+        )}
       </div>
     </KidLayout>
   )
