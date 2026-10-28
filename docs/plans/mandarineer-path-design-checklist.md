@@ -69,3 +69,19 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 
 - [ ] Deploy the web backend before an iOS build from this branch ships: the iOS app calls mandarineer.com for `/api/stickers` and the new `/api/profile` fields.
 - [ ] `feat/hidden-pinyin` and `payments-phase-a` are not on `main`. Merge order matters: payments has migration `20261013120000`, this branch has `20261027120000`. Both are already applied to the live database.
+
+## Phone test (Jenny, 2026-10-27: "just do everything so I can test it on my phone")
+
+- [x] Packs path and Play next suggest the same pack (`f1a0c8e`).
+- [x] Vercel env: `DATABASE_URL` added for Preview (same database as the live app). Before this, preview API calls failed.
+- [x] Branch pushed. Preview READY: https://kids-duolingo-git-feat-mandarineer-path-jenny-ouyangs-projects.vercel.app (behind Vercel login; mandarineer.com unchanged).
+- [ ] Jenny tests on her phone.
+
+## Payments (Jenny, 2026-10-27: "let's also make it pay-able")
+
+Spec: `docs/superpowers/specs/2026-10-13-payments-design.md`. Settings: `docs/plans/payments-settings-checklist.md`. Phase A code: branch `payments-phase-a` (14 commits, dormant, not merged).
+
+- [ ] Jenny: "go" to merge `payments-phase-a` into this branch (many files overlap; Claude resolves the conflicts).
+- [ ] Jenny: confirm which Stripe account is Mandarineer's. The Stripe tool here is a shared connection; Claude checks its account name first and does not create anything until Jenny confirms.
+- [ ] Phase B (web, Stripe): Claude builds and tests in Stripe test mode.
+- [ ] Phase C (iPhone, Apple): Claude writes the StoreKit code; Jenny does the Apple account steps.
