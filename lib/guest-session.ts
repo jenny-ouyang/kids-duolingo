@@ -50,13 +50,25 @@ export async function sendSignInLink(email: string): Promise<boolean> {
   return !error
 }
 
-/** Stores the session from a sign-in link (#access_token=…), then removes it from the address bar. */
+/**
+ * Stores the session from a sign-in link (#access_token=…), then removes it
+ * from the address bar. A link can carry anyone's session (someone could send
+ * a parent a link to THEIR account), so: magic links only, and a browser that
+ * already has a session asks before it switches, naming the email.
+ */
 async function finishLinkSignIn(): Promise<void> {
   const hash = new URLSearchParams(window.location.hash.slice(1))
   const access_token = hash.get('access_token')
   const refresh_token = hash.get('refresh_token')
-  if (!access_token || !refresh_token) return
+  if (!access_token || !refresh_token || hash.get('type') !== 'magiclink') return
   history.replaceState(null, '', window.location.pathname + window.location.search)
+  if (await hasSession()) {
+    let email = 'another account'
+    try {
+      email = (JSON.parse(atob(access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { email?: string }).email || email
+    } catch { /* unreadable token: keep the generic name */ }
+    if (!window.confirm(`Sign in as ${email}? This browser leaves the family it has now.`)) return
+  }
   await createSupabaseBrowser().auth.setSession({ access_token, refresh_token })
 }
 
