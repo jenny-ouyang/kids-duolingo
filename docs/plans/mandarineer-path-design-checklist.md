@@ -118,7 +118,7 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] A child cookie of a family that is gone sent every visit of `/` to `/welcome` → the cookie is now cleared (`ceb5807`, live).
 - [x] No direct sign-in: it was only inside the Parent Zone, behind the grown-up check → `/signin` page, linked from the landing hero, the footer and `/welcome` (`193c8a8`, live).
 - [x] The sign-in email link opened `/`, but `/` never finished the sign-in or picked a child → the landing now finishes it and goes to the child, the picker or `/welcome` (`193c8a8`, live). Browser test on localhost passed: a family with no child cookie goes straight to its kid home. Test family deleted; users 179.
-  - [ ] Not tested: a real sign-in email link end to end (needs a real inbox). Jenny: try "Sign in" on mandarineer.com with your saved email.
+  - [ ] Not tested: a real sign-in email link end to end. The only saved email is `bingjie.j.ouyang@gmail.com` (Julian, 501 hearts); Supabase shows no sign-in on it yet, so Jenny's first test did not reach it. Jenny tries again with that email.
 - [ ] Landing design (proposal, from the check): product-first layout (1A) with a real lesson screenshot; three real screens in place of the icon cards; facts in place of soft claims; remove "no payment details asked" before payments go live. Jenny: go or no.
 
 ### Account status (Jenny, 2026-10-28: "we have the account etc... all those things fixed?")
@@ -128,7 +128,7 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] iPhone app: the sign-in email link opens Safari, not the app (inferred from the code: `emailRedirectTo` is `window.location.origin`). Proposal: add a 6-digit code to the email that the parent types in the app. Jenny decides.
 - [ ] Next TestFlight build with today's fixes (build 8 has none of them).
 - [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
-- [ ] Jenny: "yes, delete" the 165 auth users that have no family? Permanent; not done.
+- [x] Jenny said yes (2026-10-28): deleted 165 anonymous auth users with no Account row. 14 users left, 0 without an account, 15 children unchanged.
 - [ ] Jenny: which of the 12 families are hers? Claude's guess: Julian/Amelie families (4 accounts, only one saved with email) are Jenny's; Adam (281 hearts, last 2026-10-12) and maybe Simmy are outside families; Mei ×2, tada, QA ×2, dfds/asdf are tests.
 - [ ] Jenny: delete the 6 test families? Not done.
 - [ ] Jenny: merge Julian's progress from 3 guest accounts into the saved account? Not done.
