@@ -255,7 +255,7 @@ function ChildReport() {
                       <span className="font-hanzi text-chinese text-3xl leading-none flex-shrink-0">
                         {word.chinese}
                       </span>
-                      <span className="text-ink-mid text-sm font-bold flex-shrink-0">
+                      <span className="font-pinyin text-ink-mid text-base font-bold flex-shrink-0">
                         {word.pinyin}
                       </span>
                       <span className="text-ink text-sm font-bold truncate">

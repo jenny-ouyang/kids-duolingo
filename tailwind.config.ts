@@ -31,6 +31,9 @@ const config: Config = {
       fontFamily: {
         display: ['var(--font-baloo)', 'ui-rounded', 'system-ui', 'sans-serif'],
         hanzi: ['var(--font-kuaile)', 'var(--font-baloo)', 'sans-serif'],
+        // Pinyin: Baloo 2 misplaces tone marks (ā ē ǐ) and only its latin subset is
+        // loaded, so tone letters fell back mid-word. One rounded system face instead.
+        pinyin: ['ui-rounded', '"SF Pro Rounded"', 'system-ui', 'sans-serif'],
         emoji: ['Apple Color Emoji', 'var(--font-emoji)', 'Segoe UI Emoji', 'sans-serif'],
         // legacy alias so unmigrated screens keep rendering during the restyle
         nunito: ['var(--font-baloo)', 'ui-rounded', 'sans-serif'],

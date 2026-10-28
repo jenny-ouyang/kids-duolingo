@@ -153,7 +153,7 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
             transition={{ type: 'spring', stiffness: 300, damping: 20 }}
             className="bg-white rounded-2xl px-6 py-3 shadow-press-card"
           >
-            <p className="text-base font-bold text-chinese tracking-wide text-center">
+            <p className="font-pinyin text-lg font-bold text-chinese-edge text-center">
               {sentence.pinyin}
             </p>
           </motion.div>

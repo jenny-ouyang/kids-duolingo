@@ -156,7 +156,7 @@ function ChineseCard({
       style={{ minHeight: 130 }}
     >
       <span className="font-hanzi text-4xl text-ink">{word.chinese}</span>
-      <span className={`text-base font-bold text-ink-mid ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
+      <span className={`font-pinyin text-base font-bold text-ink-mid ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
       <AnimatePresence>
         {state !== 'idle' && isCorrect && <CorrectBadge />}
       </AnimatePresence>
@@ -180,7 +180,7 @@ function AudioPrompt({ word, pinyinVisible }: { word: Word; pinyinVisible: boole
           {word.chinese}
         </span>
         <span className="flex items-center gap-2">
-          <span className={`text-lg font-bold text-chinese ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
+          <span className={`font-pinyin text-lg font-bold text-chinese-edge ${pinyinVisible ? '' : 'invisible'}`}>{word.pinyin}</span>
           <span className="bg-gold rounded-full px-3 py-1 shadow-press-gold">
             <span className="font-emoji text-xl">🔊</span>
           </span>
