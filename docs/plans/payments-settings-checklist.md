@@ -11,13 +11,14 @@ Owner marks: **J** = Jenny must do it (her login or her money). **C** = Claude d
 - [x] **J** New account made: `acct_1UVRTmEuUPOEXjWv`, name "Mandarineer", US, live, charges and payouts enabled, nothing due. Jenny does not use test mode; Claude may create coupons when needed.
 - [x] **J** Live secret key given through a hidden Mac dialog, saved only in `.env.local` (git-ignored). Never in chat.
 - [ ] **J** Statement descriptor is "JENNY OUYANG". Change it to `MANDARINEER`: Stripe → Settings → Business → Public details. (Only the Dashboard can change it.)
-- [ ] **C** Create the product "Mandarineer lifetime unlock" (one-time).
-- [ ] **C** Create the price: $9.99 USD, one-time. Record the price id here: {{price_...}}
-- [ ] **C** Create the coupon "Founder": $8.99 off, USD, duration once (nets $1.00).
-- [ ] **C** Create the promotion code `FOUNDER` on that coupon: max 100 redemptions, expiry date {{yyyy-mm-dd}} (default: 60 days after go-live).
-- [ ] **C** Create the webhook endpoint `https://mandarineer.com/api/stripe/webhook` with events `checkout.session.completed` and `charge.refunded`. Record the endpoint id here: {{we_...}}
-- [ ] **J** Paste into Vercel → Project kids-duolingo → Settings → Environment Variables (Production): `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` (from the endpoint above), `STRIPE_PRICE_ID`.
-- [ ] **C** Test-mode end-to-end run (Phase B plan): checkout with test card 4242 4242 4242 4242, with and without `FOUNDER`, then a refund.
+- [x] **C** Create the product "Mandarineer lifetime unlock" (one-time): `prod_VWUfZ5jzR8JSR5` (live, Mandarineer account).
+- [x] **C** Create the price: $9.99 USD, one-time: `price_1UVRgHEuUPOEXjWvTyPWLGQ0` (product default price).
+- [x] **C** Create the coupon "Founder": $8.99 off, USD, duration once (nets $1.00): `zod1MPKN`, limited to the product.
+- [x] **C** Create the promotion code `FOUNDER` on that coupon: max 100 redemptions, expires **2026-12-27** (60 days from 2026-10-28, not from go-live; Claude makes a new code if go-live is later).
+- [x] **C** Create the webhook endpoint `https://mandarineer.com/api/stripe/webhook` with events `checkout.session.completed` and `charge.refunded`: `we_1UVRgXEuUPOEXjWvEavj6v4v`. Live route answers 400 without a signature (armed).
+- [x] **C** (Jenny gave the key; Claude set it) Vercel Production + Preview: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, all type Sensitive.
+- [x] **C** Phase B code: founder detection, purchase ids, full-refund downgrade, 7 tests (`e0223c6`). Payments Phase A merged (`8a2b9af`).
+- [ ] **J** Live end-to-end run (no test mode, Jenny's call): Jenny buys once with `FOUNDER` ($1.00) on the preview (payments on there), Claude checks the unlock, then refunds it and checks the lock comes back.
 - [ ] **J** Stripe Dashboard → Settings → Public details: statement descriptor "MANDARINEER", support email support@mandarineer.com, support URL https://mandarineer.com. (Parents see this on their card statement.)
 
 ## 2. App Store Connect (iPhone purchase)
@@ -31,7 +32,7 @@ Owner marks: **J** = Jenny must do it (her login or her money). **C** = Claude d
 
 ## 3. Vercel (the switch)
 
-- [ ] **C** Add `PAYMENTS_ENABLED` to Production env with value `false` now, so the variable exists and the switch is one edit later.
+- [x] **C** Add `PAYMENTS_ENABLED` to Production env with value `false` now (done 2026-10-28). Preview has `true` for testing.
 - [ ] **J** Go-live, same hour as the 1.0.1 release: set `PAYMENTS_ENABLED=true` and redeploy. Web and phone switch on together.
 
 ## 4. Listing and privacy (ship with 1.0.1)
