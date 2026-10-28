@@ -154,11 +154,13 @@ export default function PacksPage() {
               </div>
             ) : (
               visible.map((pack, i) => (
+                // Only the first rows ease in; the rest render at once (33 rows staggered
+                // left the last ten invisible for 3 s)
                 <motion.div
                   key={pack.id}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={i < 6 ? { opacity: 0, y: 20 } : false}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.06 }}
+                  transition={i < 6 ? { delay: i * 0.06 } : undefined}
                 >
                   <button
                     onClick={() =>
