@@ -109,3 +109,14 @@ Rule: one main thing to tap on each kid screen; parents' numbers live in the Par
 - [x] Lessons (Claude's call) → `31ea748`: one row for the panda and the pīn button; no pack-name line, no "question 4 of 8", no "Next: 5 more" line (the progress bar says it).
 - [x] mandarineer.com deployed (`67706c9`, READY). TestFlight build 8 uploaded (Upload succeeded). Second test family made and deleted; users 179.
 - [ ] Jenny updates to build 8 in TestFlight and checks the calmer screens.
+
+## Entry pages (Jenny, 2026-10-28: "it's always only in welcome", "why it's not got direct enter at all?", "why it's not staying the mandarineer.com")
+
+UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch "Check my UI design").
+
+- [x] `/welcome` had no way out → Back link (website only) and "Grown-ups: already have an account? Sign in" (`ceb5807`, live).
+- [x] A child cookie of a family that is gone sent every visit of `/` to `/welcome` → the cookie is now cleared (`ceb5807`, live).
+- [x] No direct sign-in: it was only inside the Parent Zone, behind the grown-up check → `/signin` page, linked from the landing hero, the footer and `/welcome` (`193c8a8`, live).
+- [x] The sign-in email link opened `/`, but `/` never finished the sign-in or picked a child → the landing now finishes it and goes to the child, the picker or `/welcome` (`193c8a8`, live). Browser test on localhost passed: a family with no child cookie goes straight to its kid home. Test family deleted; users 179.
+  - [ ] Not tested: a real sign-in email link end to end (needs a real inbox). Jenny: try "Sign in" on mandarineer.com with your saved email.
+- [ ] Landing design (proposal, from the check): product-first layout (1A) with a real lesson screenshot; three real screens in place of the icon cards; facts in place of soft claims; remove "no payment details asked" before payments go live. Jenny: go or no.
