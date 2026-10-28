@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { apiFetch, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
-import { ensureGuestSession, hasSession } from '@/lib/guest-session'
+import { ensureGuestSession, hasSession, sendSignInLink } from '@/lib/guest-session'
 import { GUEST_RETENTION_DAYS } from '@/lib/retention'
 import WeekDots from '@/components/progress/WeekDots'
 import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
@@ -653,14 +653,8 @@ function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
     const email = signinEmail.trim()
     if (!email || signinStatus === 'sending') return
     setSigninStatus('sending')
-    const supabase = createSupabaseBrowser()
-    // Magic link into an EXISTING account (new device / cleared cookies).
-    // shouldCreateUser: false so a typo can't spawn an empty account.
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
-    })
-    setSigninStatus(error ? 'error' : 'sent')
+    // Link into an EXISTING account (new device / cleared cookies); any browser can open it
+    setSigninStatus((await sendSignInLink(email)) ? 'sent' : 'error')
   }
 
   async function handleSignOut() {
@@ -776,7 +770,7 @@ function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
           {signinStatus === 'sent' ? (
             <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-base font-bold">
               ✓ Check your inbox! Open the sign-in link we sent to{' '}
-              <strong>{signinEmail.trim()}</strong> on this device.
+              <strong>{signinEmail.trim()}</strong>.
             </div>
           ) : (
             <form onSubmit={handleSignIn} className="flex flex-col gap-2">

@@ -5,7 +5,7 @@ import Link from 'next/link'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
-import { createSupabaseBrowser } from '@/lib/supabase-browser'
+import { sendSignInLink } from '@/lib/guest-session'
 
 /**
  * Sign in for returning families, one tap from the landing page (no grown-up
@@ -21,12 +21,7 @@ export default function SignInPage() {
     const address = email.trim()
     if (!address || status === 'sending') return
     setStatus('sending')
-    // shouldCreateUser: false so a typo can't spawn an empty account
-    const { error } = await createSupabaseBrowser().auth.signInWithOtp({
-      email: address,
-      options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
-    })
-    setStatus(error ? 'error' : 'sent')
+    setStatus((await sendSignInLink(address)) ? 'sent' : 'error')
   }
 
   return (
@@ -54,7 +49,7 @@ export default function SignInPage() {
 
         {status === 'sent' ? (
           <div className="w-full bg-success-bg rounded-3xl px-5 py-4 text-success-edge text-base font-bold text-center">
-            ✓ Check your inbox. Open the link on this device, and your family is back.
+            ✓ Check your inbox. Open the link, and your family is back.
           </div>
         ) : (
           <form onSubmit={send} className="w-full flex flex-col gap-4">

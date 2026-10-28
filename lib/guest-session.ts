@@ -1,5 +1,6 @@
 'use client'
 
+import { createClient } from '@supabase/supabase-js'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { apiFetch } from '@/lib/api-fetch'
 import { setActiveChild } from '@/lib/child-cookie'
@@ -32,11 +33,40 @@ export async function ensureGuestSession(): Promise<boolean> {
 }
 
 /**
+ * Sends the sign-in email for an EXISTING account (shouldCreateUser: false, so
+ * a typo can't spawn an empty account). It uses the implicit flow, not PKCE:
+ * a PKCE link only works in the browser that asked for it, and parents often
+ * open the email somewhere else. The link opens "/" with the session in the
+ * #fragment, which finishLinkSignIn() stores.
+ */
+export async function sendSignInLink(email: string): Promise<boolean> {
+  const linkClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+  const { error } = await linkClient.auth.signInWithOtp({
+    email,
+    options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
+  })
+  return !error
+}
+
+/** Stores the session from a sign-in link (#access_token=…), then removes it from the address bar. */
+async function finishLinkSignIn(): Promise<void> {
+  const hash = new URLSearchParams(window.location.hash.slice(1))
+  const access_token = hash.get('access_token')
+  const refresh_token = hash.get('refresh_token')
+  if (!access_token || !refresh_token) return
+  history.replaceState(null, '', window.location.pathname + window.location.search)
+  await createSupabaseBrowser().auth.setSession({ access_token, refresh_token })
+}
+
+/**
  * Where a signed-in family should land: no child yet → /welcome, one child →
  * that child's home (cookie set first), several → the picker. Null when this
  * browser has no session, so the caller stays where it is.
  */
 export async function familyEntry(): Promise<string | null> {
+  await finishLinkSignIn()
   if (!(await hasSession())) return null
   const res = await apiFetch(`/api/children?tz=${new Date().getTimezoneOffset()}`)
   if (!res.ok) return null
