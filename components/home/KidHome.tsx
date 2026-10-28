@@ -7,14 +7,10 @@ import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
-import WeekDots from '@/components/progress/WeekDots'
-import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { hasSession } from '@/lib/guest-session'
-import type { User } from '@supabase/supabase-js'
 
 const PROFILE_MAX_RETRIES = 8
 const PROFILE_RETRY_DELAY_MS = 1000
-const GUEST_NUDGE_KEY = 'kd_guest_nudge_dismissed'
 
 interface NextPack {
   id: string
@@ -36,18 +32,18 @@ interface Profile {
   stickerCount: number
 }
 
-/** Small white subject button with its own-hue press edge (the Play next card leads) */
-function SubjectButton({ seal, label, variant, href }: { seal: string; label: string; variant: 'chinese' | 'math'; href: string }) {
+/** Square picture button: a big glyph a pre-reader knows, and a one-word label */
+function PictureButton({ glyph, label, href, tone }: { glyph: string; label: string; href: string; tone: 'chinese' | 'math' | 'card' }) {
   const router = useRouter()
+  const edge = tone === 'chinese' ? 'shadow-tile-chinese' : tone === 'math' ? 'shadow-tile-math' : 'shadow-press-card'
+  const ink = tone === 'chinese' ? 'text-chinese-edge font-hanzi' : tone === 'math' ? 'text-math-edge font-hanzi' : 'font-emoji'
   return (
     <button
       onClick={() => router.push(href)}
-      className={`pressable flex-1 min-h-[60px] rounded-[22px] bg-white text-ink text-lg font-extrabold flex items-center justify-center gap-2 ${
-        variant === 'chinese' ? 'shadow-tile-chinese' : 'shadow-tile-math'
-      }`}
+      className={`pressable flex-1 aspect-square max-h-[112px] rounded-[22px] bg-white ${edge} flex flex-col items-center justify-center gap-1`}
     >
-      <span className={`font-hanzi text-xl ${variant === 'chinese' ? 'text-chinese-edge' : 'text-math-edge'}`}>{seal}</span>
-      {label}
+      <span aria-hidden className={`text-[30px] leading-none ${ink}`}>{glyph}</span>
+      <span className="text-base font-extrabold text-ink">{label}</span>
     </button>
   )
 }
@@ -57,7 +53,6 @@ export default function KidHome() {
   const [profile, setProfile] = useState<Profile | null>(null)
   const [status, setStatus] = useState<'loading' | 'ready' | 'error'>('loading')
   const [hasSiblings, setHasSiblings] = useState(false)
-  const [showGuestNudge, setShowGuestNudge] = useState(false)
 
   useEffect(() => {
     let cancelled = false
@@ -114,29 +109,6 @@ export default function KidHome() {
     }
   }, [router])
 
-  // Guest-save nudge: once the profile is in, a lightweight browser-side check —
-  // guest account + real progress at stake → gentle "save your progress" chip.
-  useEffect(() => {
-    if (status !== 'ready' || !profile || profile.totalHearts <= 0) return
-    if (sessionStorage.getItem(GUEST_NUDGE_KEY) === 'true') return
-    let cancelled = false
-    createSupabaseBrowser()
-      .auth.getUser()
-      .then(({ data: { user } }: { data: { user: User | null } }) => {
-        if (!cancelled && user?.is_anonymous) setShowGuestNudge(true)
-      })
-      .catch(() => {})
-    return () => {
-      cancelled = true
-    }
-  }, [status, profile])
-
-  function dismissGuestNudge() {
-    sessionStorage.setItem(GUEST_NUDGE_KEY, 'true')
-    setShowGuestNudge(false)
-  }
-
-  const totalHearts = profile?.totalHearts ?? 0
   const showSwitcher = Boolean(profile && hasSiblings)
 
   return (
@@ -164,7 +136,7 @@ export default function KidHome() {
         </motion.div>
       )}
 
-      <div className="relative z-10 flex flex-col items-center gap-4 w-full max-w-md">
+      <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
         {/* Mascot with speech bubble */}
         <Mascot say="你好!" />
 
@@ -194,93 +166,31 @@ export default function KidHome() {
 
         {profile && (
           <>
-            {/* This week, hearts, stickers — no streak number, nothing resets */}
-            <div className="flex flex-wrap items-center justify-center gap-2">
-              <span className="bg-white rounded-full px-3.5 py-2 flex items-center gap-2 shadow-press-chip text-base font-extrabold text-ink">
-                This week <WeekDots days={profile.weekDays} today={profile.today} />
-              </span>
-              {totalHearts > 0 && (
-                <span className="bg-white rounded-full px-3.5 py-2 flex items-center gap-1.5 shadow-press-chip text-base font-extrabold text-ink">
-                  <span className="font-emoji" aria-hidden>❤️</span>
-                  {totalHearts}
-                  <span className="sr-only"> hearts</span>
-                </span>
-              )}
-            </div>
-
-            {/* Play next — one clear next step */}
+            {/* One main thing to tap: play the suggested pack */}
             {profile.nextPack && (
-              <section aria-label="Play next" className="w-full bg-white rounded-[26px] shadow-press-card p-4 flex flex-col gap-3">
-                <div className="flex items-center gap-3">
-                  <span className="font-emoji text-[32px] leading-none bg-[#FFF3D6] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]" aria-hidden>
-                    {profile.nextPack.emoji}
+              <button
+                onClick={() => router.push(`/practice/session?pack=${profile.nextPack!.id}`)}
+                aria-label={`Play next: ${profile.nextPack.name}`}
+                className="pressable w-full min-h-[132px] rounded-[28px] bg-chinese shadow-press-chinese text-white px-5 py-4 flex items-center gap-4 text-left"
+              >
+                <span aria-hidden className="font-emoji text-[44px] leading-none bg-white rounded-[20px] w-[76px] h-[76px] flex items-center justify-center rotate-[-4deg] flex-shrink-0">
+                  {profile.nextPack.emoji}
+                </span>
+                <span className="flex flex-col min-w-0">
+                  <span className="text-xl font-extrabold leading-tight truncate">
+                    {profile.nextPack.name} <span className="font-hanzi font-normal">{profile.nextPack.nameZh}</span>
                   </span>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-[19px] font-extrabold text-ink leading-tight">
-                      {profile.nextPack.name}{' '}
-                      <span className="font-hanzi text-lg text-chinese-edge font-normal">{profile.nextPack.nameZh}</span>
-                    </h2>
-                    <p className="text-base font-bold text-ink-mid">
-                      {profile.nextPack.learned} of {profile.nextPack.wordCount} words learned
-                    </p>
-                    <div className="mt-1 h-2.5 rounded-full bg-chip-track overflow-hidden">
-                      <div
-                        className="h-full rounded-full bg-success"
-                        style={{ width: `${Math.round((profile.nextPack.learned / Math.max(1, profile.nextPack.wordCount)) * 100)}%` }}
-                      />
-                    </div>
-                  </div>
-                </div>
-                <button
-                  onClick={() => router.push(`/practice/session?pack=${profile.nextPack!.id}`)}
-                  className="pressable w-full min-h-[60px] rounded-[22px] bg-chinese text-white text-[21px] font-extrabold shadow-press-chinese"
-                >
-                  Play next <span className="font-emoji">▶️</span>
-                </button>
-                <p className="text-base font-bold text-ink-mid text-center">8 questions · about 3 minutes</p>
-              </section>
+                  <span className="text-[28px] font-extrabold leading-tight">▶ Play next</span>
+                </span>
+              </button>
             )}
 
-            {/* Panda's sticker book (6-C) */}
-            <button
-              onClick={() => router.push('/stickers')}
-              className="pressable w-full min-h-[56px] rounded-[22px] bg-white text-ink text-lg font-extrabold shadow-press-card flex items-center justify-center gap-2"
-            >
-              My sticker book <span className="font-emoji">📒</span>
-              {profile.stickerCount > 0 && (
-                <span className="bg-canvas-top rounded-full px-2.5 text-base text-ink-mid">{profile.stickerCount}</span>
-              )}
-            </button>
-
             <div className="flex gap-3 w-full">
-              <SubjectButton seal="中文" label="All packs" variant="chinese" href="/packs" />
-              <SubjectButton seal="数学" label="Math" variant="math" href="/math/topics" />
+              <PictureButton glyph="中文" label="Packs" href="/packs" tone="chinese" />
+              <PictureButton glyph="数学" label="Math" href="/math/topics" tone="math" />
+              <PictureButton glyph="📒" label="Stickers" href="/stickers" tone="card" />
             </div>
           </>
-        )}
-
-        {/* Guest-save nudge — quiet, dismissable, parents' business */}
-        {showGuestNudge && (
-          <motion.div
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="bg-white rounded-full pl-4 pr-1.5 py-1.5 flex items-center gap-2 shadow-press-chip max-w-full"
-          >
-            <button
-              onClick={() => router.push('/parent')}
-              className="text-ink-mid text-base font-bold text-left"
-            >
-              <span className="font-emoji">💾</span> Playing as guest — save your
-              family&apos;s progress
-            </button>
-            <button
-              onClick={dismissGuestNudge}
-              aria-label="Dismiss"
-              className="pressable bg-canvas-top text-ink-mid rounded-full w-8 h-8 flex items-center justify-center text-sm font-extrabold flex-shrink-0"
-            >
-              ✕
-            </button>
-          </motion.div>
         )}
 
         {/* Parent link */}
