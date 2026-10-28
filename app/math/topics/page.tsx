@@ -119,7 +119,6 @@ export default function MathTopicsPage() {
               </span>
               <div className="min-w-0">
                 <h2 className="text-[19px] font-extrabold text-ink leading-tight">{next.name}</h2>
-                <p className="text-base font-bold text-ink-mid">8 questions, about 3 minutes</p>
               </div>
             </div>
             {sample && sample.operator !== 'count' && (
@@ -159,19 +158,15 @@ export default function MathTopicsPage() {
                 >
                   {topic.emoji}
                 </button>
-                <div className="min-w-0">
-                  <p className="text-[19px] font-extrabold text-ink leading-tight">{topic.name}</p>
-                  <p className="text-base font-bold text-ink-mid">{topic.wordCount} problems</p>
-                  <p className={`text-base font-extrabold ${isNext ? 'text-math-edge' : 'text-ink'}`}>{stateLine(topic, isNext)}</p>
-                </div>
+                <p className="text-[19px] font-extrabold text-ink leading-tight min-w-0">
+                  {topic.name}
+                  {isNext && <span className="block text-base text-math-edge">Next up</span>}
+                </p>
               </li>
             )
           })}
         </ol>
 
-        <p className="text-base font-bold text-ink-mid">
-          No topic is locked. Tap any stop to play it; the path only suggests the order.
-        </p>
       </div>
     </KidLayout>
   )
