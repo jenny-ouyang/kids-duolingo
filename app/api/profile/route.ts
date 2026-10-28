@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-path'
 
 /**
- * GET /api/profile
- * Returns the active child's profile (name, avatar, totalHearts, streak, lastPracticed).
+ * GET /api/profile?tz={getTimezoneOffset()}
+ * Returns the active child's profile (name, avatar, totalHearts, streak, lastPracticed),
+ * plus this week's play days (Monday first), today's index, and the suggested next pack.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { child } = await requireChild()
+    const tz = parseTz(req.nextUrl.searchParams.get('tz'))
+    const [weekDays, nextPacks, stickerCount] = await Promise.all([
+      getWeekDays([child.id], tz),
+      getNextPacks([child.id]),
+      prisma.sticker.count({ where: { childId: child.id } }),
+    ])
 
     return NextResponse.json({
       id: child.id,
@@ -17,6 +25,10 @@ export async function GET() {
       totalHearts: child.totalHearts,
       streak: child.streak,
       lastPracticed: child.lastPracticed?.toISOString() ?? null,
+      weekDays: weekDays[child.id],
+      today: todayIndex(tz),
+      nextPack: nextPacks[child.id],
+      stickerCount,
     })
   } catch (err) {
     const authErr = authErrorResponse(err)

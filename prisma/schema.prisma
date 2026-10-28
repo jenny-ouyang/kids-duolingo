@@ -35,6 +35,7 @@ model Child {
   sentenceProgress SentenceProgress[]
   mathProgress     MathProgress[]
   answerEvents     AnswerEvent[]
+  stickers         Sticker[]
 
   @@index([accountId])
 }
@@ -54,6 +55,7 @@ model Pack {
   sentenceProgress SentenceProgress[]
   mathProgress     MathProgress[]
   answerEvents     AnswerEvent[]
+  stickers         Sticker[]
 
   @@index([subject])
 }
@@ -68,6 +70,7 @@ model Word {
   sortOrder       Int               @default(0)
   pack            Pack              @relation(fields: [packId], references: [id])
   chineseProgress ChineseProgress[]
+  stickers        Sticker[]
 }
 
 /// Sentence practice for building basic language skills
@@ -177,4 +180,19 @@ model GeneratedQuestion {
   createdAt   DateTime @default(now())
 
   @@index([packId, wordId])
+}
+
+/// One word sticker per finished word session (6-C reward), shown in the sticker book.
+model Sticker {
+  id        String   @id @default(cuid())
+  childId   String
+  child     Child    @relation(fields: [childId], references: [id], onDelete: Cascade)
+  wordId    String
+  word      Word     @relation(fields: [wordId], references: [id])
+  packId    String
+  pack      Pack     @relation(fields: [packId], references: [id])
+  createdAt DateTime @default(now())
+
+  @@unique([childId, wordId])
+  @@index([childId, packId])
 }
