@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Baloo_2, ZCOOL_KuaiLe, Noto_Color_Emoji } from 'next/font/google'
 import VoicePreloader from '@/components/layout/VoicePreloader'
 import MotionProvider from '@/components/layout/MotionProvider'
+import SignInLinkCatcher from '@/components/layout/SignInLinkCatcher'
 import './globals.css'
 
 const baloo = Baloo_2({
@@ -42,6 +43,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${baloo.variable} ${kuaile.variable} ${notoEmoji.variable} font-display antialiased`}>
         <VoicePreloader />
+        <SignInLinkCatcher />
         <MotionProvider>{children}</MotionProvider>
       </body>
     </html>
