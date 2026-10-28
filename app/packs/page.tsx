@@ -93,7 +93,7 @@ export default function PacksPage() {
   const visible = tab === 'learning' ? learning : mastered
 
   return (
-    <KidLayout className="justify-start pt-6 pb-16">
+    <KidLayout align="top" className="pb-16">
       <Sun scale={0.8} />
       <Sparkles positions="sparse" />
       <Hills />

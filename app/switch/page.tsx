@@ -57,7 +57,7 @@ export default function SwitchPage() {
   }
 
   return (
-    <KidLayout>
+    <KidLayout align="top">
       <Sparkles />
       <Hills />
 

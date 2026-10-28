@@ -151,7 +151,7 @@ export default function KidHome() {
   const showSwitcher = Boolean(profile && hasSiblings)
 
   return (
-    <KidLayout>
+    <KidLayout align="top">
       <Sun />
       <Lantern className={showSwitcher ? 'top-5 left-[76px]' : 'top-4 left-10'} />
       <Sparkles />
