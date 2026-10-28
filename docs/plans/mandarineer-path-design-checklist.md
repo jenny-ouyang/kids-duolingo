@@ -120,3 +120,10 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] The sign-in email link opened `/`, but `/` never finished the sign-in or picked a child → the landing now finishes it and goes to the child, the picker or `/welcome` (`193c8a8`, live). Browser test on localhost passed: a family with no child cookie goes straight to its kid home. Test family deleted; users 179.
   - [ ] Not tested: a real sign-in email link end to end (needs a real inbox). Jenny: try "Sign in" on mandarineer.com with your saved email.
 - [ ] Landing design (proposal, from the check): product-first layout (1A) with a real lesson screenshot; three real screens in place of the icon cards; facts in place of soft claims; remove "no payment details asked" before payments go live. Jenny: go or no.
+
+### Account status (Jenny, 2026-10-28: "we have the account etc... all those things fixed?")
+
+- [x] Website: guest start and return on the same device work (tested).
+- [ ] Not tested with a real email: save progress with email, and sign in with the email link. Jenny tests Sign in on mandarineer.com with her saved email.
+- [ ] iPhone app: the sign-in email link opens Safari, not the app (inferred from the code: `emailRedirectTo` is `window.location.origin`). Proposal: add a 6-digit code to the email that the parent types in the app. Jenny decides.
+- [ ] Next TestFlight build with today's fixes (build 8 has none of them).
