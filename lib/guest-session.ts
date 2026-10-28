@@ -32,18 +32,21 @@ export async function ensureGuestSession(): Promise<boolean> {
   }
 }
 
+function linkClient() {
+  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
+    auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
+  })
+}
+
 /**
  * Sends the sign-in email for an EXISTING account (shouldCreateUser: false, so
  * a typo can't spawn an empty account). It uses the implicit flow, not PKCE:
  * a PKCE link only works in the browser that asked for it, and parents often
- * open the email somewhere else. The link opens "/" with the session in the
- * #fragment, which finishLinkSignIn() stores.
+ * open the email somewhere else (Jenny, 2026-10-28). The link opens "/" with
+ * the session in the #fragment, which finishLinkSignIn() stores.
  */
 export async function sendSignInLink(email: string): Promise<boolean> {
-  const linkClient = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!, {
-    auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false },
-  })
-  const { error } = await linkClient.auth.signInWithOtp({
+  const { error } = await linkClient().auth.signInWithOtp({
     email,
     options: { shouldCreateUser: false, emailRedirectTo: window.location.origin },
   })
@@ -51,10 +54,11 @@ export async function sendSignInLink(email: string): Promise<boolean> {
 }
 
 /**
- * Stores the session from a sign-in link (#access_token=…), then removes it
- * from the address bar. A link can carry anyone's session (someone could send
- * a parent a link to THEIR account), so: magic links only, and a browser that
- * already has a session asks before it switches, naming the email.
+ * Stores the session from a sign-in link (#access_token=…). A link can carry
+ * anyone's session (someone could send a parent a link to THEIR account), and
+ * binding it to this browser would break the any-browser sign-in. So: magic
+ * links only, the email is checked with the server, and the parent confirms
+ * that email before this browser keeps the session.
  */
 async function finishLinkSignIn(): Promise<void> {
   const hash = new URLSearchParams(window.location.hash.slice(1))
@@ -62,13 +66,10 @@ async function finishLinkSignIn(): Promise<void> {
   const refresh_token = hash.get('refresh_token')
   if (!access_token || !refresh_token || hash.get('type') !== 'magiclink') return
   history.replaceState(null, '', window.location.pathname + window.location.search)
-  if (await hasSession()) {
-    let email = 'another account'
-    try {
-      email = (JSON.parse(atob(access_token.split('.')[1].replace(/-/g, '+').replace(/_/g, '/'))) as { email?: string }).email || email
-    } catch { /* unreadable token: keep the generic name */ }
-    if (!window.confirm(`Sign in as ${email}? This browser leaves the family it has now.`)) return
-  }
+  const { data, error } = await linkClient().auth.getUser(access_token)
+  const email = data.user?.email
+  if (error || !email) return
+  if (!window.confirm(`Sign in as ${email}?`)) return
   await createSupabaseBrowser().auth.setSession({ access_token, refresh_token })
 }
 
