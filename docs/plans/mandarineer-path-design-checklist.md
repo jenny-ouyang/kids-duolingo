@@ -129,3 +129,6 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] Next TestFlight build with today's fixes (build 8 has none of them).
 - [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
 - [ ] Jenny: "yes, delete" the 165 auth users that have no family? Permanent; not done.
+- [ ] Jenny: which of the 12 families are hers? Claude's guess: Julian/Amelie families (4 accounts, only one saved with email) are Jenny's; Adam (281 hearts, last 2026-10-12) and maybe Simmy are outside families; Mei ×2, tada, QA ×2, dfds/asdf are tests.
+- [ ] Jenny: delete the 6 test families? Not done.
+- [ ] Jenny: merge Julian's progress from 3 guest accounts into the saved account? Not done.
