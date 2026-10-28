@@ -10,7 +10,7 @@ Owner marks: **J** = Jenny must do it (her login or her money). **C** = Claude d
 - [x] **J** Decide: separate Stripe account. Jenny chose "Create a separate account" (2026-10-28).
 - [x] **J** New account made: `acct_1UVRTmEuUPOEXjWv`, name "Mandarineer", US, live, charges and payouts enabled, nothing due. Jenny does not use test mode; Claude may create coupons when needed.
 - [x] **J** Live secret key given through a hidden Mac dialog, saved only in `.env.local` (git-ignored). Never in chat.
-- [ ] **J** Statement descriptor is "JENNY OUYANG". Change it to `MANDARINEER`: Stripe → Settings → Business → Public details. (Only the Dashboard can change it. Checked 2026-10-28: the API answers "You cannot use this method on your own account". Stripe first asks for support details: support URL `https://mandarineer.com`, privacy `https://mandarineer.com/privacy`, terms `https://mandarineer.com/terms`; all three pages answer 200.)
+- [ ] **J** (Optional, later. Jenny could not find the Edit button on 2026-10-28; it does not block payments.) Statement descriptor is "JENNY OUYANG". Change it to `MANDARINEER`: Stripe → Settings → Business → Public details. (Only the Dashboard can change it. Checked 2026-10-28: the API answers "You cannot use this method on your own account". Stripe first asks for support details: support URL `https://mandarineer.com`, privacy `https://mandarineer.com/privacy`, terms `https://mandarineer.com/terms`; all three pages answer 200.)
 - [x] **C** Create the product "Mandarineer lifetime unlock" (one-time): `prod_VWUfZ5jzR8JSR5` (live, Mandarineer account).
 - [x] **C** Create the price: $9.99 USD, one-time: `price_1UVRgHEuUPOEXjWvTyPWLGQ0` (product default price).
 - [x] **C** Create the coupon "Founder": $8.99 off, USD, duration once (nets $1.00): `zod1MPKN`, limited to the product.
@@ -18,7 +18,8 @@ Owner marks: **J** = Jenny must do it (her login or her money). **C** = Claude d
 - [x] **C** Create the webhook endpoint `https://mandarineer.com/api/stripe/webhook` with events `checkout.session.completed` and `charge.refunded`: `we_1UVRgXEuUPOEXjWvEavj6v4v`. Live route answers 400 without a signature (armed).
 - [x] **C** (Jenny gave the key; Claude set it) Vercel Production + Preview: `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, `STRIPE_PRICE_ID`, all type Sensitive.
 - [x] **C** Phase B code: founder detection, purchase ids, full-refund downgrade, 7 tests (`e0223c6`). Payments Phase A merged (`8a2b9af`).
-- [ ] **J** Live end-to-end run (no test mode, Jenny's call): Jenny buys once with `FOUNDER` ($1.00) on the preview (payments on there), Claude checks the unlock, then refunds it and checks the lock comes back.
+- [x] **J+C** Live end-to-end run (2026-10-28): Claude made a test account in the live database and a Checkout page with `FOUNDER` already applied. Jenny paid $1.00. The production webhook set plan `lifetime`, source `stripe`, `isFounder` true and the payment id. Claude refunded it (`re_3UVZN8EuUPOEXjWv13n312FO`); the webhook set plan back to `free` and kept `isFounder`. Test account deleted. `FOUNDER` now shows 1 of 100 used.
+  - [ ] Not tested: the app's own Unlock button and `/api/stripe/checkout` (payments are off on mandarineer.com). Test on the preview or at go-live.
 - [ ] **J** Stripe Dashboard → Settings → Public details: statement descriptor "MANDARINEER", support email support@mandarineer.com, support URL https://mandarineer.com. (Parents see this on their card statement.)
 
 ## 2. App Store Connect (iPhone purchase)
