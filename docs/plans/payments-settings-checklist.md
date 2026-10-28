@@ -10,7 +10,7 @@ Owner marks: **J** = Jenny must do it (her login or her money). **C** = Claude d
 - [x] **J** Decide: separate Stripe account. Jenny chose "Create a separate account" (2026-10-28).
 - [x] **J** New account made: `acct_1UVRTmEuUPOEXjWv`, name "Mandarineer", US, live, charges and payouts enabled, nothing due. Jenny does not use test mode; Claude may create coupons when needed.
 - [x] **J** Live secret key given through a hidden Mac dialog, saved only in `.env.local` (git-ignored). Never in chat.
-- [ ] **J** Statement descriptor is "JENNY OUYANG". Change it to `MANDARINEER`: Stripe → Settings → Business → Public details. (Only the Dashboard can change it.)
+- [ ] **J** Statement descriptor is "JENNY OUYANG". Change it to `MANDARINEER`: Stripe → Settings → Business → Public details. (Only the Dashboard can change it. Checked 2026-10-28: the API answers "You cannot use this method on your own account". Stripe first asks for support details: support URL `https://mandarineer.com`, privacy `https://mandarineer.com/privacy`, terms `https://mandarineer.com/terms`; all three pages answer 200.)
 - [x] **C** Create the product "Mandarineer lifetime unlock" (one-time): `prod_VWUfZ5jzR8JSR5` (live, Mandarineer account).
 - [x] **C** Create the price: $9.99 USD, one-time: `price_1UVRgHEuUPOEXjWvTyPWLGQ0` (product default price).
 - [x] **C** Create the coupon "Founder": $8.99 off, USD, duration once (nets $1.00): `zod1MPKN`, limited to the product.
