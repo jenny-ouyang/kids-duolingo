@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles } from '@/components/design/Scenery'
@@ -15,6 +15,9 @@ import { sendSignInLink } from '@/lib/guest-session'
 export default function SignInPage() {
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle')
+  // Set by familyEntry() when an email link was too old or used already
+  const [oldLink, setOldLink] = useState(false)
+  useEffect(() => setOldLink(window.location.search.includes('link=old')), [])
 
   async function send(e: React.FormEvent) {
     e.preventDefault()
@@ -46,6 +49,12 @@ export default function SignInPage() {
             Type the email you saved your family with. We send you a sign-in link.
           </p>
         </div>
+
+        {oldLink && status !== 'sent' && (
+          <div className="w-full bg-white rounded-3xl px-5 py-4 text-ink text-base font-bold text-center shadow-press-card">
+            That sign-in link is too old, or it was used already. Links work for 1 hour, one time. Send a new one.
+          </div>
+        )}
 
         {status === 'sent' ? (
           <div className="w-full bg-success-bg rounded-3xl px-5 py-4 text-success-edge text-base font-bold text-center">

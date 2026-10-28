@@ -59,27 +59,36 @@ export async function sendSignInLink(email: string): Promise<boolean> {
  * binding it to this browser would break the any-browser sign-in. So: magic
  * links only, the email is checked with the server, and the parent confirms
  * that email before this browser keeps the session.
+ * Returns false when the link itself failed (too old, or used already).
  */
-async function finishLinkSignIn(): Promise<void> {
+async function finishLinkSignIn(): Promise<boolean> {
   const hash = new URLSearchParams(window.location.hash.slice(1))
+  if (hash.get('error_code') || hash.get('error')) {
+    history.replaceState(null, '', window.location.pathname + window.location.search)
+    return false
+  }
   const access_token = hash.get('access_token')
   const refresh_token = hash.get('refresh_token')
-  if (!access_token || !refresh_token || hash.get('type') !== 'magiclink') return
+  if (!access_token || !refresh_token || hash.get('type') !== 'magiclink') return true
   history.replaceState(null, '', window.location.pathname + window.location.search)
   const { data, error } = await linkClient().auth.getUser(access_token)
   const email = data.user?.email
-  if (error || !email) return
-  if (!window.confirm(`Sign in as ${email}?`)) return
+  if (error || !email) return false
+  if (!window.confirm(`Sign in as ${email}?`)) return true
   await createSupabaseBrowser().auth.setSession({ access_token, refresh_token })
+  return true
 }
 
 /**
  * Where a signed-in family should land: no child yet → /welcome, one child →
- * that child's home (cookie set first), several → the picker. Null when this
+ * that child's home (cookie set first), several → the picker; a failed sign-in
+ * link → /signin to send a new one. Null when this
  * browser has no session, so the caller stays where it is.
  */
 export async function familyEntry(): Promise<string | null> {
-  await finishLinkSignIn()
+  // A failed link must not drop the parent into whatever family this browser
+  // already holds (Jenny, 2026-10-28: an old link opened a test family)
+  if (!(await finishLinkSignIn())) return '/signin?link=old'
   if (!(await hasSession())) return null
   const res = await apiFetch(`/api/children?tz=${new Date().getTimezoneOffset()}`)
   if (!res.ok) return null
