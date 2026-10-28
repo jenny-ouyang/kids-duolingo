@@ -12,8 +12,6 @@ interface ExerciseShellProps {
   heartChipRef?: Ref<HTMLSpanElement>
   onClose: () => void
   closeLabel: string
-  /** "Where am I" line, e.g. the pack name */
-  where: React.ReactNode
   /** Optional control on the where row (e.g. the pinyin toggle) */
   headerAction?: React.ReactNode
   mood: BuddyMood
@@ -23,8 +21,8 @@ interface ExerciseShellProps {
 }
 
 /**
- * Lesson frame: one top row (✕, progress bar with the 🏮, hearts earned), the
- * where line with the pīn toggle, and the small panda that reacts to answers.
+ * Lesson frame: one top row (✕, progress bar with the 🏮, hearts earned), then
+ * one row with the small panda that reacts to answers and the pīn toggle.
  * The question count lives in the right band ("Right! 2 of 8").
  */
 export default function ExerciseShell({
@@ -34,7 +32,6 @@ export default function ExerciseShell({
   heartChipRef,
   onClose,
   closeLabel,
-  where,
   headerAction,
   mood,
   buddySay,
@@ -82,12 +79,11 @@ export default function ExerciseShell({
         </span>
       </div>
 
-      <div className="flex items-center justify-between gap-3 min-h-[44px]">
-        <p className="text-base font-bold text-ink-mid truncate">{where}</p>
+      {/* One row: the panda that reacts, and the pīn button */}
+      <div className="flex items-center justify-between gap-3 min-h-[48px]">
+        <LessonBuddy mood={mood} say={buddySay} />
         {headerAction}
       </div>
-
-      <LessonBuddy mood={mood} say={buddySay} />
 
       {children}
     </div>

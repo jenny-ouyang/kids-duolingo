@@ -135,7 +135,6 @@ export default function SentencesPractice() {
   }
 
   const currentQuestion = questions[currentIndex]
-  const left = questions.length - currentIndex - 1
 
   return (
     <PracticeCanvas lesson>
@@ -146,11 +145,6 @@ export default function SentencesPractice() {
         heartChipRef={heartChipRef}
         onClose={() => router.push('/packs')}
         closeLabel="Close the lesson and go back to the packs"
-        where={
-          <>
-            <span className="font-emoji" aria-hidden>💬</span> Simple Sentences
-          </>
-        }
         mood={mood}
         headerAction={
           <PinyinToggle
@@ -179,10 +173,6 @@ export default function SentencesPractice() {
             />
           </motion.div>
         </AnimatePresence>
-        {/* What comes next, always in view */}
-        <p className="text-base font-bold text-ink-mid text-center">
-          {left > 0 ? `Next: ${left} more sentence${left === 1 ? '' : 's'}, then your stars.` : 'Last one! Then your stars.'}
-        </p>
       </ExerciseShell>
       {flight}
     </PracticeCanvas>

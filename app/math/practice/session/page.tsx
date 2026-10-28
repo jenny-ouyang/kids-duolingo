@@ -44,8 +44,6 @@ function MathPracticeSession() {
   const router = useRouter()
   const topicId = useSearchParams().get('topic') ?? ''
 
-  const [topicName, setTopicName] = useState('')
-  const [topicEmoji, setTopicEmoji] = useState('➕')
   const [questions, setQuestions] = useState<MathQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [correctCount, setCorrectCount] = useState(0)
@@ -61,20 +59,12 @@ function MathPracticeSession() {
 
   const loadSession = useCallback(async () => {
     try {
-      const [sessionRes, packRes] = await Promise.all([
-        fetchJsonCached<MathSessionResponse>(`/api/math/questions/${topicId}`),
-        fetchJsonCached<{ name?: string; emoji?: string }>(`/api/packs/${topicId}`),
-      ])
+      const sessionRes = await fetchJsonCached<MathSessionResponse>(`/api/math/questions/${topicId}`)
 
       if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
       const session = sessionRes.data
       progressRef.current = session.progress ?? {}
       setQuestions(session.questions ?? [])
-
-      if (packRes.ok && packRes.data) {
-        setTopicName(packRes.data.name ?? '')
-        setTopicEmoji(packRes.data.emoji ?? '➕')
-      }
 
       setLoading(false)
     } catch (err) {
@@ -195,12 +185,6 @@ function MathPracticeSession() {
         heartChipRef={heartChipRef}
         onClose={() => router.push('/math/topics')}
         closeLabel="Close the lesson and go back to the math topics"
-        where={
-          <>
-            <span className="font-emoji" aria-hidden>{topicEmoji}</span> {topicName} · question {currentIndex + 1} of{' '}
-            {questions.length}
-          </>
-        }
         mood={mood}
         buddySay={mood === 'listen' ? 'Let us count! 👀' : undefined}
       >

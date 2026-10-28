@@ -46,7 +46,6 @@ function PracticeSession() {
   const packId = useSearchParams().get('pack') ?? ''
 
   const [packName, setPackName] = useState('')
-  const [packEmoji, setPackEmoji] = useState('📦')
   const [questions, setQuestions] = useState<ExerciseQuestion[]>([])
   const [currentIndex, setCurrentIndex] = useState(0)
   // Which question index the child revealed pinyin on. Derived, not reset by an
@@ -73,7 +72,7 @@ function PracticeSession() {
     try {
       const [sessionRes, packRes] = await Promise.all([
         fetchJsonCached<SessionResponse>(`/api/questions/${packId}`),
-        fetchJsonCached<{ name?: string; emoji?: string }>(`/api/packs/${packId}`),
+        fetchJsonCached<{ name?: string }>(`/api/packs/${packId}`),
       ])
 
       if (!sessionRes.ok || !sessionRes.data) throw new Error('Could not load session')
@@ -83,7 +82,6 @@ function PracticeSession() {
 
       if (packRes.ok && packRes.data) {
         setPackName(packRes.data.name ?? '')
-        setPackEmoji(packRes.data.emoji ?? '📦')
       }
 
       setLoading(false)
@@ -232,11 +230,6 @@ function PracticeSession() {
         heartChipRef={heartChipRef}
         onClose={() => router.push('/packs')}
         closeLabel="Close the lesson and go back to the packs"
-        where={
-          <>
-            <span className="font-emoji" aria-hidden>{packEmoji}</span> {packName}
-          </>
-        }
         mood={mood}
         headerAction={
           <PinyinToggle
