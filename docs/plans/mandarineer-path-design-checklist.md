@@ -102,9 +102,10 @@ Rule: one main thing to tap on each kid screen; parents' numbers live in the Par
 
 - [x] Decision: kid home = panda, "Hi, {name}!", one big Play next button, three picture buttons (packs, math, stickers), Parent Zone link. Week dots, hearts, word counts and "8 questions" leave the kid home.
 - [x] Decision: also calm the reward page, packs path, math topics; Claude judges the rest ("you give the best judgements").
-- [ ] Kid home
-- [ ] Reward page: sticker or praise, stars + hearts in one row, two buttons; no Word Spotlight, Mission, progress card or score line.
-- [ ] Packs path: name only under each stop; no legend line.
-- [ ] Math topics: no problem counts, no state lines, no legend.
-- [ ] Lessons (Claude's call): one row for the panda and the pīn button; no pack-name line, no "question 4 of 8", no "Next: 5 more" line (the progress bar says it).
-- [ ] Deploy mandarineer.com and upload TestFlight build 8.
+- [x] Kid home → `39aca94`. Guest-save note also left the kid home (it is in the Parent Zone).
+- [x] Reward page → `0235884`: sticker or praise, stars + hearts in one row, two buttons; no Word Spotlight, Mission, progress card or score line.
+- [x] Packs path → `76a8553`: name only under each stop; no legend line.
+- [x] Math topics → `1a2e063`: no problem counts, no state lines, no legend.
+- [x] Lessons (Claude's call) → `31ea748`: one row for the panda and the pīn button; no pack-name line, no "question 4 of 8", no "Next: 5 more" line (the progress bar says it).
+- [x] mandarineer.com deployed (`67706c9`, READY). TestFlight build 8 uploaded (Upload succeeded). Second test family made and deleted; users 179.
+- [ ] Jenny updates to build 8 in TestFlight and checks the calmer screens.
