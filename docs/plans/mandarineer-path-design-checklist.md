@@ -95,3 +95,16 @@ Spec: `docs/superpowers/specs/2026-10-13-payments-design.md`. Settings: `docs/pl
 - [x] After the production deploy, auth users stay at 179: visits make no guest accounts.
 - [ ] Apple finishes processing build 7 (usually 5 to 30 minutes), then Jenny updates in the TestFlight app.
 - [ ] Jenny tests on her phone.
+
+## Calmer screens (Jenny, 2026-10-28: "lots of pages are very busy: especially the kid home")
+
+Rule: one main thing to tap on each kid screen; parents' numbers live in the Parent Zone and report.
+
+- [x] Decision: kid home = panda, "Hi, {name}!", one big Play next button, three picture buttons (packs, math, stickers), Parent Zone link. Week dots, hearts, word counts and "8 questions" leave the kid home.
+- [x] Decision: also calm the reward page, packs path, math topics; Claude judges the rest ("you give the best judgements").
+- [ ] Kid home
+- [ ] Reward page: sticker or praise, stars + hearts in one row, two buttons; no Word Spotlight, Mission, progress card or score line.
+- [ ] Packs path: name only under each stop; no legend line.
+- [ ] Math topics: no problem counts, no state lines, no legend.
+- [ ] Lessons (Claude's call): one row for the panda and the pīn button; no pack-name line, no "question 4 of 8", no "Next: 5 more" line (the progress bar says it).
+- [ ] Deploy mandarineer.com and upload TestFlight build 8.
