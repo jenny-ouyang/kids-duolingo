@@ -118,7 +118,8 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] A child cookie of a family that is gone sent every visit of `/` to `/welcome` → the cookie is now cleared (`ceb5807`, live).
 - [x] No direct sign-in: it was only inside the Parent Zone, behind the grown-up check → `/signin` page, linked from the landing hero, the footer and `/welcome` (`193c8a8`, live).
 - [x] The sign-in email link opened `/`, but `/` never finished the sign-in or picked a child → the landing now finishes it and goes to the child, the picker or `/welcome` (`193c8a8`, live). Browser test on localhost passed: a family with no child cookie goes straight to its kid home. Test family deleted; users 179.
-  - [ ] Not tested: a real sign-in email link end to end. The only saved email is `bingjie.j.ouyang@gmail.com` (Julian, 501 hearts); Supabase shows no sign-in on it yet, so Jenny's first test did not reach it. Jenny tries again with that email.
+  - [x] Cause of "nothing for Julian": the link was opened in another browser; PKCE links only work in the browser that asked. Fixed: links use the implicit flow and work in any browser (`8624e97`); only magic-link sessions, and a browser with a family asks first (`af80c24`, after the security review). Live.
+  - [ ] Not tested end to end: Claude sent a link at 09:22 but cannot read that inbox. Jenny opens it in any browser and reports. The only saved email is `bingjie.j.ouyang@gmail.com` (Julian, 501 hearts); Supabase shows no sign-in on it yet, so Jenny's first test did not reach it. Jenny tries again with that email.
 - [ ] Landing design (proposal, from the check): product-first layout (1A) with a real lesson screenshot; three real screens in place of the icon cards; facts in place of soft claims; remove "no payment details asked" before payments go live. Jenny: go or no.
 
 ### Account status (Jenny, 2026-10-28: "we have the account etc... all those things fixed?")
