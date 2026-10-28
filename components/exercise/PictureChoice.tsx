@@ -168,14 +168,13 @@ function ChineseCard({
 
 function AudioPrompt({ word, pinyinVisible }: { word: Word; pinyinVisible: boolean }) {
   return (
-    <div className="text-center">
+    <div className="text-center flex flex-col items-center gap-2">
+      <h1 className="text-[22px] font-extrabold text-ink leading-tight">Which one is</h1>
       <button
         onClick={() => speakChinese(word.chinese)}
+        aria-label={`Hear ${word.chinese} again`}
         className="pressable bg-white rounded-3xl shadow-press-card px-7 py-4 flex flex-col items-center gap-2"
       >
-        <span className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
-          Which one is
-        </span>
         <span className="font-hanzi text-[52px] leading-tight text-ink border-b-[6px] border-gold pb-0.5">
           {word.chinese}
         </span>
@@ -195,9 +194,7 @@ function PicturePrompt({ word }: { word: Word }) {
   const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
-        What is this in Chinese?
-      </p>
+      <h1 className="text-[22px] font-extrabold text-ink leading-tight">What is this in Chinese?</h1>
       {imageSrc ? (
         // eslint-disable-next-line @next/next/no-img-element
         <img src={imageSrc} alt={word.english} className="w-40 h-40 object-contain rounded-3xl" draggable={false} />
@@ -219,9 +216,7 @@ function EnglishPrompt({ word }: { word: Word }) {
   const imageSrc = wordImageSrc(word)
   return (
     <div className="text-center flex flex-col items-center gap-2">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
-        How do you say this in Chinese?
-      </p>
+      <h1 className="text-[22px] font-extrabold text-ink leading-tight">How do you say this in Chinese?</h1>
       <div className="bg-white rounded-3xl px-8 py-4 shadow-press-card flex flex-col items-center gap-2">
         {imageSrc ? (
           // eslint-disable-next-line @next/next/no-img-element

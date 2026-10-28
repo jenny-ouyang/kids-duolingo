@@ -35,7 +35,7 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
   if (problem.operator === 'count') {
     return (
       <div className="flex flex-col items-center gap-3">
-        <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">How many?</p>
+        <h1 className="text-[22px] font-extrabold text-ink leading-tight">How many?</h1>
         <div className="bg-white rounded-3xl px-6 py-4 shadow-press-card">
           <EmojiGroup emoji={problem.emoji} count={problem.operand1} />
         </div>
@@ -50,10 +50,11 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
 
   return (
     <div className="flex flex-col items-center gap-4">
-      <p className="text-sm font-extrabold uppercase tracking-widest text-ink-mid">
-        What is the answer?
-      </p>
-      <div className="bg-white rounded-3xl px-8 py-5 shadow-press-card flex items-center gap-4">
+      <p className="text-lg font-bold text-ink-mid">What is the answer?</p>
+      <h1
+        aria-label={`${problem.operand1} ${problem.operator === '+' ? 'plus' : 'minus'} ${problem.operand2} equals what?`}
+        className="bg-white rounded-3xl px-8 py-5 shadow-press-card flex items-center gap-4"
+      >
         <span className="text-6xl font-extrabold text-ink select-none tabular-nums">
           {problem.operand1}
         </span>
@@ -63,7 +64,7 @@ function ProblemDisplay({ question }: { question: MathQuestion }) {
         </span>
         <span className="text-5xl font-extrabold text-ink-mid select-none">=</span>
         <span className="text-6xl font-extrabold text-math-light select-none">?</span>
-      </div>
+      </h1>
     </div>
   )
 }

@@ -85,17 +85,15 @@ export default function SentenceBuild({ question, onAnswer, showPinyin }: Props)
           <motion.span
             className="font-emoji text-6xl leading-none"
             animate={{ rotate: [0, -6, 6, 0] }}
-            transition={{ duration: 2.5, repeat: Infinity, repeatDelay: 4, ease: 'easeInOut' }}
+            transition={{ duration: 0.9, ease: 'easeInOut' }}
           >
             {sentence.emoji}
           </motion.span>
         )}
-        <p className="text-2xl font-extrabold text-ink leading-snug max-w-xs">
+        <h1 className="text-[28px] font-extrabold text-ink leading-snug max-w-xs">
           {sentence.english}
-        </p>
-        <p className="text-xs font-extrabold text-ink-mid uppercase tracking-[0.2em]">
-          tap the tiles in order
-        </p>
+        </h1>
+        <p className="text-lg font-bold text-ink-mid">Tap the words in order.</p>
       </motion.div>
 
       {/* Answer slots — placed tiles fill math-blue; gentle shake on wrong, no red */}
