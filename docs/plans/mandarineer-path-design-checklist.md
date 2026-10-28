@@ -82,7 +82,8 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 Spec: `docs/superpowers/specs/2026-10-13-payments-design.md`. Settings: `docs/plans/payments-settings-checklist.md`. Phase A code: branch `payments-phase-a` (14 commits, dormant, not merged).
 
 - [ ] Jenny: "go" to merge `payments-phase-a` into this branch (many files overlap; Claude resolves the conflicts).
-- [ ] Jenny: confirm which Stripe account is Mandarineer's. The Stripe tool here is a shared connection; Claude checks its account name first and does not create anything until Jenny confirms.
+- [x] Stripe tool checked (2026-10-28): it is the Build to Launch account, live mode. Nothing created. Next steps in `docs/plans/payments-settings-checklist.md` §1.
+- [ ] Jenny: separate Mandarineer Stripe account (proposed) or the Build to Launch one.
 - [ ] Phase B (web, Stripe): Claude builds and tests in Stripe test mode.
 - [ ] Phase C (iPhone, Apple): Claude writes the StoreKit code; Jenny does the Apple account steps.
 
