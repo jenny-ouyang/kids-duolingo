@@ -15,9 +15,12 @@ const X = [30, 68] // stop centers alternate left and right, % of the width
 
 /** The pack the path suggests: the first started and unfinished, else the first not started */
 export function suggestedIndex(packs: PathPack[]): number {
-  const started = packs.findIndex((p) => p.masteryPct > 0 && p.masteryPct < 100)
+  // Same rule as the home's Play next (lib/learning-path.ts): word packs only,
+  // so the sentences pack (no words, mastery always 0) is never the suggestion
+  const isWordPack = (p: PathPack) => p.id !== 'sentences'
+  const started = packs.findIndex((p) => isWordPack(p) && p.masteryPct > 0 && p.masteryPct < 100)
   if (started >= 0) return started
-  const fresh = packs.findIndex((p) => p.masteryPct === 0)
+  const fresh = packs.findIndex((p) => isWordPack(p) && p.masteryPct === 0)
   return fresh >= 0 ? fresh : 0
 }
 
