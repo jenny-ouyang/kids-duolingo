@@ -8,6 +8,7 @@ import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
 import { hasSession } from '@/lib/guest-session'
+import { clearActiveChild } from '@/lib/child-cookie'
 
 const PROFILE_MAX_RETRIES = 8
 const PROFILE_RETRY_DELAY_MS = 1000
@@ -66,6 +67,8 @@ export default function KidHome() {
           if (res.status === 401) {
             // No session means no family yet (guest auth starts at /welcome)
             if (!(await hasSession())) {
+              // Drop a stale child cookie, or "/" keeps sending this browser here
+              await clearActiveChild()
               router.replace('/welcome')
               return
             }
@@ -74,6 +77,7 @@ export default function KidHome() {
           }
           if (res.status === 403) {
             // Authed but no child yet — first visit, go set one up
+            await clearActiveChild()
             router.replace('/welcome')
             return
           }

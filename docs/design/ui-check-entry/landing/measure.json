@@ -1,0 +1,175 @@
+{
+  "id": "landing",
+  "url": "https://mandarineer.com/",
+  "measured": "2026-10-28T16:09:11.957Z",
+  "tellCount": 2,
+  "of": 16,
+  "target": 2,
+  "tells": [
+    "L1 centered hero",
+    "K2 icon cards in a 3 or 4 grid"
+  ],
+  "checks": {
+    "T1 no font chosen, or Inter": false,
+    "L1 centered hero": true,
+    "T2 accent word in the headline": false,
+    "C1 gradient text": false,
+    "C2 purple in a gradient": false,
+    "C1 three or more gradient fills": false,
+    "K1 shadcn token structure": false,
+    "I1 Lucide is the only icon set": false,
+    "I2 \"AI\" icons (sparkles, zap, brain)": false,
+    "K3 three or more pill badges": false,
+    "K2 icon cards in a 3 or 4 grid": true,
+    "K5 glass or blur": false,
+    "T4 three or more uppercase labels": false,
+    "L6 colored left border on cards": false,
+    "M1 fade-up on scroll": false,
+    "W1 buzzword copy": false
+  },
+  "raw": {
+    "title": "Mandarineer: Mandarin for Kids — Learn Chinese, Ages 4–8",
+    "bodyFont": "__Baloo_2_f4296f, __Baloo_2_Fallback_f4296f, ui-rounded, system-ui, sans-serif",
+    "h1Skipped": [],
+    "h1": {
+      "sel": "h1.-mt-4.text-[38px]",
+      "text": "Mandarineer",
+      "font": "__Baloo_2_f4296f, __Baloo_2_Fallback_f4296f, ui-rounded, sys",
+      "size": 52,
+      "weight": 800,
+      "ls": "normal",
+      "align": "center",
+      "centerX": true,
+      "w": 304,
+      "vw": 1440,
+      "twoTone": false,
+      "gradient": false
+    },
+    "h1Old": {
+      "text": "Mandarineer",
+      "size": 52,
+      "twoTone": false,
+      "centerX": true,
+      "align": "center"
+    },
+    "headFont": "__Baloo_2_f4296f",
+    "gradText": 0,
+    "gradFill": 1,
+    "gradPurple": 0,
+    "gradHues": {
+      "white": 1,
+      "orange": 1
+    },
+    "blur": 0,
+    "glass": 0,
+    "bigBlur": 0,
+    "pills": 1,
+    "pillMarkers": 0,
+    "pillsOld": 1,
+    "examples": {
+      "gradText": [],
+      "gradFill": [
+        {
+          "sel": "header.sunrise-canvas.flex",
+          "text": "✦ ✦ ✦ 🐼 你好! Mandarineer A gentle, playful way for",
+          "size": "1440x900"
+        }
+      ],
+      "gradPurple": [],
+      "blur": [],
+      "pills": [
+        {
+          "sel": "span.inline-block.bg-white",
+          "text": "你好!",
+          "size": "61x32"
+        }
+      ],
+      "pillMarkers": [],
+      "upperLabels": [],
+      "leftBorder": []
+    },
+    "upperLabels": 0,
+    "leftBorder": 0,
+    "transitions": 1,
+    "animated": 4,
+    "hiddenFadeIn": 0,
+    "hiddenFadeInOld": 0,
+    "bigShadow": 0,
+    "button": {
+      "text": "Play free →",
+      "bg": "rgb(21, 131, 108)",
+      "hue": "teal",
+      "radius": "9999px",
+      "height": 60,
+      "hasIcon": false
+    },
+    "svg": 0,
+    "lucide": 0,
+    "lucideNames": [],
+    "aiIcons": [],
+    "shadcn": {
+      "background": "",
+      "primary": "",
+      "radius": "",
+      "ring": "",
+      "mutedFg": ""
+    },
+    "pageBg": "255,248,231",
+    "dark": false,
+    "iconGrids": 1,
+    "iconGridsOld": 0,
+    "iconGridExamples": [
+      [
+        "👆 Tap and learn Bite-size sessions of 8 questions",
+        "🧠 Remembers what’s tricky Spaced repetition works",
+        "💛 Kind by design No punishment, no losing lives, "
+      ]
+    ],
+    "iconGridEls": [
+      {
+        "sel": "div.mt-8.grid",
+        "text": "👆 Tap and learn Bite-size sessions of 8 questions",
+        "size": "984x270",
+        "cards": 3
+      }
+    ],
+    "words": 271,
+    "buzz": [],
+    "sections": {
+      "faq": false,
+      "testimonials": false,
+      "pricing": false,
+      "stats": 0,
+      "noCard": false,
+      "getStarted": false,
+      "footerCopyright": true
+    },
+    "emojiHead": false,
+    "emojiCount": 17,
+    "vendor": {
+      "lovableBadge": false,
+      "boltBadge": false,
+      "gptengineer": false,
+      "generator": null,
+      "v0": false,
+      "replit": false,
+      "base44": false,
+      "nextjs": true,
+      "vite": false
+    },
+    "fontsLoaded": [
+      "__Baloo_2_f4296f",
+      "__Baloo_2_Fallback_f4296f",
+      "__ZCOOL_KuaiLe_f5ae82",
+      "__ZCOOL_KuaiLe_Fallback_f5ae82"
+    ],
+    "height": 2244,
+    "preScrollOld": 0,
+    "fadeUp": {
+      "candidates": 0,
+      "revealed": 0,
+      "noScroll": false,
+      "examples": []
+    }
+  }
+}

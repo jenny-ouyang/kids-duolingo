@@ -3,6 +3,7 @@
 import { apiFetch } from '@/lib/api-fetch'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles } from '@/components/design/Scenery'
@@ -14,6 +15,9 @@ const AVATARS = ['🦁', '🐼', '🐰', '🦊', '🐸', '🐯', '🐨', '🦄',
 
 // Decorative rhythm only — selection is shown by success tokens + ✓ badge
 const TILE_EDGES = ['shadow-tile-chinese', 'shadow-tile-math', 'shadow-tile-gold', 'shadow-tile-plum']
+
+// The installed app has no landing page to go back to; the website does
+const IS_APP = process.env.NEXT_PUBLIC_CAP_BUILD === '1'
 
 const MAX_RETRIES = 6
 const RETRY_DELAY_MS = 1200
@@ -84,6 +88,18 @@ export default function WelcomePage() {
     <KidLayout>
       <Sparkles />
       <Hills />
+
+      {/* A full page load, not <Link>: the router may hold a cached "/" that was the kid home */}
+      {!IS_APP && (
+        // eslint-disable-next-line @next/next/no-html-link-for-pages
+        <a
+          href="/"
+          className="pressable fixed left-4 z-20 min-h-[44px] flex items-center rounded-[14px] bg-white px-4 text-base font-extrabold text-ink shadow-press-chip"
+          style={{ top: 'max(16px, env(safe-area-inset-top))' }}
+        >
+          ← Back
+        </a>
+      )}
 
       <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
         {/* Panda guide */}
@@ -203,6 +219,11 @@ export default function WelcomePage() {
             )}
           </button>
         </motion.div>
+
+        {/* Returning families: sign in from the Parent Zone, not by making a new child */}
+        <Link href="/parent" className="min-h-[44px] flex items-center text-base font-bold text-ink-mid underline underline-offset-2">
+          Grown-ups: already have an account? Sign in
+        </Link>
       </div>
     </KidLayout>
   )
