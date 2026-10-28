@@ -127,3 +127,5 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] Not tested with a real email: save progress with email, and sign in with the email link. Jenny tests Sign in on mandarineer.com with her saved email.
 - [ ] iPhone app: the sign-in email link opens Safari, not the app (inferred from the code: `emailRedirectTo` is `window.location.origin`). Proposal: add a 6-digit code to the email that the parent types in the app. Jenny decides.
 - [ ] Next TestFlight build with today's fixes (build 8 has none of them).
+- [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
+- [ ] Jenny: "yes, delete" the 165 auth users that have no family? Permanent; not done.
