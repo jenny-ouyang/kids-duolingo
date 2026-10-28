@@ -49,6 +49,9 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as {
       heartsEarned: number
       tzOffsetMinutes?: number
+      /** Word session only: the pack, and the words right on the first try (sticker candidates) */
+      packId?: string
+      firstTryWordIds?: string[]
     }
 
     const now = new Date()
@@ -77,9 +80,12 @@ export async function POST(req: NextRequest) {
       },
     })
 
+    const sticker = await awardSticker(child.id, body.packId, body.firstTryWordIds)
+
     return NextResponse.json({
       totalHearts: updated.totalHearts,
       streak: updated.streak,
+      sticker,
     })
   } catch (err) {
     const authErr = authErrorResponse(err)
@@ -87,4 +93,28 @@ export async function POST(req: NextRequest) {
     console.error('[profile POST]', err)
     return NextResponse.json({ error: 'DB error' }, { status: 500 })
   }
+}
+
+/**
+ * One word sticker per finished word session (6-C): a word the child got right
+ * on the first try this session, from this pack, not already in the book.
+ * The candidate list comes from the client, so it is checked against the pack.
+ */
+async function awardSticker(childId: string, packId: unknown, wordIds: unknown) {
+  if (typeof packId !== 'string' || !Array.isArray(wordIds)) return null
+  const ids = wordIds.filter((id): id is string => typeof id === 'string').slice(0, 50)
+  if (ids.length === 0) return null
+
+  const [words, owned] = await Promise.all([
+    prisma.word.findMany({ where: { packId, id: { in: ids } } }),
+    prisma.sticker.findMany({ where: { childId, wordId: { in: ids } }, select: { wordId: true } }),
+  ])
+  const ownedIds = new Set(owned.map((s) => s.wordId))
+  const fresh = words.filter((w) => !ownedIds.has(w.id))
+  if (fresh.length === 0) return null
+
+  const word = fresh[Math.floor(Math.random() * fresh.length)]
+  // A double submit can race; the unique (childId, wordId) index keeps one row
+  await prisma.sticker.createMany({ data: [{ childId, wordId: word.id, packId }], skipDuplicates: true })
+  return { wordId: word.id, chinese: word.chinese, pinyin: word.pinyin, english: word.english, image: word.image, packId }
 }

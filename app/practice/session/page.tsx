@@ -62,6 +62,8 @@ function PracticeSession() {
 
   const wordProgressRef = useRef<Record<string, WordProgress>>({})
   const correctWordsRef = useRef<{ english: string; chinese: string; pinyin: string }[]>([])
+  // Words right on the first try: the server picks this session's sticker from them
+  const firstTryIdsRef = useRef<string[]>([])
   // Words missed on first try come back once more before the session ends
   const requeuedRef = useRef<Set<string>>(new Set())
   const currentIndexRef = useRef(0)
@@ -125,6 +127,7 @@ function PracticeSession() {
     if (correct) {
       newHeartsEarned = Math.min(heartsEarned + 1, MAX_HEARTS)
       setHeartsEarned(newHeartsEarned)
+      firstTryIdsRef.current.push(itemId)
       correctWordsRef.current.push({
         english: currentQuestion.word.english,
         chinese: currentQuestion.word.chinese,
@@ -146,13 +149,24 @@ function PracticeSession() {
 
     const isLast = currentIndex >= sessionQuestions.length - 1
 
-    setTimeout(() => {
+    setTimeout(async () => {
       if (isLast) {
-        apiFetch('/api/profile', {
+        // Wait (briefly) for the session save: its answer carries the new sticker.
+        // Offline or slow, the reward screen simply shows no sticker.
+        const save = apiFetch('/api/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ heartsEarned: newHeartsEarned, tzOffsetMinutes: new Date().getTimezoneOffset() }),
-        }).catch(console.error)
+          body: JSON.stringify({
+            heartsEarned: newHeartsEarned,
+            tzOffsetMinutes: new Date().getTimezoneOffset(),
+            packId,
+            firstTryWordIds: firstTryIdsRef.current,
+          }),
+        })
+          .then((r) => (r.ok ? r.json() : null))
+          .then((d: { sticker?: unknown } | null) => d?.sticker ?? null)
+          .catch(() => null)
+        const sticker = await Promise.race([save, new Promise<null>((resolve) => setTimeout(() => resolve(null), 2500))])
 
         try {
           sessionStorage.setItem('lastSession', JSON.stringify({
@@ -160,6 +174,7 @@ function PracticeSession() {
             packName,
             subject: 'chinese',
             correctWords: correctWordsRef.current,
+            sticker,
           }))
         } catch { /* sessionStorage unavailable */ }
 
