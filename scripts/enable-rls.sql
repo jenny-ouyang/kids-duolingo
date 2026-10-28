@@ -19,6 +19,7 @@ ALTER TABLE IF EXISTS "SentenceProgress"  ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "MathProgress"      ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "AnswerEvent"       ENABLE ROW LEVEL SECURITY;
 ALTER TABLE IF EXISTS "GeneratedQuestion" ENABLE ROW LEVEL SECURITY;
+ALTER TABLE IF EXISTS "Sticker"           ENABLE ROW LEVEL SECURITY; -- 20261027120000_add_stickers also enables it
 ALTER TABLE IF EXISTS "ChildProfile"      ENABLE ROW LEVEL SECURITY; -- dropped by contract migration; harmless if gone
 
 -- Verify: every row should show rowsecurity = true
