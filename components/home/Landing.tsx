@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
+import ResumeFamily from '@/components/home/ResumeFamily'
 
 /*
  * Public landing page — the SEO surface visitors (and crawlers) see before a
@@ -103,6 +104,11 @@ export default function Landing() {
             Free to play · No sign-up needed · Works on phone, tablet &amp;
             computer
           </p>
+
+          <Link href="/signin" className="min-h-[44px] inline-flex items-center text-base font-extrabold text-ink underline underline-offset-2">
+            Already playing? Sign in
+          </Link>
+          <ResumeFamily />
         </div>
       </header>
 
@@ -261,6 +267,10 @@ export default function Landing() {
             <span aria-hidden>·</span>
             <Link href="/parent" className="underline underline-offset-2">
               Parent Zone
+            </Link>
+            <span aria-hidden>·</span>
+            <Link href="/signin" className="underline underline-offset-2">
+              Sign in
             </Link>
           </nav>
           <p className="text-sm font-bold text-ink-mid">

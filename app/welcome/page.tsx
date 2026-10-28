@@ -220,8 +220,8 @@ export default function WelcomePage() {
           </button>
         </motion.div>
 
-        {/* Returning families: sign in from the Parent Zone, not by making a new child */}
-        <Link href="/parent" className="min-h-[44px] flex items-center text-base font-bold text-ink-mid underline underline-offset-2">
+        {/* Returning families sign in; they do not make a new child */}
+        <Link href="/signin" className="min-h-[44px] flex items-center text-base font-bold text-ink-mid underline underline-offset-2">
           Grown-ups: already have an account? Sign in
         </Link>
       </div>
