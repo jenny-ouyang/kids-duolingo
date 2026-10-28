@@ -251,9 +251,7 @@ export function getEncouragement(ctx: SessionContext): Encouragement {
     `${ctx.correct}/${ctx.total} 🎯`,
     `Score: ${ctx.correct}/${ctx.total} 🌟`,
   ]
-  if (ctx.hearts > 0) {
-    subOptions.push(`${ctx.hearts} heart${ctx.hearts !== 1 ? 's' : ''} earned! ❤️`)
-  }
+  // No hearts line here: the celebrate page's hearts chip already says it
   if (tier === 'perfect') {
     subOptions.push('Every. Single. One. 💯')
   }

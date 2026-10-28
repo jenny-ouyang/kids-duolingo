@@ -82,7 +82,7 @@ function CelebrationContent() {
 
   return (
     <>
-      <Confetti count={allCorrect ? 80 : 40} />
+      <Confetti count={40} />
 
       <motion.div
         initial={{ scale: 0.7, opacity: 0 }}
@@ -117,7 +117,7 @@ function CelebrationContent() {
             <span className="font-hanzi text-4xl text-ink border-b-[6px] border-gold pb-0.5">
               {enc.chinesePhrase}
             </span>
-            <span className={`text-base font-bold text-chinese ${showPinyin ? '' : 'invisible'}`}>
+            <span className={`font-pinyin text-base font-bold text-chinese-edge ${showPinyin ? '' : 'invisible'}`}>
               {enc.chinesePinyin}
             </span>
             <span className="text-sm font-bold text-ink-mid">

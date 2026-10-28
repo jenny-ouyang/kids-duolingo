@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 
-const COLORS = ['#FF6B6B', '#FFD93D', '#6BCB77', '#4D96FF', '#FF922B', '#CC5DE8', '#F06595']
+// Sunrise Playground palette only (DESIGN.md)
+const COLORS = ['#F4576B', '#FF7A82', '#3D7DE4', '#57A5F5', '#FFCF57', '#F5B93F', '#1FA88C', '#9A7BE8']
 const SHAPES = ['●', '★', '■', '▲', '♦']
 
 interface Particle {
@@ -17,8 +18,9 @@ interface Particle {
   rotate: number
 }
 
-export default function Confetti({ count = 60 }: { count?: number }) {
+export default function Confetti({ count = 40 }: { count?: number }) {
   const [particles, setParticles] = useState<Particle[]>([])
+  const reduceMotion = useReducedMotion()
 
   useEffect(() => {
     const generated: Particle[] = Array.from({ length: count }, (_, i) => ({
@@ -32,10 +34,16 @@ export default function Confetti({ count = 60 }: { count?: number }) {
       rotate: Math.random() * 720 - 360,
     }))
     setParticles(generated)
+    // Leave the page when the last piece lands, so no invisible nodes stay behind
+    const end = Math.max(...generated.map((p) => p.delay + p.duration))
+    const timer = setTimeout(() => setParticles([]), end * 1000 + 100)
+    return () => clearTimeout(timer)
   }, [count])
 
+  if (reduceMotion || particles.length === 0) return null
+
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden z-50" aria-hidden>
       {particles.map((p) => (
         <motion.div
           key={p.id}
