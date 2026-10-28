@@ -8,6 +8,8 @@ import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { apiFetch, fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
 import { ensureGuestSession, hasSession } from '@/lib/guest-session'
+import { GUEST_RETENTION_DAYS } from '@/lib/retention'
+import WeekDots from '@/components/progress/WeekDots'
 import type { User } from '@supabase/supabase-js'
 
 const GATE_KEY = 'kd_parent_gate'
@@ -30,8 +32,15 @@ interface ChildRow {
   name: string
   avatar: string
   totalHearts: number
-  streak: number
   lastPracticed: string | null
+  weekDays: boolean[]
+  today: number
+  nextPack: { id: string; name: string; nameZh: string; emoji: string; learned: number; wordCount: number } | null
+}
+
+const AVATAR_NAMES: Record<string, string> = {
+  '🦁': 'Lion', '🐼': 'Panda', '🦊': 'Fox', '🐸': 'Frog', '🦄': 'Unicorn',
+  '🐯': 'Tiger', '🐨': 'Koala', '🐰': 'Bunny', '🐙': 'Octopus', '🦖': 'Dinosaur',
 }
 
 interface AccountInfo {
@@ -85,7 +94,7 @@ function AdultGate({ onPass }: { onPass: () => void }) {
       >
         <div className="font-emoji text-4xl mb-3">🔒</div>
         <h1 className="text-xl font-extrabold text-ink">Grown-ups only</h1>
-        <p className="text-ink-mid text-sm font-bold mt-1">
+        <p className="text-ink-mid text-base font-bold mt-1">
           Answer this to open the parent zone.
         </p>
         <form onSubmit={handleSubmit} className="mt-6 flex flex-col gap-3">
@@ -96,12 +105,13 @@ function AdultGate({ onPass }: { onPass: () => void }) {
             type="number"
             inputMode="numeric"
             value={answer}
+            aria-label={GATE_QUESTIONS[questionIdx].prompt}
             onChange={(e) => setAnswer(e.target.value)}
             autoFocus
             className={`${inputClass} text-center text-lg`}
           />
           {wrong && (
-            <p className="text-ink-mid text-sm font-bold">
+            <p className="text-ink-mid text-base font-bold">
               Not quite — try this one instead.
             </p>
           )}
@@ -114,7 +124,7 @@ function AdultGate({ onPass }: { onPass: () => void }) {
         </form>
         <button
           onClick={() => router.push('/')}
-          className="mt-5 min-h-[44px] text-ink-mid text-sm font-bold underline underline-offset-2"
+          className="mt-5 min-h-[44px] text-ink-mid text-base font-bold underline underline-offset-2"
         >
           ← Back to the app
         </button>
@@ -137,7 +147,7 @@ function AvatarPicker({
           key={avatar}
           type="button"
           onClick={() => onChange(avatar)}
-          aria-label={`Pick ${avatar}`}
+          aria-label={AVATAR_NAMES[avatar] ?? avatar}
           aria-pressed={value === avatar}
           className={`pressable w-14 h-14 rounded-2xl flex items-center justify-center text-2xl ${
             value === avatar
@@ -152,13 +162,13 @@ function AvatarPicker({
   )
 }
 
-function ChildrenSection() {
+function ChildrenSection({ startAdding = false }: { startAdding?: boolean }) {
   const [children, setChildren] = useState<ChildRow[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loadFailed, setLoadFailed] = useState(false)
 
   // Add form
-  const [showAdd, setShowAdd] = useState(false)
+  const [showAdd, setShowAdd] = useState(startAdding)
   const [newName, setNewName] = useState('')
   const [newAvatar, setNewAvatar] = useState(AVATARS[0])
   const [saving, setSaving] = useState(false)
@@ -179,7 +189,7 @@ function ChildrenSection() {
       setLoadFailed(false)
       return
     }
-    const { ok, data } = await fetchJsonWithAuthRetry<ChildRow[]>('/api/children')
+    const { ok, data } = await fetchJsonWithAuthRetry<ChildRow[]>(`/api/children?tz=${new Date().getTimezoneOffset()}`)
     if (ok && Array.isArray(data)) {
       setChildren(data)
       setLoadFailed(false)
@@ -284,7 +294,7 @@ function ChildrenSection() {
               setEditingId(null)
               setDeletingId(null)
             }}
-            className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-[15px] font-extrabold shadow-press-go"
+            className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-base font-extrabold shadow-press-go"
           >
             + Add a child
           </button>
@@ -292,7 +302,7 @@ function ChildrenSection() {
       </div>
 
       {loadFailed && (
-        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-sm font-bold flex items-center justify-between gap-3">
+        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-base font-bold flex items-center justify-between gap-3">
           <span>Couldn&apos;t load your children.</span>
           <button
             onClick={fetchChildren}
@@ -304,13 +314,13 @@ function ChildrenSection() {
       )}
 
       {error && (
-        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-sm font-bold">
+        <div className="bg-chip-track rounded-2xl px-4 py-3 text-ink text-base font-bold">
           {error}
         </div>
       )}
 
       {children !== null && children.length >= MAX_CHILDREN && (
-        <p className="text-ink-mid text-sm font-bold">
+        <p className="text-ink-mid text-base font-bold">
           You&apos;ve reached the maximum of {MAX_CHILDREN} children on one account.
         </p>
       )}
@@ -327,6 +337,7 @@ function ChildrenSection() {
             <input
               type="text"
               value={newName}
+              aria-label="Child's nickname"
               onChange={(e) => setNewName(e.target.value)}
               placeholder="Child's nickname"
               maxLength={20}
@@ -338,14 +349,14 @@ function ChildrenSection() {
               <button
                 type="submit"
                 disabled={!newName.trim() || saving}
-                className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-go disabled:opacity-50"
+                className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-base font-extrabold shadow-press-go disabled:opacity-50"
               >
                 Add
               </button>
               <button
                 type="button"
                 onClick={() => setShowAdd(false)}
-                className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
+                className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-base font-extrabold shadow-press-chip"
               >
                 Cancel
               </button>
@@ -354,12 +365,16 @@ function ChildrenSection() {
         )}
       </AnimatePresence>
 
+      {children !== null && children.length > 0 && (
+        <p className="text-base font-bold text-ink-mid">A missed day leaves a gap; nothing resets.</p>
+      )}
+
       {children === null && (
-        <div className="text-ink-mid text-sm font-bold">Loading…</div>
+        <div className="text-ink-mid text-base font-bold">Loading…</div>
       )}
 
       {children !== null && children.length === 0 && !loadFailed && (
-        <p className="text-ink-mid text-sm font-bold">
+        <p className="text-ink-mid text-base font-bold">
           No children yet. Add one to get started.
         </p>
       )}
@@ -376,6 +391,7 @@ function ChildrenSection() {
               <input
                 type="text"
                 value={editName}
+                aria-label="Child's nickname"
                 onChange={(e) => setEditName(e.target.value)}
                 maxLength={20}
                 autoFocus
@@ -386,42 +402,61 @@ function ChildrenSection() {
                 <button
                   type="submit"
                   disabled={!editName.trim() || saving}
-                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-[15px] font-extrabold shadow-press-go disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-6 text-base font-extrabold shadow-press-go disabled:opacity-50"
                 >
                   Save
                 </button>
                 <button
                   type="button"
                   onClick={() => setEditingId(null)}
-                  className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-[15px] font-extrabold shadow-press-chip"
+                  className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-6 text-base font-extrabold shadow-press-chip"
                 >
                   Cancel
                 </button>
               </div>
             </form>
           ) : (
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-[#FFF3D6] rotate-[-4deg] flex items-center justify-center flex-shrink-0">
-                <span className="font-emoji text-2xl leading-none">{child.avatar}</span>
+            <div className="flex flex-col gap-3">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-[#FFF3D6] rotate-[-4deg] flex items-center justify-center flex-shrink-0">
+                  <span className="font-emoji text-2xl leading-none">{child.avatar}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-extrabold text-ink">{child.name}</h3>
+                  <p className="text-base font-bold text-ink-mid">
+                    Played {child.weekDays?.filter(Boolean).length ?? 0} day
+                    {(child.weekDays?.filter(Boolean).length ?? 0) === 1 ? '' : 's'} this week ·{' '}
+                    <span className="font-emoji">❤️</span> {child.totalHearts} · {formatLastPracticed(child.lastPracticed)}
+                  </p>
+                </div>
               </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-extrabold text-ink">{child.name}</p>
-                <p className="text-sm font-bold text-ink-mid mt-0.5">
-                  <span className="font-emoji">❤️</span> {child.totalHearts} hearts ·{' '}
-                  <span className="font-emoji">🔥</span> {child.streak} day streak ·{' '}
-                  {formatLastPracticed(child.lastPracticed)}
-                </p>
-              </div>
-              <div className="flex gap-2 flex-shrink-0">
+
+              {child.weekDays && <WeekDots days={child.weekDays} today={child.today} size={18} letters />}
+
+              {child.nextPack && (
+                <div className="bg-canvas-top rounded-2xl px-3.5 py-2.5 flex items-center gap-3">
+                  <span className="font-emoji text-2xl" aria-hidden>{child.nextPack.emoji}</span>
+                  <p className="text-base font-bold text-ink min-w-0">
+                    <span className="font-extrabold text-success-edge">Next up:</span> {child.nextPack.name}{' '}
+                    <span className="font-hanzi text-chinese-edge">{child.nextPack.nameZh}</span>
+                    <span className="block text-ink-mid">
+                      {child.nextPack.learned} of {child.nextPack.wordCount} words learned. Every pack is open; this is
+                      only the suggestion.
+                    </span>
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-2 gap-2 sm:flex">
                 <Link
                   href={`/parent/report?child=${child.id}`}
-                  className="pressable min-h-[56px] bg-white text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex items-center"
+                  className="col-span-2 pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-base font-extrabold shadow-press-go flex items-center justify-center"
                 >
-                  Report
+                  See {child.name}&apos;s report
                 </Link>
                 <button
                   onClick={() => startEdit(child)}
-                  className="pressable min-h-[56px] bg-canvas-top text-ink rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
+                  className="pressable min-h-[56px] bg-white text-ink rounded-2xl px-4 text-base font-extrabold shadow-press-chip"
                 >
                   Edit
                 </button>
@@ -431,7 +466,7 @@ function ChildrenSection() {
                     setDeleteText('')
                     setEditingId(null)
                   }}
-                  className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip"
+                  className="pressable min-h-[56px] bg-white text-ink-mid rounded-2xl px-4 text-base font-extrabold shadow-press-chip"
                 >
                   Remove
                 </button>
@@ -441,7 +476,7 @@ function ChildrenSection() {
 
           {deletingId === child.id && editingId !== child.id && (
             <div className="border-t border-chip-track pt-3 flex flex-col gap-2">
-              <p className="text-sm font-bold text-ink">
+              <p className="text-base font-bold text-ink">
                 This permanently deletes <strong>{child.name}</strong> and all their
                 progress. Type <strong>{child.name}</strong> to confirm.
               </p>
@@ -449,6 +484,7 @@ function ChildrenSection() {
                 <input
                   type="text"
                   value={deleteText}
+                  aria-label={`Type ${child.name} to confirm`}
                   onChange={(e) => setDeleteText(e.target.value)}
                   placeholder={child.name}
                   className={`${inputClass} flex-1 min-w-0`}
@@ -457,7 +493,7 @@ function ChildrenSection() {
                 <button
                   onClick={() => handleDelete(child)}
                   disabled={deleteText !== child.name || saving}
-                  className="pressable min-h-[56px] bg-chinese-edge text-white rounded-2xl px-6 text-sm font-extrabold shadow-[0_6px_0_#8E2038] disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-chinese-edge text-white rounded-2xl px-6 text-base font-extrabold shadow-[0_6px_0_#8E2038] disabled:opacity-50"
                 >
                   Delete
                 </button>
@@ -470,7 +506,8 @@ function ChildrenSection() {
   )
 }
 
-function AccountSection() {
+/** part 'save': only a guest's save card (shown first); part 'rest': everything else */
+function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
   const [account, setAccount] = useState<AccountInfo | null>(null)
   const [loading, setLoading] = useState(true)
 
@@ -562,23 +599,29 @@ function AccountSection() {
     window.location.assign('/')
   }
 
+  // The save part only exists for a signed-in guest
+  if (part === 'save' && !loading && !account?.isAnonymous) return null
+
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-lg font-extrabold text-ink">Account</h2>
+      <h2 className="text-lg font-extrabold text-ink">{part === 'save' ? 'Save progress' : 'Account'}</h2>
 
-      {loading && <div className="text-ink-mid text-sm font-bold">Loading…</div>}
+      {loading && <div className="text-ink-mid text-base font-bold">Loading…</div>}
 
-      {!loading && account && account.isAnonymous && (
+      {!loading && part !== 'rest' && account && account.isAnonymous && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Save your family&apos;s progress</h3>
-            <p className="text-ink-mid text-sm font-bold mt-1">
+            <p className="text-ink-mid text-base font-bold mt-1">
               You&apos;re using a guest account right now. Add your email to keep your
               children&apos;s progress safe and use it on other devices.
             </p>
+            <p className="bg-canvas-top rounded-xl px-4 py-2.5 mt-2 text-ink text-base font-bold">
+              Guest progress is deleted after {GUEST_RETENTION_DAYS} days without play.
+            </p>
           </div>
           {claimStatus === 'sent' ? (
-            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-sm font-bold">
+            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-base font-bold">
               ✓ Check your inbox! Open the confirmation link we sent to{' '}
               <strong>{claimEmail.trim()}</strong> to finish saving your account.
             </div>
@@ -588,6 +631,7 @@ function AccountSection() {
                 <input
                   type="email"
                   value={claimEmail}
+                  aria-label="Your email"
                   onChange={(e) => setClaimEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
@@ -596,18 +640,18 @@ function AccountSection() {
                 <button
                   type="submit"
                   disabled={!claimEmail.trim() || claimStatus === 'sending'}
-                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-go disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-base font-extrabold shadow-press-go disabled:opacity-50"
                 >
                   {claimStatus === 'sending' ? 'Sending…' : 'Save progress'}
                 </button>
               </div>
               {claimStatus === 'error' && (
-                <p className="text-ink text-sm font-bold">
+                <p className="text-ink text-base font-bold">
                   Something went wrong sending the confirmation email. Please try again.
                 </p>
               )}
               {claimStatus === 'exists' && (
-                <p className="text-ink text-sm font-bold">
+                <p className="text-ink text-base font-bold">
                   That email already has a Mandarineer account! Use{' '}
                   <strong>&ldquo;Already saved on another device?&rdquo;</strong> below to
                   sign into it instead.
@@ -618,17 +662,17 @@ function AccountSection() {
         </div>
       )}
 
-      {!loading && (!account || account.isAnonymous) && (
+      {!loading && part !== 'save' && (!account || account.isAnonymous) && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Already saved on another device?</h3>
-            <p className="text-ink-mid text-sm font-bold mt-1">
+            <p className="text-ink-mid text-base font-bold mt-1">
               Sign in with the email you used before and we&apos;ll bring your family&apos;s
               progress to this device.
             </p>
           </div>
           {signinStatus === 'sent' ? (
-            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-sm font-bold">
+            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-base font-bold">
               ✓ Check your inbox! Open the sign-in link we sent to{' '}
               <strong>{signinEmail.trim()}</strong> on this device.
             </div>
@@ -638,6 +682,7 @@ function AccountSection() {
                 <input
                   type="email"
                   value={signinEmail}
+                  aria-label="Your email"
                   onChange={(e) => setSigninEmail(e.target.value)}
                   placeholder="you@example.com"
                   required
@@ -646,13 +691,13 @@ function AccountSection() {
                 <button
                   type="submit"
                   disabled={!signinEmail.trim() || signinStatus === 'sending'}
-                  className="pressable min-h-[56px] bg-math text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-math disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-math text-white rounded-2xl px-5 text-base font-extrabold shadow-press-math disabled:opacity-50"
                 >
                   {signinStatus === 'sending' ? 'Sending…' : 'Email me a link'}
                 </button>
               </div>
               {signinStatus === 'error' && (
-                <p className="text-ink text-sm font-bold">
+                <p className="text-ink text-base font-bold">
                   We couldn&apos;t find an account with that email, or the email failed to
                   send. Check the address and try again.
                 </p>
@@ -662,28 +707,28 @@ function AccountSection() {
         </div>
       )}
 
-      {!loading && account && !account.isAnonymous && (
+      {!loading && part !== 'save' && account && !account.isAnonymous && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex items-center gap-4">
           <div className="flex-1 min-w-0">
             <p className="font-extrabold text-ink truncate">{account.email}</p>
-            <p className="text-ink-mid text-sm font-bold mt-0.5">
+            <p className="text-ink-mid text-base font-bold mt-0.5">
               Your family&apos;s progress is saved to this account.
             </p>
           </div>
           <button
             onClick={handleSignOut}
-            className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip flex-shrink-0"
+            className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-base font-extrabold shadow-press-chip flex-shrink-0"
           >
             Sign out
           </button>
         </div>
       )}
 
-      {!loading && account && (
+      {!loading && part !== 'save' && account && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Delete account</h3>
-            <p className="text-ink-mid text-sm font-bold mt-1">
+            <p className="text-ink-mid text-base font-bold mt-1">
               Permanently removes this account, every child profile, and all practice
               history. This cannot be undone.
             </p>
@@ -691,19 +736,20 @@ function AccountSection() {
           {!deleteOpen ? (
             <button
               onClick={() => setDeleteOpen(true)}
-              className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-sm font-extrabold shadow-press-chip self-start"
+              className="pressable min-h-[56px] bg-canvas-top text-ink-mid rounded-2xl px-4 text-base font-extrabold shadow-press-chip self-start"
             >
               Delete my account…
             </button>
           ) : (
             <div className="flex flex-col gap-2">
-              <p className="text-ink text-sm font-bold">
+              <p className="text-ink text-base font-bold">
                 Type <strong>DELETE</strong> to confirm.
               </p>
               <div className="flex gap-3">
                 <input
                   type="text"
                   value={deleteText}
+                  aria-label="Type DELETE to confirm"
                   onChange={(e) => setDeleteText(e.target.value)}
                   placeholder="DELETE"
                   autoCapitalize="characters"
@@ -713,7 +759,7 @@ function AccountSection() {
                 <button
                   onClick={handleDeleteAccount}
                   disabled={deleteText !== 'DELETE' || deleteStatus === 'deleting'}
-                  className="pressable min-h-[56px] bg-chinese text-white rounded-2xl px-5 text-sm font-extrabold shadow-press-chinese disabled:opacity-50"
+                  className="pressable min-h-[56px] bg-chinese text-white rounded-2xl px-5 text-base font-extrabold shadow-press-chinese disabled:opacity-50"
                 >
                   {deleteStatus === 'deleting' ? 'Deleting…' : 'Delete forever'}
                 </button>
@@ -724,12 +770,12 @@ function AccountSection() {
                   setDeleteText('')
                   setDeleteStatus('idle')
                 }}
-                className="text-ink-mid text-sm font-bold underline underline-offset-2 self-start"
+                className="text-ink-mid text-base font-bold underline underline-offset-2 self-start"
               >
                 Keep my account
               </button>
               {deleteStatus === 'error' && (
-                <p className="text-ink text-sm font-bold">
+                <p className="text-ink text-base font-bold">
                   We couldn&apos;t delete the account. Please try again, or email{' '}
                   <strong>support@mandarineer.com</strong>.
                 </p>
@@ -745,9 +791,18 @@ function AccountSection() {
 export default function ParentZone() {
   const router = useRouter()
   const [gate, setGate] = useState<'checking' | 'locked' | 'open'>('checking')
+  // A guest's save card comes first: guest data is deleted after days without play
+  const [isGuest, setIsGuest] = useState(false)
+  // /parent?add=1 (from the kids' switch screen) opens the add form once the gate is passed
+  const [startAdding, setStartAdding] = useState(false)
 
   useEffect(() => {
     setGate(sessionStorage.getItem(GATE_KEY) === 'passed' ? 'open' : 'locked')
+    setStartAdding(new URLSearchParams(window.location.search).get('add') === '1')
+    createSupabaseBrowser()
+      .auth.getUser()
+      .then(({ data: { user } }: { data: { user: User | null } }) => setIsGuest(!user || Boolean(user.is_anonymous)))
+      .catch(() => {})
   }, [])
 
   if (gate === 'checking') {
@@ -783,24 +838,25 @@ export default function ParentZone() {
           </button>
           <div>
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">Parent Zone</h1>
-            <p className="text-ink-mid text-sm font-bold">Manage your children and account</p>
+            <p className="text-ink-mid text-base font-bold">Manage your children and account</p>
           </div>
         </div>
 
-        <ChildrenSection />
-        <AccountSection />
+        {isGuest && <AccountSection part="save" />}
+        <ChildrenSection startAdding={startAdding} />
+        <AccountSection part={isGuest ? 'rest' : 'all'} />
 
         {/* Quiet trust links — parents' surface only */}
         <footer className="flex items-center justify-center gap-6 pb-4">
           <Link
             href="/privacy"
-            className="text-ink-mid text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-base font-bold underline underline-offset-2"
           >
             Privacy
           </Link>
           <Link
             href="/terms"
-            className="text-ink-mid text-sm font-bold underline underline-offset-2"
+            className="text-ink-mid text-base font-bold underline underline-offset-2"
           >
             Terms
           </Link>

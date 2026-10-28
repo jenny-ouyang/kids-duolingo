@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { GUEST_RETENTION_DAYS } from '@/lib/retention'
 
-const RETENTION_DAYS = 90
+const RETENTION_DAYS = GUEST_RETENTION_DAYS
 
 /**
  * GET /api/cron/cleanup-guests — Vercel Cron (vercel.json), daily.

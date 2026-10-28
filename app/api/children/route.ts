@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
+import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-path'
 
 const MAX_CHILDREN = 6
 const MAX_NAME_LENGTH = 20
@@ -12,9 +13,10 @@ function sanitizeName(raw: unknown): string | null {
 }
 
 /**
- * GET /api/children — list the account's children.
+ * GET /api/children?tz={getTimezoneOffset()} — list the account's children, each
+ * with this week's play days (Monday first), today's index and the suggested next pack.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
     const { userId } = await getAuthContext()
     const children = await prisma.child.findMany({
@@ -22,7 +24,15 @@ export async function GET() {
       orderBy: { createdAt: 'asc' },
       select: { id: true, name: true, avatar: true, totalHearts: true, streak: true, lastPracticed: true },
     })
-    return NextResponse.json(children)
+    const tz = parseTz(req.nextUrl.searchParams.get('tz'))
+    const ids = children.map((c) => c.id)
+    const [weekDays, nextPacks] = ids.length
+      ? await Promise.all([getWeekDays(ids, tz), getNextPacks(ids)])
+      : [{}, {}]
+    const today = todayIndex(tz)
+    return NextResponse.json(
+      children.map((c) => ({ ...c, weekDays: (weekDays as Record<string, boolean[]>)[c.id], today, nextPack: (nextPacks as Record<string, unknown>)[c.id] ?? null }))
+    )
   } catch (err) {
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
