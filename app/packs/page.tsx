@@ -98,7 +98,6 @@ export default function PacksPage() {
   // 7 stops around the suggested one: one behind, the rest ahead
   const windowStart = Math.max(0, Math.min(next - 1, packs.length - 7))
   const pathPacks = packs.slice(windowStart, windowStart + 7)
-  const doneCount = packs.filter((p) => p.masteryPct === 100).length
 
   const learning = packs.filter((p) => p.masteryPct < 100)
   const mastered = packs.filter((p) => p.masteryPct === 100)
@@ -128,12 +127,6 @@ export default function PacksPage() {
 
         {!showAll && packs.length > 0 && (
           <>
-            <p className="text-base font-bold text-ink-mid">
-              Every pack is open. The path only suggests the order.{' '}
-              <b className="text-ink">
-                {doneCount} of {packs.length} done.
-              </b>
-            </p>
             <PackPath packs={pathPacks} nextId={packs[next].id} onOpen={openPack} />
             <button
               onClick={() => setShowAll(true)}

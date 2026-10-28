@@ -10,7 +10,7 @@ export interface PathPack {
   masteryPct: number
 }
 
-const STEP = 124 // vertical distance between stops, px
+const STEP = 112 // vertical distance between stops, px
 const X = [30, 68] // stop centers alternate left and right, % of the width
 
 /** The pack the path suggests: the first started and unfinished, else the first not started */
@@ -57,7 +57,8 @@ function Ring({ pct, size }: { pct: number; size: number }) {
 /**
  * Packs as stops on a dotted trail, in sortOrder (6-B). One stop says
  * "Start here". No stop is locked: every stop is a button that opens its
- * session, and each says its state in words, not color alone.
+ * session. Under each stop only the name shows (calm screen); the state in
+ * words is in the button's label, and the ring and ✓ show it by shape.
  */
 export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[]; nextId: string; onOpen: (pack: PathPack) => void }) {
   const next = packs.findIndex((p) => p.id === nextId)
@@ -109,8 +110,6 @@ export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[];
               )}
             </button>
             <span className="mt-2.5 text-base font-extrabold text-ink leading-tight text-center">{pack.name}</span>
-            {pack.nameZh && <span className="font-hanzi text-[15px] text-chinese-edge leading-tight">{pack.nameZh}</span>}
-            <span className="text-[15px] font-extrabold text-ink-mid leading-tight text-center">{stateWords(pack, isNext)}</span>
             {isNext && (
               <span
                 aria-hidden
