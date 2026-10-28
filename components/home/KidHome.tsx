@@ -7,6 +7,7 @@ import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
+import WeekDots from '@/components/progress/WeekDots'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { hasSession } from '@/lib/guest-session'
 import type { User } from '@supabase/supabase-js'
@@ -15,50 +16,39 @@ const PROFILE_MAX_RETRIES = 8
 const PROFILE_RETRY_DELAY_MS = 1000
 const GUEST_NUDGE_KEY = 'kd_guest_nudge_dismissed'
 
+interface NextPack {
+  id: string
+  name: string
+  nameZh: string
+  emoji: string
+  learned: number
+  wordCount: number
+}
+
 interface Profile {
   id: string
   name: string
   avatar: string
   totalHearts: number
-  streak: number
+  weekDays: boolean[]
+  today: number
+  nextPack: NextPack | null
+  stickerCount: number
 }
 
-interface SubjectCardProps {
-  label: string
-  description: string
-  seal: string
-  variant: 'chinese' | 'math'
-  href: string
-  delay: number
-}
-
-function SubjectCard({ label, description, seal, variant, href, delay }: SubjectCardProps) {
+/** Small white subject button with its own-hue press edge (the Play next card leads) */
+function SubjectButton({ seal, label, variant, href }: { seal: string; label: string; variant: 'chinese' | 'math'; href: string }) {
   const router = useRouter()
-  const surface =
-    variant === 'chinese'
-      ? 'bg-gradient-to-br from-chinese-light to-chinese shadow-press-chinese'
-      : 'bg-gradient-to-br from-math-light to-math shadow-press-math'
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 24 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay }}
-      className="w-full"
+    <button
+      onClick={() => router.push(href)}
+      className={`pressable flex-1 min-h-[60px] rounded-[22px] bg-white text-ink text-lg font-extrabold flex items-center justify-center gap-2 ${
+        variant === 'chinese' ? 'shadow-tile-chinese' : 'shadow-tile-math'
+      }`}
     >
-      <button
-        onClick={() => router.push(href)}
-        className={`${surface} pressable relative w-full min-h-[88px] rounded-[26px] py-5 pl-5 pr-24 text-left text-white`}
-      >
-        <span className="block text-[27px] font-extrabold leading-tight">{label}</span>
-        <span className="block text-sm font-bold text-white/85">{description}</span>
-        <span
-          aria-hidden
-          className="absolute right-4 top-1/2 -translate-y-1/2 rotate-[4deg] rounded-[14px] bg-white/20 px-3 py-2 font-hanzi text-[28px] leading-none"
-        >
-          {seal}
-        </span>
-      </button>
-    </motion.div>
+      <span className={`font-hanzi text-xl ${variant === 'chinese' ? 'text-chinese-edge' : 'text-math-edge'}`}>{seal}</span>
+      {label}
+    </button>
   )
 }
 
@@ -75,7 +65,7 @@ export default function KidHome() {
     async function loadProfile() {
       for (let attempt = 0; attempt < PROFILE_MAX_RETRIES; attempt++) {
         try {
-          const res = await apiFetch('/api/profile')
+          const res = await apiFetch(`/api/profile?tz=${new Date().getTimezoneOffset()}`)
           if (cancelled) return
 
           if (res.status === 401) {
@@ -147,7 +137,6 @@ export default function KidHome() {
   }
 
   const totalHearts = profile?.totalHearts ?? 0
-  const streak = profile?.streak ?? 0
   const showSwitcher = Boolean(profile && hasSiblings)
 
   return (
@@ -175,88 +164,100 @@ export default function KidHome() {
         </motion.div>
       )}
 
-      <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
+      <div className="relative z-10 flex flex-col items-center gap-4 w-full max-w-md">
         {/* Mascot with speech bubble */}
         <Mascot say="你好!" />
 
         {/* Greeting */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="text-center -mt-6"
-        >
+        <div className="text-center -mt-6">
           {status === 'error' ? (
             <>
-              <h1 className="text-[36px] font-extrabold text-ink leading-tight">
+              <h1 className="text-[34px] font-extrabold text-ink leading-tight">
                 We&apos;re napping, try again soon <span className="font-emoji">😴</span>
               </h1>
-              <p className="text-lg text-ink-mid font-bold mt-2">
-                Come back in a little bit!
-              </p>
+              <p className="text-lg text-ink-mid font-bold mt-2">Come back in a little bit!</p>
             </>
           ) : (
-            <>
-              <h1 className="text-[36px] font-extrabold text-ink leading-tight">
-                {profile ? (
-                  <>
-                    Hi, {profile.name}! <span className="font-emoji">{profile.avatar}</span>
-                  </>
-                ) : (
-                  <>
-                    Hi there! <span className="font-emoji">👋</span>
-                  </>
-                )}
-              </h1>
-              <p className="text-[15px] text-ink-mid font-bold mt-1.5">
-                What do you want to learn today?
-              </p>
-            </>
+            <h1 className="text-[34px] font-extrabold text-ink leading-tight">
+              {profile ? (
+                <>
+                  Hi, {profile.name}! <span className="font-emoji">{profile.avatar}</span>
+                </>
+              ) : (
+                <>
+                  Hi there! <span className="font-emoji">👋</span>
+                </>
+              )}
+            </h1>
           )}
-        </motion.div>
-
-        {/* Hearts + streak chips */}
-        {totalHearts > 0 && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-            className="flex items-center gap-2.5"
-          >
-            <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1.5 shadow-press-chip">
-              <span className="font-emoji text-xl">❤️</span>
-              <span className="text-[15px] font-extrabold text-ink">
-                {totalHearts} heart{totalHearts !== 1 ? 's' : ''}
-              </span>
-            </div>
-            {streak > 1 && (
-              <div className="bg-white rounded-full px-4 py-2 flex items-center gap-1.5 shadow-press-chip">
-                <span className="font-emoji text-xl">🔥</span>
-                <span className="text-[15px] font-extrabold text-ink">{streak} days</span>
-              </div>
-            )}
-          </motion.div>
-        )}
-
-        {/* Subject cards */}
-        <div className="flex flex-col gap-5 w-full">
-          <SubjectCard
-            label="Chinese"
-            description="Learn Mandarin words"
-            seal="中文"
-            variant="chinese"
-            href="/packs"
-            delay={0.5}
-          />
-          <SubjectCard
-            label="Math"
-            description="Count and add numbers"
-            seal="数学"
-            variant="math"
-            href="/math/topics"
-            delay={0.65}
-          />
         </div>
+
+        {profile && (
+          <>
+            {/* This week, hearts, stickers — no streak number, nothing resets */}
+            <div className="flex flex-wrap items-center justify-center gap-2">
+              <span className="bg-white rounded-full px-3.5 py-2 flex items-center gap-2 shadow-press-chip text-base font-extrabold text-ink">
+                This week <WeekDots days={profile.weekDays} today={profile.today} />
+              </span>
+              {totalHearts > 0 && (
+                <span className="bg-white rounded-full px-3.5 py-2 flex items-center gap-1.5 shadow-press-chip text-base font-extrabold text-ink">
+                  <span className="font-emoji" aria-hidden>❤️</span>
+                  {totalHearts}
+                  <span className="sr-only"> hearts</span>
+                </span>
+              )}
+            </div>
+
+            {/* Play next — one clear next step */}
+            {profile.nextPack && (
+              <section aria-label="Play next" className="w-full bg-white rounded-[26px] shadow-press-card p-4 flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="font-emoji text-[32px] leading-none bg-[#FFF3D6] rounded-2xl px-2.5 py-1.5 rotate-[-4deg]" aria-hidden>
+                    {profile.nextPack.emoji}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <h2 className="text-[19px] font-extrabold text-ink leading-tight">
+                      {profile.nextPack.name}{' '}
+                      <span className="font-hanzi text-lg text-chinese-edge font-normal">{profile.nextPack.nameZh}</span>
+                    </h2>
+                    <p className="text-base font-bold text-ink-mid">
+                      {profile.nextPack.learned} of {profile.nextPack.wordCount} words learned
+                    </p>
+                    <div className="mt-1 h-2.5 rounded-full bg-chip-track overflow-hidden">
+                      <div
+                        className="h-full rounded-full bg-success"
+                        style={{ width: `${Math.round((profile.nextPack.learned / Math.max(1, profile.nextPack.wordCount)) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <button
+                  onClick={() => router.push(`/practice/session?pack=${profile.nextPack!.id}`)}
+                  className="pressable w-full min-h-[60px] rounded-[22px] bg-chinese text-white text-[21px] font-extrabold shadow-press-chinese"
+                >
+                  Play next <span className="font-emoji">▶️</span>
+                </button>
+                <p className="text-base font-bold text-ink-mid text-center">8 questions · about 3 minutes</p>
+              </section>
+            )}
+
+            {/* Panda's sticker book (6-C) */}
+            <button
+              onClick={() => router.push('/stickers')}
+              className="pressable w-full min-h-[56px] rounded-[22px] bg-white text-ink text-lg font-extrabold shadow-press-card flex items-center justify-center gap-2"
+            >
+              My sticker book <span className="font-emoji">📒</span>
+              {profile.stickerCount > 0 && (
+                <span className="bg-canvas-top rounded-full px-2.5 text-base text-ink-mid">{profile.stickerCount}</span>
+              )}
+            </button>
+
+            <div className="flex gap-3 w-full">
+              <SubjectButton seal="中文" label="All packs" variant="chinese" href="/packs" />
+              <SubjectButton seal="数学" label="Math" variant="math" href="/math/topics" />
+            </div>
+          </>
+        )}
 
         {/* Guest-save nudge — quiet, dismissable, parents' business */}
         {showGuestNudge && (
@@ -267,7 +268,7 @@ export default function KidHome() {
           >
             <button
               onClick={() => router.push('/parent')}
-              className="text-ink-mid text-sm font-bold text-left"
+              className="text-ink-mid text-base font-bold text-left"
             >
               <span className="font-emoji">💾</span> Playing as guest — save your
               family&apos;s progress
@@ -283,15 +284,12 @@ export default function KidHome() {
         )}
 
         {/* Parent link */}
-        <motion.button
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.9 }}
+        <button
           onClick={() => router.push('/parent')}
-          className="text-ink-mid text-sm font-bold underline underline-offset-2"
+          className="min-h-[44px] text-ink-mid text-base font-bold underline underline-offset-2"
         >
-          Parent Dashboard
-        </motion.button>
+          Parent Zone
+        </button>
       </div>
     </KidLayout>
   )
