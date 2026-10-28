@@ -8,6 +8,7 @@ import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
+import { hasSession } from '@/lib/guest-session'
 import type { User } from '@supabase/supabase-js'
 
 const PROFILE_MAX_RETRIES = 8
@@ -78,7 +79,11 @@ export default function KidHome() {
           if (cancelled) return
 
           if (res.status === 401) {
-            // AuthBootstrap may still be signing in anonymously — wait and retry
+            // No session means no family yet (guest auth starts at /welcome)
+            if (!(await hasSession())) {
+              router.replace('/welcome')
+              return
+            }
             await new Promise((resolve) => setTimeout(resolve, PROFILE_RETRY_DELAY_MS))
             continue
           }

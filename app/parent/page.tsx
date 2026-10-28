@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { apiFetch, fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
+import { ensureGuestSession, hasSession } from '@/lib/guest-session'
 import type { User } from '@supabase/supabase-js'
 
 const GATE_KEY = 'kd_parent_gate'
@@ -172,6 +173,12 @@ function ChildrenSection() {
   const [deleteText, setDeleteText] = useState('')
 
   const fetchChildren = useCallback(async () => {
+    // No session yet: nothing to load, and the add form makes the guest account
+    if (!(await hasSession())) {
+      setChildren([])
+      setLoadFailed(false)
+      return
+    }
     const { ok, data } = await fetchJsonWithAuthRetry<ChildRow[]>('/api/children')
     if (ok && Array.isArray(data)) {
       setChildren(data)
@@ -192,6 +199,7 @@ function ChildrenSection() {
     if (!newName.trim() || saving) return
     setSaving(true)
     try {
+      await ensureGuestSession()
       const res = await apiFetch('/api/children', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -522,7 +530,7 @@ function AccountSection() {
     // so / shows the landing/picker again.
     await clearActiveChild()
     await supabase.auth.signOut()
-    // Full navigation so a fresh anonymous session bootstraps on the home page.
+    // Full navigation so / shows the landing again.
     window.location.assign('/')
   }
 
@@ -559,14 +567,6 @@ function AccountSection() {
       <h2 className="text-lg font-extrabold text-ink">Account</h2>
 
       {loading && <div className="text-ink-soft text-sm font-bold">Loading…</div>}
-
-      {!loading && !account && (
-        <div className="bg-white rounded-[22px] p-5 shadow-press-card">
-          <p className="text-ink-soft text-sm font-bold">
-            No account session found. Head back to the app and try again.
-          </p>
-        </div>
-      )}
 
       {!loading && account && account.isAnonymous && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
@@ -618,7 +618,7 @@ function AccountSection() {
         </div>
       )}
 
-      {!loading && account && account.isAnonymous && (
+      {!loading && (!account || account.isAnonymous) && (
         <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
           <div>
             <h3 className="font-extrabold text-ink">Already saved on another device?</h3>

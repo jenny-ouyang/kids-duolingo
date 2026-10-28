@@ -8,6 +8,7 @@ import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
 import { setActiveChild } from '@/lib/child-cookie'
+import { ensureGuestSession } from '@/lib/guest-session'
 
 const AVATARS = ['🦁', '🐼', '🐰', '🦊', '🐸', '🐯', '🐨', '🦄', '🐶', '🐱', '🐧', '🐢']
 
@@ -33,6 +34,8 @@ export default function WelcomePage() {
     setError(null)
 
     try {
+      // The guest auth user is created here, at the first child — not on page load.
+      await ensureGuestSession()
       for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
         const res = await apiFetch('/api/children', {
           method: 'POST',
@@ -41,7 +44,7 @@ export default function WelcomePage() {
         })
 
         if (res.status === 401) {
-          // AuthBootstrap may still be signing in anonymously — wait and retry
+          // The new guest session may not be visible to the API yet — wait and retry
           setWaitingForAuth(true)
           await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY_MS))
           continue

@@ -74,8 +74,8 @@ export interface ApiFetchResult<T> {
 }
 
 /**
- * Fetch that tolerates the anonymous-auth bootstrap race: AuthBootstrap may
- * still be signing in when a page's first API call fires, so on 401 this
+ * Fetch that tolerates the auth race right after /welcome signs a guest in:
+ * the new session may not be visible on the first API call, so on 401 this
  * retries up to 6 times at 1s intervals before giving up.
  * Returns { ok, status, data } where data is the parsed JSON body or null.
  * A network error surfaces as { ok: false, status: 0, data: null }.

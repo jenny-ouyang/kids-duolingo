@@ -99,8 +99,10 @@ This is the single most important thing to understand before touching any API ca
 
 ### Auth funnel
 
-Supabase Auth, guest-first: `components/auth/AuthBootstrap.tsx` calls `signInAnonymously()`
-on first visit; parents later claim the account via magic link (`updateUser({ email })` keeps
+Supabase Auth, guest-first: `lib/guest-session.ts` `ensureGuestSession()` calls
+`signInAnonymously()` only when a family creates its first child (`/welcome`, or "Add a child"
+in the Parent Zone). Never sign in on page load: every visitor and crawler would become an
+auth user. Parents later claim the account via magic link (`updateUser({ email })` keeps
 the same user id, so no data migration).
 
 `lib/auth.ts` is the only funnel. `requireChild()` validates the JWT (`getUser()`, **never**
