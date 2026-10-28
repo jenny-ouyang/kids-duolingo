@@ -6,13 +6,11 @@ import { motion, useReducedMotion } from 'framer-motion'
 import Confetti from '@/components/celebration/Confetti'
 import Mascot from '@/components/design/Mascot'
 import PinyinToggle from '@/components/exercise/PinyinToggle'
-import WeekDots from '@/components/progress/WeekDots'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import { wordEmoji, wordImageSrc } from '@/components/exercise/PictureChoice'
 import { speakChinese } from '@/lib/tts'
 import { playCelebrationSound, playStarSound, playStickerSound } from '@/lib/sounds'
 import { hapticCelebrate } from '@/lib/haptics'
-import { fetchJsonCached } from '@/lib/api-fetch'
 import { getEncouragement, SessionData, Encouragement } from '@/lib/encouragement'
 
 interface Sticker {
@@ -22,20 +20,6 @@ interface Sticker {
   english: string
   image: string
   packId: string
-}
-
-interface PackProgress {
-  id: string
-  name: string
-  nameZh: string
-  emoji: string
-  wordCount: number
-  learned: number
-}
-
-interface Week {
-  weekDays: boolean[]
-  today: number
 }
 
 function CelebrationContent() {
@@ -56,8 +40,6 @@ function CelebrationContent() {
   const [enc, setEnc] = useState<Encouragement | null>(null)
   const [sticker, setSticker] = useState<Sticker | null>(null)
   const [showPinyin, setShowPinyin] = useState(false)
-  const [pack, setPack] = useState<PackProgress | null>(null)
-  const [week, setWeek] = useState<Week | null>(null)
   // "Skip" (or a tap anywhere) jumps every entrance to its end state
   const [skipped, setSkipped] = useState(false)
   // Reduce Motion: no confetti and nothing to skip; parts only fade in (MotionConfig)
@@ -101,16 +83,6 @@ function CelebrationContent() {
       speakChinese(encouragement.chinesePhrase)
     }, 1200)
   }, [packId, subject, correct, total, heartsEarned, stars])
-
-  // How far the pack has come, and this week's dots
-  useEffect(() => {
-    fetchJsonCached<PackProgress[]>(isMath ? '/api/packs?subject=math' : '/api/packs').then(({ ok, data }) => {
-      if (ok && Array.isArray(data)) setPack(data.find((p) => p.id === packId) ?? null)
-    })
-    fetchJsonCached<Week>(`/api/profile?tz=${new Date().getTimezoneOffset()}`).then(({ ok, data }) => {
-      if (ok && data?.weekDays) setWeek({ weekDays: data.weekDays, today: data.today })
-    })
-  }, [isMath, packId])
 
   if (!enc) return null
 
@@ -200,10 +172,20 @@ function CelebrationContent() {
           </div>
         )}
 
-        {/* Stars */}
-        <div className="flex gap-2" aria-label={`${stars} stars`}>{starRow}</div>
+        {/* Stars and the hearts, in one row */}
+        <div className="flex items-center gap-2">
+          <div className="flex gap-2" aria-label={`${stars} stars`}>{starRow}</div>
+          {heartsEarned > 0 && (
+            <span className="ml-2 bg-white rounded-full px-3.5 py-1.5 shadow-press-chip text-lg font-extrabold text-ink">
+              +{heartsEarned} <span className="font-emoji" aria-hidden>❤️</span>
+              <span className="sr-only"> hearts</span>
+            </span>
+          )}
+        </div>
 
-        {/* Chinese praise phrase — teaches through encouragement */}
+        {/* Chinese praise phrase — teaches through encouragement. With a sticker,
+            the sticker word is this screen's Chinese, so the phrase stays out */}
+        {!sticker && (
         <motion.div
           {...enter({ opacity: 0, scale: 0.9 }, 0.6)}
           animate={{ opacity: 1, scale: 1 }}
@@ -225,41 +207,7 @@ function CelebrationContent() {
           {/* Separate control: tapping the phrase plays audio, so reveal can't share that tap */}
           <PinyinToggle on={showPinyin} onToggle={() => setShowPinyin((v) => !v)} />
         </motion.div>
-
-        {/* How far the pack has come (6-B), this week, and the hearts — said once */}
-        <motion.section
-          {...enter({ opacity: 0, y: 10 }, 0.8)}
-          animate={{ opacity: 1, y: 0 }}
-          aria-label="Your progress"
-          className="w-full bg-white rounded-[22px] shadow-press-card px-4 py-3 flex flex-col gap-2 text-left"
-        >
-          {pack && (
-            <>
-              <div className="flex items-center gap-2.5">
-                <span className="font-emoji text-2xl" aria-hidden>{pack.emoji}</span>
-                <span className="text-[17px] font-extrabold text-ink">
-                  {pack.name}{' '}
-                  {pack.nameZh && <span className="font-hanzi text-chinese-edge font-normal">{pack.nameZh}</span>}
-                </span>
-                <span className="ml-auto text-base font-extrabold text-ink tabular-nums">
-                  {pack.learned} / {pack.wordCount}
-                </span>
-              </div>
-              <div className="h-2.5 rounded-full bg-chip-track overflow-hidden">
-                <div className="h-full rounded-full bg-success" style={{ width: `${Math.round((pack.learned / Math.max(1, pack.wordCount)) * 100)}%` }} />
-              </div>
-            </>
-          )}
-          <div className="flex items-center gap-3 flex-wrap">
-            {week && <WeekDots days={week.weekDays} today={week.today} />}
-            <span className="ml-auto text-base font-extrabold text-ink">{enc.subMessage}</span>
-            {heartsEarned > 0 && (
-              <span className="text-base font-extrabold text-ink">
-                <span className="font-emoji" aria-hidden>❤️</span> +{heartsEarned} heart{heartsEarned !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-        </motion.section>
+        )}
 
         {/* Action buttons */}
         <motion.div
@@ -268,26 +216,23 @@ function CelebrationContent() {
           className="flex flex-col gap-4 mt-1 w-full"
           onClick={(e) => e.stopPropagation()}
         >
-          {sticker && (
+          {sticker ? (
             <button
               onClick={() => router.push('/stickers')}
               className="pressable min-h-[60px] bg-chinese text-white font-extrabold text-xl rounded-3xl py-4 px-8 shadow-press-chinese"
             >
               Put it in my book <span className="font-emoji">📒</span>
             </button>
+          ) : (
+            <button
+              onClick={() => router.push(playAgainHref)}
+              className={`pressable min-h-[60px] text-white font-extrabold text-xl rounded-3xl py-4 px-8 ${
+                isMath ? 'bg-math shadow-press-math' : 'bg-chinese shadow-press-chinese'
+              }`}
+            >
+              Keep going <span className="font-emoji">▶️</span>
+            </button>
           )}
-          <button
-            onClick={() => router.push(playAgainHref)}
-            className={`pressable min-h-[56px] font-extrabold text-xl rounded-3xl py-4 px-8 ${
-              sticker
-                ? 'bg-white text-ink shadow-press-card'
-                : isMath
-                  ? 'bg-math text-white shadow-press-math'
-                  : 'bg-chinese text-white shadow-press-chinese'
-            }`}
-          >
-            Keep going <span className="font-emoji">▶️</span>
-          </button>
           <button
             onClick={() => router.push(backHref)}
             className="pressable min-h-[56px] bg-white text-ink font-extrabold text-lg rounded-3xl py-3 px-8 shadow-press-card"
@@ -296,25 +241,6 @@ function CelebrationContent() {
           </button>
         </motion.div>
 
-        {/* Word spotlight — highlights a specific word the child mastered */}
-        {enc.spotlightWord && (
-          <div className="bg-white rounded-2xl px-5 py-3 shadow-press-card w-full text-left">
-            <h2 className="flex items-center gap-2 mb-1 font-extrabold text-ink">
-              <span className="font-emoji text-xl">💡</span> Word Spotlight
-            </h2>
-            <p className="text-ink text-base font-semibold">{enc.spotlightWord.message}</p>
-          </div>
-        )}
-
-        {/* Real-life mission */}
-        {enc.mission && (
-          <div className="bg-white rounded-2xl px-5 py-3 shadow-press-card w-full text-left">
-            <h2 className="flex items-center gap-2 mb-1 font-extrabold text-ink">
-              <span className="font-emoji text-xl">🎯</span> Today&apos;s Mission
-            </h2>
-            <p className="text-ink text-base font-semibold">{enc.mission}</p>
-          </div>
-        )}
       </motion.div>
     </>
   )
