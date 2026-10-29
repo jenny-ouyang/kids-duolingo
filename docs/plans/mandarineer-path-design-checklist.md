@@ -152,5 +152,6 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 ## Library guide from this session (Jenny, 2026-10-28: "/btl-library ... a guide for the token, code sending for email")
 
 - [x] Jenny chose: new guide, from the setup we ran, scope "6-digit code in the sign-in email" only.
-- [ ] Subagent writes the guide file in `btl-community/docs/library-guides/` (duplicate check against `library_content` first). Not published.
+- [x] Guide written: `~/Documents/apps/btl-community/docs/library-guides/supabase-email-sign-in-code.md` ("Add a 6-Digit Sign-In Code to Your Supabase Email", 1861 words). Duplicate check: no sign-in guide in `library_content`. 1 internal link, checked. No private values. Not committed in btl-community.
+  - [ ] Not verified: the dashboard place of "Email OTP Length"; the `jq` PATCH command (new, not run); iOS showing the code above the keyboard. Update after the build 9 iPhone test.
 - [ ] Jenny: publish it as an unpublished row? (She switches it live herself.)
