@@ -136,6 +136,9 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] Next TestFlight build with today's fixes (build 8 has none of them).
 - [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
 - [x] Jenny said yes (2026-10-28): deleted 165 anonymous auth users with no Account row. 14 users left, 0 without an account, 15 children unchanged.
-- [ ] Jenny: which of the 12 families are hers? Claude's guess: Julian/Amelie families (4 accounts, only one saved with email) are Jenny's; Adam (281 hearts, last 2026-10-12) and maybe Simmy are outside families; Mei ×2, tada, QA ×2, dfds/asdf are tests.
-- [ ] Jenny: delete the 6 test families? Not done.
-- [ ] Jenny: merge Julian's progress from 3 guest accounts into the saved account? Not done.
+- [x] Jenny: which of the 12 families are hers? (Decided 2026-10-28 by "yes clean up": Julian/Amelie are hers; Adam and Simmy stay as they are.) Claude's guess: Julian/Amelie families (4 accounts, only one saved with email) are Jenny's; Adam (281 hearts, last 2026-10-12) and maybe Simmy are outside families; Mei ×2, tada, QA ×2, dfds/asdf are tests.
+- [x] Jenny said yes (2026-10-28): deleted 6 test families (tada, Mei ×2, QA ×2, dfds/asdf) with their auth users. Backup first: `~/Documents/apps/kids-duolingo-backups/backup-cleanup-2026-10-28/` (outside the repo, it holds children's data).
+- [x] Jenny said yes (2026-10-28): merged Julian from 3 guest families into the saved account in one transaction. Hearts add up (501+145+5 = 651); for each word or problem the row with the most repetitions stays; all 1156 answers kept. Result: Julian 651 hearts, 215 words, 52 math, last played 2026-10-18. Amelie (no progress) moved into the saved account. Guest families and their auth users deleted.
+- [x] Now: 5 accounts (yours, Adam, Simmy, 2 with no child), 4 children, 5 auth users.
+- [ ] 2 accounts with no child (`78299a8a` from 2026-08-20, `cf861538` from a Python script 2026-08-21). Harmless. Jenny: delete them?
+- [x] EU cookies (Jenny asked 2026-10-28): no consent banner needed. The site has no trackers, only cookies it needs (sign-in session, `kd_child`) and offline lesson storage. These need no consent under EU rules, but the privacy page must list them: added "Cookies and storage" to /privacy.

@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">
               Privacy Policy
             </h1>
-            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-10-11</p>
+            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-10-28</p>
           </div>
         </div>
 
@@ -84,6 +84,22 @@ export default function PrivacyPage() {
               Data is stored with Supabase, our hosting and database provider, in
               the United States. Supabase processes the data on our behalf and does
               not use it for its own purposes.
+            </p>
+          </Section>
+
+          <Section title="Cookies and storage">
+            <p>
+              We use only the cookies and browser storage the app needs to work, so
+              we do not ask for cookie consent:
+            </p>
+            <ul className="list-disc pl-5 flex flex-col gap-1.5">
+              <li>Your sign-in session (set by Supabase), so your family stays signed in.</li>
+              <li><strong>kd_child</strong>: which child is playing on this device.</li>
+              <li>A copy of recent lessons in browser storage, so practice works offline.</li>
+            </ul>
+            <p>
+              If you pay on the web, Stripe&apos;s checkout page sets its own cookies
+              to stop fraud. Those cookies are on Stripe&apos;s site, not ours.
             </p>
           </Section>
 
