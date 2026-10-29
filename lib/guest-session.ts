@@ -54,6 +54,19 @@ export async function sendSignInLink(email: string): Promise<boolean> {
 }
 
 /**
+ * Signs in with the code from the sign-in email. The iPhone app needs this:
+ * the email's link opens Safari, not the app. The parent types the code, so
+ * this browser asked for it and no confirm is needed (unlike a link).
+ */
+export async function verifySignInCode(email: string, code: string): Promise<boolean> {
+  const { data, error } = await linkClient().auth.verifyOtp({ email, token: code, type: 'email' })
+  if (error || !data.session) return false
+  const { access_token, refresh_token } = data.session
+  const { error: saveError } = await createSupabaseBrowser().auth.setSession({ access_token, refresh_token })
+  return !saveError
+}
+
+/**
  * Stores the session from a sign-in link (#access_token=…). A link can carry
  * anyone's session (someone could send a parent a link to THEIR account), and
  * binding it to this browser would break the any-browser sign-in. So: magic

@@ -132,7 +132,10 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 
 - [x] Website: guest start and return on the same device work (tested).
 - [ ] Not tested with a real email: save progress with email, and sign in with the email link. Jenny tests Sign in on mandarineer.com with her saved email.
-- [ ] iPhone app: the sign-in email link opens Safari, not the app (inferred from the code: `emailRedirectTo` is `window.location.origin`). Proposal: add a 6-digit code to the email that the parent types in the app. Jenny decides.
+- [x] iPhone app: the sign-in email link opens Safari, not the app. Jenny said "go" (2026-10-28) for a code in the email.
+  - [x] App code: code box after "Send" on /signin and in the Parent Zone (`components/auth/SignInCode.tsx`, `verifySignInCode`). On the branch only, not live: the email has no code yet.
+  - [ ] Supabase email template: add `{{ .Token }}` to "Magic link or OTP" (`docs/design/email-templates/magic-link.html`). Blocked: no Claude token reaches the Mandarineer Supabase project. Jenny: make an access token at supabase.com/dashboard/account/tokens and paste it in the hidden box.
+  - [ ] End-to-end test: Claude sends a code, reads it in Gmail, types it, sees Julian. Then deploy.
 - [ ] Next TestFlight build with today's fixes (build 8 has none of them).
 - [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
 - [x] Jenny said yes (2026-10-28): deleted 165 anonymous auth users with no Account row. 14 users left, 0 without an account, 15 children unchanged.

@@ -6,11 +6,12 @@ import KidLayout from '@/components/layout/KidLayout'
 import { Hills, Sparkles } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
 import { sendSignInLink } from '@/lib/guest-session'
+import SignInCode from '@/components/auth/SignInCode'
 
 /**
  * Sign in for returning families, one tap from the landing page (no grown-up
- * gate: an email link is the gate). The link opens "/", where ResumeFamily
- * finishes the sign-in and takes the family to its child.
+ * gate: the email is the gate). The parent types the email's code here, or
+ * opens its link, which SignInLinkCatcher finishes on any page.
  */
 export default function SignInPage() {
   const [email, setEmail] = useState('')
@@ -46,20 +47,18 @@ export default function SignInPage() {
         <div className="text-center -mt-4">
           <h1 className="text-[27px] font-extrabold text-ink">Welcome back</h1>
           <p className="text-[15px] text-ink-mid font-bold mt-1">
-            Type the email you saved your family with. We send you a sign-in link.
+            Type the email you saved your family with. We send you a sign-in code.
           </p>
         </div>
 
         {oldLink && status !== 'sent' && (
           <div className="w-full bg-white rounded-3xl px-5 py-4 text-ink text-base font-bold text-center shadow-press-card">
-            That sign-in link is too old, or it was used already. Links work for 1 hour, one time. Send a new one.
+            That sign-in link is too old, or it was used already. Links work for 1 hour, one time. Send a new email.
           </div>
         )}
 
         {status === 'sent' ? (
-          <div className="w-full bg-success-bg rounded-3xl px-5 py-4 text-success-edge text-base font-bold text-center">
-            ✓ Check your inbox. Open the link, and your family is back.
-          </div>
+          <SignInCode email={email.trim()} />
         ) : (
           <form onSubmit={send} className="w-full flex flex-col gap-4">
             <input
@@ -77,7 +76,7 @@ export default function SignInPage() {
               disabled={!email.trim() || status === 'sending'}
               className="pressable w-full min-h-[60px] rounded-[26px] py-4 text-xl font-extrabold text-white bg-go shadow-press-go disabled:opacity-40"
             >
-              {status === 'sending' ? 'Sending…' : 'Send my sign-in link'}
+              {status === 'sending' ? 'Sending…' : 'Send my sign-in code'}
             </button>
             {status === 'error' && (
               <p className="text-[15px] text-chinese font-bold text-center">

@@ -8,6 +8,7 @@ import { createSupabaseBrowser } from '@/lib/supabase-browser'
 import { apiFetch, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
 import { clearActiveChild } from '@/lib/child-cookie'
 import { ensureGuestSession, hasSession, sendSignInLink } from '@/lib/guest-session'
+import SignInCode from '@/components/auth/SignInCode'
 import { GUEST_RETENTION_DAYS } from '@/lib/retention'
 import WeekDots from '@/components/progress/WeekDots'
 import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
@@ -768,10 +769,7 @@ function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
             </p>
           </div>
           {signinStatus === 'sent' ? (
-            <div className="bg-success-bg rounded-2xl px-4 py-3 text-success-edge text-base font-bold">
-              ✓ Check your inbox! Open the sign-in link we sent to{' '}
-              <strong>{signinEmail.trim()}</strong>.
-            </div>
+            <SignInCode email={signinEmail.trim()} />
           ) : (
             <form onSubmit={handleSignIn} className="flex flex-col gap-2">
               <div className="flex gap-3">
@@ -789,7 +787,7 @@ function AccountSection({ part = 'all' }: { part?: 'all' | 'save' | 'rest' }) {
                   disabled={!signinEmail.trim() || signinStatus === 'sending'}
                   className="pressable min-h-[56px] bg-math text-white rounded-2xl px-5 text-base font-extrabold shadow-press-math disabled:opacity-50"
                 >
-                  {signinStatus === 'sending' ? 'Sending…' : 'Email me a link'}
+                  {signinStatus === 'sending' ? 'Sending…' : 'Email me a code'}
                 </button>
               </div>
               {signinStatus === 'error' && (
