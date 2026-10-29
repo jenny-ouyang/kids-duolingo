@@ -148,3 +148,9 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] Now: 5 accounts (yours, Adam, Simmy, 2 with no child), 4 children, 5 auth users.
 - [x] 2 accounts with no child (`78299a8a` from 2026-08-20, `cf861538` from a Python script 2026-08-21): Jenny said ok (2026-10-28), deleted with their auth users. Backup: `~/Documents/apps/kids-duolingo-backups/empty-accounts-2026-10-28.csv`. Now 3 accounts (yours, Adam, Simmy), 4 children, 3 auth users, 0 without an account.
 - [x] EU cookies (Jenny asked 2026-10-28): no consent banner needed. The site has no trackers, only cookies it needs (sign-in session, `kd_child`) and offline lesson storage. These need no consent under EU rules, but the privacy page must list them: added "Cookies and storage" to /privacy.
+
+## Library guide from this session (Jenny, 2026-10-28: "/btl-library ... a guide for the token, code sending for email")
+
+- [x] Jenny chose: new guide, from the setup we ran, scope "6-digit code in the sign-in email" only.
+- [ ] Subagent writes the guide file in `btl-community/docs/library-guides/` (duplicate check against `library_content` first). Not published.
+- [ ] Jenny: publish it as an unpublished row? (She switches it live herself.)
