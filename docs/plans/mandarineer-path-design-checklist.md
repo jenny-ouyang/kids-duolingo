@@ -68,7 +68,7 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 ## Before you deploy
 
 - [x] Deploy the web backend before an iOS build from this branch ships: the iOS app calls mandarineer.com for `/api/stickers` and the new `/api/profile` fields.
-- [ ] `feat/hidden-pinyin` and `payments-phase-a` are not on `main`. Merge order matters: payments has migration `20261013120000`, this branch has `20261027120000`. Both are already applied to the live database.
+- [x] `feat/hidden-pinyin` and `payments-phase-a` are not on `main`. Merge order matters: payments has migration `20261013120000`, this branch has `20261027120000`. Both are already applied to the live database. Checked 2026-10-29: both are on `main`.
 
 ## Phone test (Jenny, 2026-10-27: "just do everything so I can test it on my phone")
 
@@ -81,10 +81,10 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 
 Spec: `docs/superpowers/specs/2026-10-13-payments-design.md`. Settings: `docs/plans/payments-settings-checklist.md`. Phase A code: branch `payments-phase-a` (14 commits, dormant, not merged).
 
-- [ ] Jenny: "go" to merge `payments-phase-a` into this branch (many files overlap; Claude resolves the conflicts).
+- [x] Jenny: "go" to merge `payments-phase-a` into this branch (many files overlap; Claude resolves the conflicts). Done: merged (on `main`, checked 2026-10-29).
 - [x] Stripe tool checked (2026-10-28): it is the Build to Launch account, live mode. Nothing created. Next steps in `docs/plans/payments-settings-checklist.md` §1.
 - [ ] Jenny: separate Mandarineer Stripe account (proposed) or the Build to Launch one.
-- [ ] Phase B (web, Stripe): Claude builds and tests in Stripe test mode.
+- [x] Phase B (web, Stripe): Claude builds and tests in Stripe test mode. Done: live $1 test with FOUNDER passed.
 - [ ] Phase C (iPhone, Apple): Claude writes the StoreKit code; Jenny does the Apple account steps.
 
 ## TestFlight (Jenny, 2026-10-28: "did you update to the testflight at all?" — no, until now)
@@ -155,3 +155,12 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] Guide written: `~/Documents/apps/btl-community/docs/library-guides/supabase-email-sign-in-code.md` ("Add a 6-Digit Sign-In Code to Your Supabase Email", 1861 words). Duplicate check: no sign-in guide in `library_content`. 1 internal link, checked. No private values. Not committed in btl-community.
   - [ ] Not verified: the dashboard place of "Email OTP Length"; the `jq` PATCH command (new, not run); iOS showing the code above the keyboard. Update after the build 9 iPhone test.
 - [ ] Jenny: publish it as an unpublished row? (She switches it live herself.)
+
+## Release path to the App Store (2026-10-29)
+
+- [ ] 1. Jenny: update to build 9 in TestFlight and test the sign-in code (Parent Zone → "Already saved on another device?"). Expected: Julian and Amelie.
+- [ ] 2. Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
+- [ ] 3. Claude: Phase C, StoreKit code for the iPhone purchase, then build 10 to TestFlight.
+- [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
+- [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
+- [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
