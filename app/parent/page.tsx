@@ -1060,9 +1060,10 @@ export default function ParentZone() {
           </div>
         </div>
 
+        {/* The purchase first: the one thing a parent (and App Review) looks for here */}
+        <UnlockSection />
         {isGuest && <AccountSection part="save" />}
         <ChildrenSection startAdding={startAdding} />
-        <UnlockSection />
         <AccountSection part={isGuest ? 'rest' : 'all'} />
 
         {/* Quiet trust links — parents' surface only */}
