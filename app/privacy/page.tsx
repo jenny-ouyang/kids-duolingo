@@ -34,7 +34,7 @@ export default function PrivacyPage() {
             <h1 className="text-[27px] font-extrabold text-ink leading-tight">
               Privacy Policy
             </h1>
-            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-10-28</p>
+            <p className="text-ink-mid text-sm font-bold">Last updated: 2026-10-30</p>
           </div>
         </div>
 
@@ -63,6 +63,12 @@ export default function PrivacyPage() {
                 whether they were right, and the hearts and streaks earned. This
                 powers the spaced-repetition scheduling and the progress you see in
                 the Parent Zone.
+              </li>
+              <li>
+                <strong>Purchases</strong> — if you unlock everything, we store
+                your plan, where it came from, and the Stripe or Apple transaction
+                id. If you buy in the iPhone app, Apple handles the payment. Card
+                numbers never reach our servers.
               </li>
             </ul>
           </Section>

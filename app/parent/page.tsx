@@ -5,7 +5,16 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { createSupabaseBrowser } from '@/lib/supabase-browser'
-import { apiFetch, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
+import { apiFetch, fetchJsonCached, fetchJsonWithAuthRetry, isNativeApp } from '@/lib/api-fetch'
+import {
+  buyLifetime,
+  getStoreInfo,
+  onPurchaseUpdated,
+  restoreLifetime,
+  verifyWithServer,
+  type PurchaseOutcome,
+  type StoreInfo,
+} from '@/lib/purchase-native'
 import { clearActiveChild } from '@/lib/child-cookie'
 import { ensureGuestSession, hasSession, sendSignInLink } from '@/lib/guest-session'
 import SignInCode from '@/components/auth/SignInCode'
@@ -519,10 +528,122 @@ interface AccountStatus {
   totalPackCount: number
 }
 
+function UnlockedCard({ isFounder }: { isFounder: boolean }) {
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-extrabold text-ink">Unlock</h2>
+      <div className="bg-white rounded-[22px] p-5 shadow-press-card">
+        <p className="font-extrabold text-ink">Everything is unlocked ✓</p>
+        <p className="text-ink-mid text-base font-bold mt-1">
+          {isFounder
+            ? 'Founder — thank you! Every future pack and upgrade is yours, forever.'
+            : 'Every pack, every child in your family, forever.'}
+        </p>
+      </div>
+    </section>
+  )
+}
+
+const NATIVE_PURCHASE_MESSAGES: Partial<Record<PurchaseOutcome, string>> = {
+  pending:
+    'Waiting for the family organizer to approve. When they say yes, the packs unlock here. You can also tap Restore Purchases.',
+  'nothing-to-restore':
+    "We couldn't find a purchase for this Apple ID. If you bought it with a different Apple ID, sign in with that one and try again.",
+  'verify-failed':
+    "Your purchase is safe with Apple, but we couldn't confirm it yet. Check your connection, then tap Restore Purchases. You won't be charged again.",
+  'store-error': "The App Store didn't answer. Please try again in a moment.",
+}
+
 /**
- * The one buy surface (spec 2026-10-13 §4). Web path only in Phase A; the
- * native StoreKit path lands in Phase C. Renders nothing while payments are
- * off, so the Parent Zone is unchanged for everyone until go-live.
+ * iPhone buy card (spec 2026-10-13 §4 and §6): Apple's localized price from
+ * StoreKit, Buy, Restore Purchases. No link to the website (App Store 3.1.1).
+ * Shown when payments are on, and also in the StoreKit sandbox (TestFlight and
+ * App Review) so the purchase can be tested while PAYMENTS_ENABLED is still off.
+ */
+function NativeUnlockCard({ status, onUnlocked }: { status: AccountStatus; onUnlocked: () => Promise<void> }) {
+  const [store, setStore] = useState<StoreInfo | null>(null)
+  const [busy, setBusy] = useState<'buy' | 'restore' | null>(null)
+  const [message, setMessage] = useState<string | null>(null)
+
+  useEffect(() => {
+    if (status.lifetime) return
+    let cancelled = false
+    getStoreInfo().then((info) => {
+      if (!cancelled) setStore(info)
+    })
+    return () => {
+      cancelled = true
+    }
+  }, [status.lifetime])
+
+  // Ask to Buy approved later, or a purchase that finished after the app closed.
+  useEffect(() => {
+    return onPurchaseUpdated(async (jws) => {
+      if (await verifyWithServer(jws)) {
+        setMessage(null)
+        await onUnlocked()
+      }
+    })
+  }, [onUnlocked])
+
+  if (status.lifetime) return <UnlockedCard isFounder={status.isFounder} />
+
+  const sandbox = store?.environment === 'sandbox' || store?.environment === 'xcode'
+  if (!status.paymentsEnabled && !sandbox) return null
+
+  async function run(kind: 'buy' | 'restore') {
+    if (busy) return
+    setBusy(kind)
+    setMessage(null)
+    const outcome = kind === 'buy' ? await buyLifetime() : await restoreLifetime()
+    if (outcome === 'unlocked') {
+      await onUnlocked()
+    } else {
+      setMessage(NATIVE_PURCHASE_MESSAGES[outcome] ?? null)
+    }
+    setBusy(null)
+  }
+
+  const product = store?.product ?? null
+
+  return (
+    <section className="flex flex-col gap-4">
+      <h2 className="text-lg font-extrabold text-ink">Unlock everything</h2>
+      <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
+        <p className="text-ink-mid text-base font-bold">
+          {status.freePackCount} of {status.totalPackCount} packs are free forever. One purchase opens the rest for every
+          child in your family — pay once, keep it always. No subscription.
+        </p>
+        {store && !product && (
+          <p className="text-ink text-base font-bold bg-chip-track rounded-2xl px-4 py-3">
+            The App Store isn&apos;t ready right now. Please try again later.
+          </p>
+        )}
+        {message && <p className="text-ink text-base font-bold">{message}</p>}
+        <button
+          onClick={() => run('buy')}
+          disabled={!product || busy !== null}
+          className="pressable min-h-[56px] bg-go text-white rounded-2xl px-5 text-base font-extrabold shadow-press-go disabled:opacity-50 self-start"
+        >
+          {busy === 'buy' ? 'Opening the App Store…' : product ? `Buy — ${product.displayPrice}` : 'Buy'}
+        </button>
+        <button
+          onClick={() => run('restore')}
+          disabled={busy !== null}
+          className="pressable min-h-[48px] bg-white text-ink rounded-2xl px-5 text-base font-extrabold shadow-press-chip disabled:opacity-50 self-start"
+        >
+          {busy === 'restore' ? 'Restoring…' : 'Restore Purchases'}
+        </button>
+      </div>
+    </section>
+  )
+}
+
+/**
+ * The one buy surface (spec 2026-10-13 §4). Web: Stripe Checkout. iPhone:
+ * NativeUnlockCard (StoreKit). Renders nothing while payments are off, so the
+ * Parent Zone is unchanged for everyone until go-live (except the StoreKit
+ * sandbox on iPhone, see NativeUnlockCard).
  */
 function UnlockSection() {
   const [status, setStatus] = useState<AccountStatus | null>(null)
@@ -539,8 +660,18 @@ function UnlockSection() {
     }
   }, [])
 
-  // Phase C replaces this with the StoreKit card; a web purchase link must never render inside the iPhone app (App Store 3.1.1).
-  if (isNativeApp()) return null
+  // After an iPhone purchase: new plan state, and fresh pack lists so the
+  // per-child offline cache drops the old `locked: true`.
+  const refreshAfterUnlock = useCallback(async () => {
+    const { ok, data } = await fetchJsonWithAuthRetry<AccountStatus>('/api/account')
+    if (ok && data) setStatus(data)
+    await Promise.all([fetchJsonCached('/api/packs'), fetchJsonCached('/api/packs?subject=math')])
+  }, [])
+
+  // A web purchase link must never render inside the iPhone app (App Store 3.1.1).
+  if (isNativeApp()) {
+    return status ? <NativeUnlockCard status={status} onUnlocked={refreshAfterUnlock} /> : null
+  }
 
   if (!status || !status.paymentsEnabled) return null
 
@@ -566,21 +697,7 @@ function UnlockSection() {
     setBuying(false)
   }
 
-  if (status.lifetime) {
-    return (
-      <section className="flex flex-col gap-4">
-        <h2 className="text-lg font-extrabold text-ink">Unlock</h2>
-        <div className="bg-white rounded-[22px] p-5 shadow-press-card">
-          <p className="font-extrabold text-ink">Everything is unlocked ✓</p>
-          <p className="text-ink-mid text-base font-bold mt-1">
-            {status.isFounder
-              ? 'Founder — thank you! Every future pack and upgrade is yours, forever.'
-              : 'Every pack, every child in your family, forever.'}
-          </p>
-        </div>
-      </section>
-    )
-  }
+  if (status.lifetime) return <UnlockedCard isFounder={status.isFounder} />
 
   return (
     <section className="flex flex-col gap-4">
