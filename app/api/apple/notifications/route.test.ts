@@ -1,13 +1,24 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { makeFakeAppleDb } from '@/lib/test/fake-apple-db'
 
-const { updateMany, decodeTx, decodeNotification } = vi.hoisted(() => ({
-  updateMany: vi.fn(),
+const { decodeTx, decodeNotification, fake } = vi.hoisted(() => ({
   decodeTx: vi.fn(),
   decodeNotification: vi.fn(),
+  fake: { current: null as ReturnType<typeof makeFakeAppleDb> | null, fail: false },
 }))
 
 vi.mock('@/lib/db', () => ({
-  prisma: { account: { updateMany } },
+  get prisma() {
+    const p = fake.current!.prisma
+    return fake.fail
+      ? {
+          ...p,
+          $transaction: async () => {
+            throw new Error('db down')
+          },
+        }
+      : p
+  },
 }))
 
 // The verifier is stubbed at the library boundary.
@@ -34,9 +45,13 @@ vi.mock('@apple/app-store-server-library', async (importOriginal) => {
 import { VerificationException, VerificationStatus } from '@apple/app-store-server-library'
 import { POST } from './route'
 
+fake.current = makeFakeAppleDb()
+const db = fake.current
+
 const tx = (extra: Record<string, unknown> = {}) => ({
   productId: 'com.mandarineer.app.lifetime',
   type: 'Non-Consumable',
+  transactionId: '2000000123',
   originalTransactionId: '2000000123',
   inAppOwnershipType: 'PURCHASED',
   ...extra,
@@ -60,54 +75,61 @@ function deliver(body: unknown = { signedPayload: 'eyJ.payload' }) {
 describe('POST /api/apple/notifications', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    updateMany.mockResolvedValue({ count: 1 })
+    db.reset()
+    fake.fail = false
     decodeTx.mockResolvedValue(tx())
+    db.addAccount({ id: 'buyer', plan: 'lifetime', planSource: 'apple', appleOriginalTransactionId: '2000000123' })
   })
 
   it('rejects a payload that fails verification, with no write', async () => {
     decodeNotification.mockRejectedValue(new VerificationException(VerificationStatus.VERIFICATION_FAILURE))
-    const res = await deliver()
-    expect(res.status).toBe(400)
-    expect(updateMany).not.toHaveBeenCalled()
+    expect((await deliver()).status).toBe(400)
+    expect(db.get('buyer').plan).toBe('lifetime')
+    expect(db.revocations).toHaveLength(0)
   })
 
-  it('REFUND for our product: an Apple-sourced account goes back to free and is unbound', async () => {
+  it('REFUND for our product: the Apple-sourced buyer goes back to free, unbound, and is recorded', async () => {
     decodeNotification.mockResolvedValue(notification('REFUND'))
-    const res = await deliver()
-    expect(res.status).toBe(200)
-    expect(updateMany).toHaveBeenCalledWith({
-      where: { appleOriginalTransactionId: '2000000123', planSource: 'apple' },
-      data: { plan: 'free', planSource: null, planGrantedAt: null, appleOriginalTransactionId: null },
-    })
+    expect((await deliver()).status).toBe(200)
+    expect(db.get('buyer')).toMatchObject({ plan: 'free', planSource: null, appleOriginalTransactionId: null })
+    expect(db.revocations).toEqual([expect.objectContaining({ key: 'purchased:2000000123', notificationType: 'REFUND' })])
   })
 
   it('REVOKE for the buyer copy is handled like REFUND', async () => {
     decodeNotification.mockResolvedValue(notification('REVOKE'))
     await deliver()
-    expect(updateMany).toHaveBeenCalledTimes(1)
+    expect(db.get('buyer').plan).toBe('free')
   })
 
-  it('REFUND for a Stripe-sourced account is a no-op (the write only matches planSource apple)', async () => {
-    updateMany.mockResolvedValue({ count: 0 })
+  it('a second delivery of the same REFUND is a no-op', async () => {
     decodeNotification.mockResolvedValue(notification('REFUND'))
-    const res = await deliver()
-    expect(res.status).toBe(200)
-    expect(updateMany.mock.calls[0][0].where.planSource).toBe('apple')
+    await deliver()
+    expect((await deliver()).status).toBe(200)
+    expect(db.revocations).toHaveLength(1)
   })
 
-  it('REVOKE for a family-shared copy does not touch the buyer account', async () => {
+  it('REFUND for a Stripe-sourced account keeps the Stripe plan', async () => {
+    db.reset()
+    db.addAccount({ id: 's1', plan: 'lifetime', planSource: 'stripe', appleOriginalTransactionId: '2000000123' })
+    decodeNotification.mockResolvedValue(notification('REFUND'))
+    expect((await deliver()).status).toBe(200)
+    expect(db.get('s1')).toMatchObject({ plan: 'lifetime', planSource: 'stripe' })
+  })
+
+  it('REVOKE for a family-shared copy carrying the buyer id does not touch the buyer', async () => {
     decodeNotification.mockResolvedValue(notification('REVOKE'))
-    decodeTx.mockResolvedValue(tx({ inAppOwnershipType: 'FAMILY_SHARED' }))
-    const res = await deliver()
-    expect(res.status).toBe(200)
-    expect(updateMany).not.toHaveBeenCalled()
+    decodeTx.mockResolvedValue(tx({ inAppOwnershipType: 'FAMILY_SHARED', transactionId: '3000000001' }))
+    expect((await deliver()).status).toBe(200)
+    expect(db.get('buyer')).toMatchObject({ plan: 'lifetime', appleOriginalTransactionId: '2000000123' })
+    expect(db.revocations.map((r) => r.key)).toEqual(['family:3000000001'])
   })
 
   it('REFUND for another product is ignored', async () => {
     decodeNotification.mockResolvedValue(notification('REFUND'))
     decodeTx.mockResolvedValue(tx({ productId: 'com.other.thing' }))
     expect((await deliver()).status).toBe(200)
-    expect(updateMany).not.toHaveBeenCalled()
+    expect(db.get('buyer').plan).toBe('lifetime')
+    expect(db.revocations).toHaveLength(0)
   })
 
   it('TEST and other types are acknowledged and ignored', async () => {
@@ -115,7 +137,7 @@ describe('POST /api/apple/notifications', () => {
       decodeNotification.mockResolvedValue({ notificationType: type, data: {} })
       expect((await deliver()).status).toBe(200)
     }
-    expect(updateMany).not.toHaveBeenCalled()
+    expect(db.get('buyer').plan).toBe('lifetime')
   })
 
   it('falls back to the Sandbox verifier for a sandbox notification', async () => {
@@ -124,12 +146,12 @@ describe('POST /api/apple/notifications', () => {
       return notification('REFUND')
     })
     expect((await deliver()).status).toBe(200)
-    expect(updateMany).toHaveBeenCalledTimes(1)
+    expect(db.get('buyer').plan).toBe('free')
   })
 
   it('a DB failure returns 500 so Apple retries', async () => {
     decodeNotification.mockResolvedValue(notification('REFUND'))
-    updateMany.mockRejectedValue(new Error('db down'))
+    fake.fail = true
     expect((await deliver()).status).toBe(500)
   })
 

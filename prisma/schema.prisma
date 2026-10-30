@@ -10,22 +10,48 @@ datasource db {
 /// One row per Supabase auth user. id == auth.users.id (uuid string).
 /// Guests (anonymous sign-ins) get a row too; isGuest flips false when claimed.
 model Account {
-  id                         String    @id
-  email                      String?   @unique
-  isGuest                    Boolean   @default(true)
-  plan                       String    @default("free")
+  id                         String             @id
+  email                      String?            @unique
+  isGuest                    Boolean            @default(true)
+  plan                       String             @default("free")
   /// 'stripe' | 'apple' | 'manual' — which system granted `plan`. Refunds downgrade only when the source matches.
   planSource                 String?
   planGrantedAt              DateTime?
   /// Founder promise (spec 2026-10-13 §1): every future pack and upgrade free, forever. Never cleared by a refund of another source.
-  isFounder                  Boolean   @default(false)
-  stripeCheckoutSessionId    String?   @unique
+  isFounder                  Boolean            @default(false)
+  stripeCheckoutSessionId    String?            @unique
   stripePaymentIntentId      String?
   /// One Apple purchase binds to at most one account at a time (restore moves it).
-  appleOriginalTransactionId String?   @unique
-  createdAt                  DateTime  @default(now())
-  updatedAt                  DateTime  @updatedAt
+  appleOriginalTransactionId String?            @unique
+  /// 'Production' | 'Sandbox' — App Store environment of the Apple grant (App Review buys in Sandbox).
+  appleEnvironment           String?
+  createdAt                  DateTime           @default(now())
+  updatedAt                  DateTime           @updatedAt
   children                   Child[]
+  appleFamilyGrants          AppleFamilyGrant[]
+}
+
+/// One family-shared copy of the Apple purchase (Family Sharing is on). Keyed by the
+/// family member's own transactionId so one JWS unlocks at most one account at a time.
+model AppleFamilyGrant {
+  transactionId         String   @id
+  originalTransactionId String
+  accountId             String
+  account               Account  @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  environment           String?
+  createdAt             DateTime @default(now())
+
+  @@index([originalTransactionId])
+  @@index([accountId])
+}
+
+/// Apple REFUND / REVOKE notifications, kept so an old signed transaction cannot be
+/// replayed to /api/apple/verify. key: 'purchased:<originalTransactionId>' or
+/// 'family:<transactionId>'.
+model AppleRevocation {
+  key              String   @id
+  notificationType String
+  createdAt        DateTime @default(now())
 }
 
 /// Replaces ChildProfile. One account, many children. Nickname + avatar only — no PII.
@@ -99,7 +125,7 @@ model MathProblem {
   id           String         @id
   packId       String
   operand1     Int
-  operator     String         // "+" | "-" | "count"
+  operator     String // "+" | "-" | "count"
   operand2     Int
   answer       Int
   emoji        String

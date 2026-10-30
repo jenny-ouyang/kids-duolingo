@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { APPLE_LIFETIME_PRODUCT_ID, isFamilyShared, verifyNotification, verifyTransaction } from '@/lib/apple-verify'
+import { dropAppleIfNoBasis, familyKey, purchasedKey } from '@/lib/apple-grants'
 
 export const runtime = 'nodejs'
 
@@ -9,14 +10,16 @@ export const runtime = 'nodejs'
  * Body: { signedPayload }. NEVER trusts the body without verifying the
  * signature against Apple's root certificates (lib/apple-verify.ts).
  *
- * - REFUND or REVOKE for our product, PURCHASED (the buyer's own copy): the
- *   account bound to that originalTransactionId goes back to free and loses
- *   the Apple binding, but only when its plan came from Apple. A Stripe or
- *   manual plan is left alone.
- * - FAMILY_SHARED transactions are acknowledged and ignored. A REVOKE for a
- *   family member's copy carries the BUYER's originalTransactionId, so acting
- *   on it would lock out the parent who paid. What happens to family members
- *   after a refund is an open decision (checklist, Phase C).
+ * Every REFUND / REVOKE for our product is recorded in AppleRevocation so
+ * /api/apple/verify refuses the old signed transaction (a JWS signed before
+ * a refund carries no revocationDate).
+ * - PURCHASED (the buyer's own copy): the buyer account loses the Apple
+ *   binding, every family-shared copy of that purchase is ended, and each
+ *   affected account goes back to free if its plan came from Apple and it has
+ *   no other Apple basis. Stripe / manual plans are never touched.
+ * - FAMILY_SHARED: only that family member's grant ends. The buyer's binding
+ *   is never touched, because the notification may carry the buyer's
+ *   originalTransactionId.
  * - TEST and every other type: acknowledged (200) and ignored.
  *
  * A DB failure returns 500 so Apple retries. Idempotent: a second delivery
@@ -60,17 +63,68 @@ export async function POST(req: Request) {
   if (tx.productId !== APPLE_LIFETIME_PRODUCT_ID || !tx.originalTransactionId) {
     return NextResponse.json({ received: true })
   }
-  if (isFamilyShared(tx)) {
-    console.log(`[apple notifications] ${type} for a family-shared copy: ignored (open decision)`)
+  const otid = tx.originalTransactionId
+  const familyTxId = isFamilyShared(tx) ? tx.transactionId : undefined
+  if (isFamilyShared(tx) && !familyTxId) {
     return NextResponse.json({ received: true })
   }
 
   try {
-    const result = await prisma.account.updateMany({
-      where: { appleOriginalTransactionId: tx.originalTransactionId, planSource: 'apple' },
-      data: { plan: 'free', planSource: null, planGrantedAt: null, appleOriginalTransactionId: null },
+    const downgraded = await prisma.$transaction(async (db) => {
+      const affected = new Set<string>()
+      if (familyTxId) {
+        // A family member's copy. Never touch the buyer's binding: the
+        // notification may carry the buyer's originalTransactionId.
+        await db.appleRevocation.upsert({
+          where: { key: familyKey(familyTxId) },
+          create: { key: familyKey(familyTxId), notificationType: type },
+          update: {},
+        })
+        const otidIsBuyers = (await db.account.count({ where: { appleOriginalTransactionId: otid } })) > 0
+        const grants = await db.appleFamilyGrant.findMany({
+          where: otidIsBuyers ? { transactionId: familyTxId } : { OR: [{ transactionId: familyTxId }, { originalTransactionId: otid }] },
+          select: { transactionId: true, accountId: true },
+        })
+        for (const g of grants) {
+          if (g.transactionId === familyTxId) continue
+          await db.appleRevocation.upsert({
+            where: { key: familyKey(g.transactionId) },
+            create: { key: familyKey(g.transactionId), notificationType: type },
+            update: {},
+          })
+        }
+        await db.appleFamilyGrant.deleteMany({ where: { transactionId: { in: grants.map((g) => g.transactionId) } } })
+        grants.forEach((g) => affected.add(g.accountId))
+      } else {
+        // The buyer's own purchase: record it so the old JWS cannot be
+        // replayed, unbind the buyer, and end every family-shared copy of it.
+        await db.appleRevocation.upsert({
+          where: { key: purchasedKey(otid) },
+          create: { key: purchasedKey(otid), notificationType: type },
+          update: {},
+        })
+        const bound = await db.account.findMany({ where: { appleOriginalTransactionId: otid }, select: { id: true } })
+        await db.account.updateMany({ where: { appleOriginalTransactionId: otid }, data: { appleOriginalTransactionId: null } })
+        bound.forEach((a) => affected.add(a.id))
+        const grants = await db.appleFamilyGrant.findMany({
+          where: { originalTransactionId: otid },
+          select: { transactionId: true, accountId: true },
+        })
+        for (const g of grants) {
+          await db.appleRevocation.upsert({
+            where: { key: familyKey(g.transactionId) },
+            create: { key: familyKey(g.transactionId), notificationType: type },
+            update: {},
+          })
+        }
+        await db.appleFamilyGrant.deleteMany({ where: { originalTransactionId: otid } })
+        grants.forEach((g) => affected.add(g.accountId))
+      }
+      let count = 0
+      for (const id of Array.from(affected)) if (await dropAppleIfNoBasis(db, id)) count++
+      return count
     })
-    console.log(`[apple notifications] ${type}: ${result.count} account(s) back to free`)
+    console.log(`[apple notifications] ${type}${familyTxId ? ' (family copy)' : ''}: ${downgraded} account(s) back to free`)
     return NextResponse.json({ received: true })
   } catch (err) {
     console.error('[apple notifications POST]', err)

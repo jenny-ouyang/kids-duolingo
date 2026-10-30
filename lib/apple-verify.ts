@@ -34,6 +34,7 @@ function getVerifiers(): SignedDataVerifier[] {
   return verifiers
 }
 
+// Sandbox stays accepted on the production server on purpose: Apple App Review buys in the Sandbox against it, and only our TestFlight / sandbox testers can make Sandbox transactions for this bundle id. Each grant stores tx.environment (Account.appleEnvironment).
 /** Runs `fn` with the Production verifier, then the Sandbox one when the data is from the other environment. */
 async function withEnvironmentFallback<T>(fn: (v: SignedDataVerifier) => Promise<T>): Promise<T> {
   const [production, sandbox] = getVerifiers()
