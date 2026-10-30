@@ -181,3 +181,4 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] Before submit: replace the purchase review screenshot (now the landing page, a placeholder) with a real iPhone screenshot of the Unlock everything card from build 10.
 - [x] App Store Connect API works from this Mac (key TT2YN4RP4G, issuer in `.env.local`). Claude edits listing text, review notes and screenshots; App Privacy answers stay in the browser.
 - [ ] Bug: build 10 showed no Unlock everything card in TestFlight (build 10 was VALID and in beta). Fix in 03a52e8: card hides only when the store says production, environment also read from AppTransaction, a "Test store" line shows. Build 11 uploads it; Jenny checks the card and the line.
+  - [x] Build 11 uploaded 2026-10-30 11:38 (manual signing, profile "Mandarineer AppStore"; automatic signing fails with "no devices").
