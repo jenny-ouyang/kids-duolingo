@@ -139,7 +139,7 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
   - [x] End-to-end test on localhost: Claude sent a code, read it in Gmail (663721), typed it, and saw "Who's playing?" with Julian and Amelie.
   - [ ] Test in the iPhone app (next TestFlight build).
 - [x] TestFlight build 9 uploaded (2026-10-28, "Upload succeeded"). It has all of today's fixes and the code sign-in, and it calls mandarineer.com (`08c96a6`).
-- [ ] Apple finishes processing build 9; Jenny updates in TestFlight, opens Parent Zone → "Already saved on another device?", sends a code, and types it. Expected: Julian and Amelie.
+- [x] Apple finishes processing build 9; Jenny updates in TestFlight, opens Parent Zone → "Already saved on another device?", sends a code, and types it. Expected: Julian and Amelie.
 - [x] Counts on 2026-10-28: 179 auth users (178 guests, 1 with email), 12 families with a child, 15 children, 4 ever played, 2 played in the last 30 days, 0 paid. 165 auth users have no family (old sign-in-on-every-visit bug, fixed `8fde74a`).
 - [x] Jenny said yes (2026-10-28): deleted 165 anonymous auth users with no Account row. 14 users left, 0 without an account, 15 children unchanged.
 - [x] Jenny: which of the 12 families are hers? (Decided 2026-10-28 by "yes clean up": Julian/Amelie are hers; Adam and Simmy stay as they are.) Claude's guess: Julian/Amelie families (4 accounts, only one saved with email) are Jenny's; Adam (281 hearts, last 2026-10-12) and maybe Simmy are outside families; Mei ×2, tada, QA ×2, dfds/asdf are tests.
@@ -158,8 +158,8 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 
 ## Release path to the App Store (2026-10-29)
 
-- [ ] 1. Jenny: update to build 9 in TestFlight and test the sign-in code (Parent Zone → "Already saved on another device?"). Expected: Julian and Amelie.
-- [ ] 2. Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
+- [x] 1. Jenny: update to build 9 in TestFlight and test the sign-in code (Parent Zone → "Already saved on another device?"). Expected: Julian and Amelie.
+- [ ] 2. (Agreement, bank and tax done 2026-10-29; Small Business Program and in-app purchase open) Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
 - [ ] 3. Claude: Phase C, StoreKit code for the iPhone purchase, then build 10 to TestFlight.
 - [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
 - [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
