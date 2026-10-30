@@ -10,6 +10,14 @@
  * no next/server.
  */
 
+/**
+ * Founding period (Jenny, 2026-10-30): the home page sells $9.99 as the
+ * founding price with every future pack and upgrade included. Every lifetime
+ * purchase made while this is true gets isFounder, so the promise holds for
+ * every buyer, not only FOUNDER-code buyers. Set false when the price goes up.
+ */
+export const FOUNDING_PERIOD = true
+
 /** One-time purchase price shown in the Parent Zone (Stripe is the source of truth via STRIPE_PRICE_ID). */
 export const LIFETIME_PRICE_DISPLAY = '$9.99'
 

@@ -242,8 +242,9 @@ export default function Landing() {
                   🎈
                 </span>
                 <span>
-                  Free to start, with free packs to keep. One {LIFETIME_PRICE_DISPLAY}{' '}
-                  payment opens everything for every child — no subscription.
+                  <strong>Founding price: {LIFETIME_PRICE_DISPLAY}, one time.</strong>{' '}
+                  Lifetime access for every child, with every future pack and
+                  upgrade included. The price goes up after the founding period.
                 </span>
               </li>
             </ul>
