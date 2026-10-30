@@ -195,4 +195,5 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [ ] Jenny (browser): App Privacy: add Purchases → Purchase History (linked to the user, not tracking, App Functionality), then Publish.
 - [ ] Jenny: "yes, submit". Claude submits version 1.0 with the purchase.
 - [x] Release type set to MANUAL: after approval, Jenny presses Release and Claude turns on payments in the same hour.
-- [ ] Jenny decides: payments during App Review. Off: the reviewer buys and sees only "Everything is unlocked" (all packs are open), which Apple can reject as a purchase that gives nothing (guideline 2.1/3.1.1). On: mandarineer.com and the app lock packs today, for every family.
+- [x] (2026-10-30: turn payments ON when we submit; Jenny's account got a free manual unlock first, Julian and Amelie keep everything) Jenny decides: payments during App Review. Off: the reviewer buys and sees only "Everything is unlocked" (all packs are open), which Apple can reject as a purchase that gives nothing (guideline 2.1/3.1.1). On: mandarineer.com and the app lock packs today, for every family.
+- [ ] Claude, at submit: set `PAYMENTS_ENABLED=true` in Vercel production and redeploy; check a new guest sees locks and the web Buy card.
