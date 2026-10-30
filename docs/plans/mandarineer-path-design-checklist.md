@@ -211,3 +211,17 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Vercel production READY for 660ee58; `/api/account` and `/api/children` answer 401 without sign-in (not 404). Checked 2026-10-30.
 - [ ] Prevention: `scripts/build-ios.sh` must not leave the repo in a state that a commit can capture (for example, build from a copy, or refuse to start when a commit could run). Proposal; Jenny decides.
 - [ ] Security review (automated, on the restored code; old code, not new): a child can get words of a locked pack by sending crafted requests: sticker award in `app/api/profile/route.ts` has no pack check; `app/api/progress/route.ts` does not check that the word belongs to the pack; the report in `app/api/children/[childId]/report/route.ts` shows words from locked packs. Medium. Proposal: fix after submit, before the price goes up.
+
+### Buy card hidden on build 12 (2026-10-30)
+
+- [x] Cause (from code, not tested on device): `ios/App/App/LifetimePurchase.swift:61` falls back to "production" when it cannot read the environment, and with payments off that hides the card.
+- [x] Fix without a new build: 8bf98cf, `PAYMENTS_TESTER_EMAILS` (jenny@buildtolaunch.ai, bingjie.j.ouyang@gmail.com) in Vercel production; those accounts see the card. Pack access unchanged. Deploy READY.
+- [ ] Jenny: reopen Parent Zone signed in as jenny@buildtolaunch.ai; the card shows; Buy with the sandbox tester.
+- [ ] Next build: Swift fallback returns "unknown", not "production".
+
+### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
+
+- [ ] Flow: child plays a free lesson first, no sign-up; after the first finished lesson, a grown-ups check, then the founding-price offer with "Not now"; a locked pack opens the same offer; sign-in (email code) only when a parent buys or saves progress. Jenny's idea was sign-up first, then the offer, then the app.
+- [ ] Parent Zone: a small button at the top right of the home screen, behind the grown-ups check, in place of the text link at the bottom.
+- [ ] Home loads slowly (Jenny, screenshot 27): measure the time of `/api/profile` and the pack lists; show the buttons at once and fill in "Play next" when it arrives. Not measured yet.
+- [ ] When: in 1.0 before submit (new build, new test) or in 1.1 after submit. Claude recommends 1.1.
