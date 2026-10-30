@@ -189,8 +189,8 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 
 - [x] Description: "Free to play" line replaced with the one-purchase line (API, 2026-10-30).
 - [ ] Jenny: build 11 test: card shows, sandbox Buy works. Then a real screenshot of the card replaces the purchase placeholder.
-- [ ] Jenny gives: App Review contact phone and email; copyright line; third-party content answer.
+- [ ] Jenny gives: App Review contact phone (open). Decided: email bingjie.j.ouyang@gmail.com, copyright "2026 Build to Launch" (set), third-party content: yes, with rights (set).
 - [ ] Claude: review contact, copyright, content rights, review notes (API).
-- [ ] Claude: attach build 11 to version 1.0 (now build 5 is attached).
+- [x] Claude: attach build 11 to version 1.0 (done through the API, 2026-10-30).
 - [ ] Jenny (browser): App Privacy: add Purchases → Purchase History (linked to the user, not tracking, App Functionality), then Publish.
 - [ ] Jenny: "yes, submit". Claude submits version 1.0 with the purchase.
