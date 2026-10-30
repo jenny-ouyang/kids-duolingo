@@ -45,6 +45,17 @@ export function paymentsEnabled(): boolean {
 }
 
 /**
+ * Accounts that see the buy card while payments are still off, so a purchase
+ * can be tested on a real device before launch. Comma-separated emails in
+ * PAYMENTS_TESTER_EMAILS. UI only: pack access still follows paymentsEnabled().
+ */
+export function isPaymentsTester(email: string | null): boolean {
+  if (!email) return false
+  const list = (process.env.PAYMENTS_TESTER_EMAILS ?? '').split(',').map((e) => e.trim().toLowerCase())
+  return list.includes(email.toLowerCase())
+}
+
+/**
  * THE access rule. Every gated route and the pack list go through here.
  * Payments off → everything is open (today's behaviour).
  */

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { prisma } from '@/lib/db'
 import { getAuthContext, authErrorResponse, CHILD_COOKIE } from '@/lib/auth'
-import { hasLifetime, isPackFree, paymentsEnabled } from '@/lib/plan'
+import { hasLifetime, isPackFree, isPaymentsTester, paymentsEnabled } from '@/lib/plan'
 
 export const runtime = 'nodejs'
 
@@ -32,7 +32,7 @@ export async function GET() {
       isFounder: account.isFounder,
       isGuest: account.isGuest,
       email: account.email,
-      paymentsEnabled: paymentsEnabled(),
+      paymentsEnabled: paymentsEnabled() || isPaymentsTester(account.email),
       freePackCount,
       totalPackCount: withContent.length,
     })

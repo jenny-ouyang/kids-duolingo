@@ -63,3 +63,16 @@ describe('canAccessPack', () => {
     expect(hasLifetime({ plan: 'Lifetime' })).toBe(false)
   })
 })
+
+describe('isPaymentsTester', () => {
+  it('matches listed emails, any case, and nothing else', async () => {
+    const { isPaymentsTester } = await import('@/lib/plan')
+    process.env.PAYMENTS_TESTER_EMAILS = 'a@x.com, Jenny@BuildToLaunch.ai'
+    expect(isPaymentsTester('jenny@buildtolaunch.ai')).toBe(true)
+    expect(isPaymentsTester('a@x.com')).toBe(true)
+    expect(isPaymentsTester('b@x.com')).toBe(false)
+    expect(isPaymentsTester(null)).toBe(false)
+    delete process.env.PAYMENTS_TESTER_EMAILS
+    expect(isPaymentsTester('a@x.com')).toBe(false)
+  })
+})
