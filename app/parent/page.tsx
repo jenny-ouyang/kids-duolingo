@@ -588,8 +588,10 @@ function NativeUnlockCard({ status, onUnlocked }: { status: AccountStatus; onUnl
 
   if (status.lifetime) return <UnlockedCard isFounder={status.isFounder} />
 
-  const sandbox = store?.environment === 'sandbox' || store?.environment === 'xcode'
-  if (!status.paymentsEnabled && !sandbox) return null
+  // Payments off: hide only in the real App Store. 'unknown' (the plugin did not
+  // answer) shows the card with its environment line, so a fault is visible in
+  // TestFlight instead of a silent empty space.
+  if (!status.paymentsEnabled && (!store || store.environment === 'production')) return null
 
   async function run(kind: 'buy' | 'restore') {
     if (busy) return
@@ -620,6 +622,11 @@ function NativeUnlockCard({ status, onUnlocked }: { status: AccountStatus; onUnl
           </p>
         )}
         {message && <p className="text-ink text-base font-bold">{message}</p>}
+        {!status.paymentsEnabled && (
+          <p className="text-ink-mid text-sm font-bold">
+            Test store: {store?.environment} · product {product ? 'loaded' : 'not loaded'}
+          </p>
+        )}
         <button
           onClick={() => run('buy')}
           disabled={!product || busy !== null}

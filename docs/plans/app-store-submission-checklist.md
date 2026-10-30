@@ -7,7 +7,7 @@ Goal: submit version 1.0, build 6, free, to App Review. Claude drives App Store 
 ## 0. Access (one of the two)
 
 - [ ] **J** Option A, browser: reconnect the Claude Chrome extension and open App Store Connect in that Chrome, signed in. Claude then fills every screen below with you watching.
-- [ ] **J** Option B, API: paste the **Issuer ID** from App Store Connect → Users and Access → Integrations → App Store Connect API (it is a UUID at the top of the page, not a secret). Key `TT2YN4RP4G` already sits on this Mac. Claude then fills everything the API supports and asks for the browser only for the App Privacy answers, which the API does not cover. Issuer ID: {{issuer id}}
+- [x] **J** Option B, API: paste the **Issuer ID** from App Store Connect → Users and Access → Integrations → App Store Connect API (it is a UUID at the top of the page, not a secret). Key `TT2YN4RP4G` already sits on this Mac. Claude then fills everything the API supports and asks for the browser only for the App Privacy answers, which the API does not cover. Issuer ID: 076078be-e0e1-4b6a-9487-81f4585e88d9 (saved in .env.local as ASC_ISSUER_ID, 2026-10-30)
 
 ## 1. Already done
 

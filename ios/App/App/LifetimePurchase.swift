@@ -47,14 +47,24 @@ public class LifetimePurchasePlugin: CAPPlugin, CAPBridgedPlugin {
 
     /// TestFlight and App Review run against the StoreKit sandbox. Read from the
     /// receipt URL so no App Store sign-in prompt can appear.
-    private static func storeEnvironment() -> String {
-        Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" ? "sandbox" : "production"
+    private static func storeEnvironment() async -> String {
+        if Bundle.main.appStoreReceiptURL?.lastPathComponent == "sandboxReceipt" { return "sandbox" }
+        // The receipt file can be missing on a fresh TestFlight install; the
+        // signed app transaction (iOS 16+) names the environment directly.
+        if #available(iOS 16.0, *), case .verified(let app) = try? await AppTransaction.shared {
+            switch app.environment {
+            case .sandbox: return "sandbox"
+            case .xcode: return "xcode"
+            default: return "production"
+            }
+        }
+        return "production"
     }
 
     /// { product?: { id, displayPrice }, environment }. displayPrice is Apple's localized price.
     @objc func getProduct(_ call: CAPPluginCall) {
         Task {
-            var data: [String: Any] = ["environment": LifetimePurchasePlugin.storeEnvironment()]
+            var data: [String: Any] = ["environment": await LifetimePurchasePlugin.storeEnvironment()]
             if let product = try? await Product.products(for: [LifetimePurchasePlugin.productId]).first {
                 data["product"] = ["id": product.id, "displayPrice": product.displayPrice]
             }
