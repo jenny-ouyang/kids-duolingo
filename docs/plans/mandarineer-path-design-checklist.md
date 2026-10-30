@@ -164,4 +164,4 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
 - [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
 - [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
-- [ ] Jenny decides: price per family ($9.99 for all children, proposed) or per child ($9.99 for each child). Per child needs a consumable "child place" product on iPhone, server records for restore, no Family Sharing, and a change to the web Stripe price.
+- [x] (2026-10-30: per family for launch; change later if data says so) Jenny decides: price per family ($9.99 for all children, proposed) or per child ($9.99 for each child). Per child needs a consumable "child place" product on iPhone, server records for restore, no Family Sharing, and a change to the web Stripe price.
