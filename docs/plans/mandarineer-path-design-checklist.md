@@ -182,3 +182,15 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [x] App Store Connect API works from this Mac (key TT2YN4RP4G, issuer in `.env.local`). Claude edits listing text, review notes and screenshots; App Privacy answers stay in the browser.
 - [ ] Bug: build 10 showed no Unlock everything card in TestFlight (build 10 was VALID and in beta). Fix in 03a52e8: card hides only when the store says production, environment also read from AppTransaction, a "Test store" line shows. Build 11 uploads it; Jenny checks the card and the line.
   - [x] Build 11 uploaded 2026-10-30 11:38 (manual signing, profile "Mandarineer AppStore"; automatic signing fails with "no devices").
+
+## Submit 1.0 today (2026-10-30)
+
+Already set in App Store Connect (checked through the API): name, subtitle, description, keywords, promo text, support and marketing URL, privacy URL, category Education, age rating 4+, 6 iPhone and 3 iPad screenshots, purchase READY_TO_SUBMIT.
+
+- [x] Description: "Free to play" line replaced with the one-purchase line (API, 2026-10-30).
+- [ ] Jenny: build 11 test: card shows, sandbox Buy works. Then a real screenshot of the card replaces the purchase placeholder.
+- [ ] Jenny gives: App Review contact phone and email; copyright line; third-party content answer.
+- [ ] Claude: review contact, copyright, content rights, review notes (API).
+- [ ] Claude: attach build 11 to version 1.0 (now build 5 is attached).
+- [ ] Jenny (browser): App Privacy: add Purchases → Purchase History (linked to the user, not tracking, App Functionality), then Publish.
+- [ ] Jenny: "yes, submit". Claude submits version 1.0 with the purchase.
