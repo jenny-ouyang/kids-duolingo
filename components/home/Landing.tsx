@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Hills, Sparkles, Sun } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
+import { LIFETIME_PRICE_DISPLAY } from '@/lib/plan'
 import ResumeFamily from '@/components/home/ResumeFamily'
 
 /*
@@ -97,11 +98,11 @@ export default function Landing() {
             href="/welcome"
             className="pressable mt-2 inline-flex min-h-[60px] items-center justify-center rounded-full bg-go px-12 py-4 text-xl font-extrabold text-white shadow-press-go"
           >
-            Play free →
+            Start free →
           </Link>
 
           <p className="text-sm font-extrabold text-ink-mid">
-            Free to play · No sign-up needed · Works on phone, tablet &amp;
+            Free to start · No sign-up needed · Works on phone, tablet &amp;
             computer
           </p>
 
@@ -241,8 +242,8 @@ export default function Landing() {
                   🎈
                 </span>
                 <span>
-                  Free while in early access — every pack and feature, no
-                  payment details asked.
+                  Free to start, with free packs to keep. One {LIFETIME_PRICE_DISPLAY}{' '}
+                  payment opens everything for every child — no subscription.
                 </span>
               </li>
             </ul>
