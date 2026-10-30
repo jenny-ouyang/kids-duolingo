@@ -58,7 +58,8 @@ public class LifetimePurchasePlugin: CAPPlugin, CAPBridgedPlugin {
             default: return "production"
             }
         }
-        return "production"
+        // Not known: say so. "production" here hid the TestFlight buy card (build 12).
+        return "unknown"
     }
 
     /// { product?: { id, displayPrice }, environment }. displayPrice is Apple's localized price.

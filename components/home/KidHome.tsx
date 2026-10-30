@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import KidLayout from '@/components/layout/KidLayout'
-import { Hills, Sparkles, Sun, Lantern } from '@/components/design/Scenery'
+import { Hills, Sparkles, Lantern } from '@/components/design/Scenery'
 import Mascot from '@/components/design/Mascot'
 import { hasSession } from '@/lib/guest-session'
 import { clearActiveChild } from '@/lib/child-cookie'
@@ -117,7 +117,6 @@ export default function KidHome() {
 
   return (
     <KidLayout align="top">
-      <Sun />
       <Lantern className={showSwitcher ? 'top-5 left-[76px]' : 'top-4 left-10'} />
       <Sparkles />
       <Hills />
@@ -139,6 +138,16 @@ export default function KidHome() {
           </button>
         </motion.div>
       )}
+
+      {/* Parent Zone sits in a fixed corner from the first frame: content that
+          loads later can never move it under a tap (Jenny 2026-10-30: her tap on a
+          bottom link landed on Play next after the profile arrived). */}
+      <button
+        onClick={() => router.push('/parent')}
+        className="pressable absolute top-3 right-3 z-20 min-h-[44px] px-4 rounded-2xl bg-white shadow-press-chip text-ink-mid text-base font-extrabold"
+      >
+        Parent Zone
+      </button>
 
       <div className="relative z-10 flex flex-col items-center gap-6 w-full max-w-md">
         {/* Mascot with speech bubble */}
@@ -168,10 +177,12 @@ export default function KidHome() {
           )}
         </div>
 
-        {profile && (
+        {status !== 'error' && (
           <>
-            {/* One main thing to tap: play the suggested pack */}
-            {profile.nextPack && (
+            {/* One main thing to tap: play the suggested pack. While the profile
+                loads, an empty block of the same height holds its place. */}
+            {!profile && <div aria-hidden className="w-full min-h-[132px] rounded-[28px] bg-white/50 animate-pulse" />}
+            {profile?.nextPack && (
               <button
                 onClick={() => router.push(`/practice/session?pack=${profile.nextPack!.id}`)}
                 aria-label={`Play next: ${profile.nextPack.name}`}
@@ -197,13 +208,6 @@ export default function KidHome() {
           </>
         )}
 
-        {/* Parent link */}
-        <button
-          onClick={() => router.push('/parent')}
-          className="min-h-[44px] text-ink-mid text-base font-bold underline underline-offset-2"
-        >
-          Parent Zone
-        </button>
       </div>
     </KidLayout>
   )
