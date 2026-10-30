@@ -160,17 +160,18 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 
 - [x] 1. Jenny: update to build 9 in TestFlight and test the sign-in code (Parent Zone → "Already saved on another device?"). Expected: Julian and Amelie.
 - [x] 2. (All done 2026-10-30: agreement, Small Business Program form, in-app purchase with Family Sharing on) Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
-- [ ] 3. Claude: Phase C, StoreKit code for the iPhone purchase, then build 10 to TestFlight.
-  - [ ] Swift plugin `ios/App/App/LifetimePurchase.swift` (StoreKit 2: product, buy, restore).
-  - [ ] JS wrapper `lib/purchase-native.ts`.
-  - [ ] `POST /api/apple/verify` (Apple certificates, product id check, restore rule).
-  - [ ] `POST /api/apple/notifications` (refund and revoke).
-  - [ ] Tests for both routes.
-  - [ ] Parent Zone on iPhone: Apple price, Buy, Restore Purchases.
-  - [ ] Privacy manifest: purchase history.
-  - [ ] Build 10 (version 1.0) to TestFlight.
-  - [ ] Family Sharing is on (not in the spec): a shared family member gets lifetime without the "move on restore" rule. Open: what happens to shared family members when the buyer gets a refund.
-- [ ] Jenny: in App Store Connect, check that the Paid Apps agreement shows **Active**; make a sandbox tester; set the server notification URL; upload a placeholder review screenshot on the purchase page.
+- [x] 3. (done 2026-10-30, one decision open below) Claude: Phase C, StoreKit code for the iPhone purchase, then build 10 to TestFlight.
+  - [x] (2026-10-30, c8e8964..a678eb4) Swift plugin `ios/App/App/LifetimePurchase.swift` (StoreKit 2: product, buy, restore). Registered in `MainViewController.capacitorDidLoad()` (SceneDelegate and storyboard point to it). Compiles (simulator build and archive).
+  - [x] (2026-10-30) JS wrapper `lib/purchase-native.ts`.
+  - [x] (2026-10-30) `POST /api/apple/verify` (Apple certificates, product id check, restore rule). Certificates are embedded as base64 in `lib/apple-root-certs.ts`. Live on mandarineer.com.
+  - [x] (2026-10-30) `POST /api/apple/notifications` (refund and revoke). Live on mandarineer.com.
+  - [x] (2026-10-30) Tests for both routes: 70 tests pass in total.
+  - [x] (2026-10-30) Parent Zone on iPhone: Apple price, Buy, Restore Purchases.
+  - [x] (2026-10-30) Privacy manifest: purchase history. Privacy page has a "Purchases" line.
+  - [x] (2026-10-30, upload succeeded 00:36; archive 1.0 (10), app points to mandarineer.com, 0 vercel.app) Build 10 (version 1.0) to TestFlight. Apple still has to process it before it shows in TestFlight.
+  - [x] (2026-10-30, security review fixes 430d18a, 576eca3) Family Sharing is on (not in the spec): a shared family member gets lifetime without the "move on restore" rule. Each shared copy is saved by its own transactionId, so one shared purchase unlocks only one account at a time. A buyer refund ends every shared copy. A refunded purchase cannot be sent again to get the unlock back.
+  - [ ] Jenny decides: the iPhone buy card shows in the Apple sandbox (TestFlight and App Review) even while `PAYMENTS_ENABLED` is off, so you and Apple can test the purchase. Real App Store users see it only after go-live. Keep this, or change it?
+- [ ] (done 2026-10-30: agreement Active, sandbox tester, notification URLs; placeholder review screenshot not confirmed) Jenny: in App Store Connect, check that the Paid Apps agreement shows **Active**; make a sandbox tester; set the server notification URL; upload a placeholder review screenshot on the purchase page.
 - [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
 - [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
 - [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
