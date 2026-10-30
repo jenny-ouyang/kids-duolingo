@@ -220,7 +220,7 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Next build: Swift fallback returns "unknown", not "production" (build 13).
 - [x] Build 13 uploaded (replaced by build 14).
 - [x] Locked pack: 🔒 and not tappable; buy card one line, no free-pack count (f9b1a87, Jenny's rule).
-- [ ] Build 14 uploaded (done 16:05); processed and attached to version 1.0; Jenny checks home, locks and buy card.
+- [x] Build 14 uploaded, VALID, attached to version 1.0 (API check). Open: Jenny checks home, locks and buy card.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
 
