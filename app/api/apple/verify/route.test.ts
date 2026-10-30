@@ -193,6 +193,25 @@ describe('POST /api/apple/verify', () => {
       expect((await verifyTx(validTx())).status).toBe(400)
     })
 
+    it('the revocation check runs inside the grant transaction, after the purchase lock (race fix)', async () => {
+      await verify()
+      expect(db.log).toEqual(['tx:begin', 'lock:2000000123', 'revocation:check', 'tx:end'])
+      db.log.length = 0
+      as('u2')
+      await verifyTx(familyTx('3000000001'))
+      expect(db.log).toEqual(['tx:begin', 'lock:2000000123', 'revocation:check', 'tx:end'])
+    })
+
+    it('a refund recorded after the request started but before the locked check is honoured', async () => {
+      // The refund commits while verify is still decoding the JWS.
+      decodeTx.mockImplementation(async () => {
+        db.revocations.push({ key: 'purchased:2000000123', notificationType: 'REFUND' })
+        return validTx()
+      })
+      expect((await verify()).status).toBe(400)
+      expect(db.get('u1').plan).toBe('free')
+    })
+
     it('a new purchase after a refund (new originalTransactionId) is accepted', async () => {
       await notify('REFUND', validTx())
       expect((await verifyTx(validTx({ transactionId: '2000000999', originalTransactionId: '2000000999' }))).status).toBe(200)
@@ -260,6 +279,20 @@ describe('POST /api/apple/verify', () => {
       as('u1')
       expect((await verifyTx(familyTx('3000000001'))).status).toBe(400)
       expect(db.get('u1').plan).toBe('free')
+    })
+
+    it("a family member's REVOKE does not fan out to other members sharing the same originalTransactionId", async () => {
+      // No buyer account bound here, so the old fan-out rule would have hit u2 too.
+      await verifyTx(familyTx('3000000001'))
+      as('u2')
+      await verifyTx(familyTx('3000000002'))
+      await notify('REVOKE', familyTx('3000000001'))
+      expect(db.get('u1').plan).toBe('free')
+      expect(db.get('u2').plan).toBe('lifetime')
+      expect(db.revocations.map((r) => r.key)).toEqual(['family:3000000001'])
+      // u2 can still re-verify its own copy
+      as('u2')
+      expect((await verifyTx(familyTx('3000000002'))).status).toBe(200)
     })
 
     it("a family member's REVOKE ends only that grant and never touches the buyer", async () => {

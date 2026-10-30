@@ -124,6 +124,20 @@ describe('POST /api/apple/notifications', () => {
     expect(db.revocations.map((r) => r.key)).toEqual(['family:3000000001'])
   })
 
+  it('takes the purchase lock before recording the revocation (same lock as verify)', async () => {
+    decodeNotification.mockResolvedValue(notification('REFUND'))
+    await deliver()
+    expect(db.log.slice(0, 3)).toEqual(['tx:begin', 'lock:2000000123', 'revocation:write'])
+  })
+
+  it('a family-copy notification never records the originalTransactionId as revoked', async () => {
+    decodeNotification.mockResolvedValue(notification('REFUND'))
+    decodeTx.mockResolvedValue(tx({ inAppOwnershipType: 'FAMILY_SHARED', transactionId: '3000000001' }))
+    await deliver()
+    expect(db.revocations.map((r) => r.key)).toEqual(['family:3000000001'])
+    expect(db.log.slice(0, 2)).toEqual(['tx:begin', 'lock:2000000123'])
+  })
+
   it('REFUND for another product is ignored', async () => {
     decodeNotification.mockResolvedValue(notification('REFUND'))
     decodeTx.mockResolvedValue(tx({ productId: 'com.other.thing' }))

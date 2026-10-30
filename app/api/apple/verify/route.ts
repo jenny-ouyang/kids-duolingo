@@ -3,7 +3,7 @@ import { prisma } from '@/lib/db'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
 import { hasLifetime } from '@/lib/plan'
 import { isFamilyShared, isValidLifetimeTransaction, verifyTransaction } from '@/lib/apple-verify'
-import { dropAppleIfNoBasis, familyKey, purchasedKey } from '@/lib/apple-grants'
+import { dropAppleIfNoBasis, familyKey, lockPurchase, purchasedKey, type Db } from '@/lib/apple-grants'
 
 export const runtime = 'nodejs'
 
@@ -63,15 +63,19 @@ export async function POST(req: Request) {
 
     const revocationKeys = [purchasedKey(originalTransactionId)]
     if (familyShared) revocationKeys.push(familyKey(transactionId as string))
-    const revoked = await prisma.appleRevocation.findFirst({ where: { key: { in: revocationKeys } } })
-    if (revoked) {
-      console.log(`[apple verify] ${userId}: refused, ${revoked.key} was refunded or revoked`)
-      return NextResponse.json({ error: 'refunded or revoked' }, { status: 400 })
+    /** Inside the transaction, after the lock: a refund recorded meanwhile is seen here. */
+    const isRevoked = async (db: Db): Promise<boolean> => {
+      await lockPurchase(db, originalTransactionId)
+      const revoked = await db.appleRevocation.findFirst({ where: { key: { in: revocationKeys } } })
+      if (revoked) console.log(`[apple verify] ${userId}: refused, ${revoked.key} was refunded or revoked`)
+      return revoked !== null
     }
+    const refused = () => NextResponse.json({ error: 'refunded or revoked' }, { status: 400 })
 
     if (familyShared) {
       const familyTxId = transactionId as string
       const moved = await prisma.$transaction(async (db) => {
+        if (await isRevoked(db)) return 'revoked' as const
         const grant = await db.appleFamilyGrant.findUnique({ where: { transactionId: familyTxId } })
         let from: string | null = null
         if (!grant) {
@@ -94,6 +98,7 @@ export async function POST(req: Request) {
         }
         return from
       })
+      if (moved === 'revoked') return refused()
       console.log(`[apple verify] ${userId}: lifetime from a family-shared purchase${moved ? ' (moved)' : ''}`)
       return NextResponse.json({ lifetime: true })
     }
@@ -109,6 +114,7 @@ export async function POST(req: Request) {
     }
 
     const movedFrom = await prisma.$transaction(async (db) => {
+      if (await isRevoked(db)) return 'revoked' as const
       // Clear the old binding BEFORE writing the new one (the column is unique).
       const others = await db.account.findMany({
         where: { appleOriginalTransactionId: originalTransactionId, id: { not: userId } },
@@ -133,6 +139,7 @@ export async function POST(req: Request) {
       })
       return others.length
     })
+    if (movedFrom === 'revoked') return refused()
     console.log(`[apple verify] ${userId}: lifetime from Apple${movedFrom ? ' (moved from another account)' : ''}`)
     return NextResponse.json({ lifetime: true })
   } catch (err) {

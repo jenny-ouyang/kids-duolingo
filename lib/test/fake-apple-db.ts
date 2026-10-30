@@ -56,6 +56,8 @@ function table(rows: Row[], key: string) {
 }
 
 export function makeFakeAppleDb() {
+  /** Order of operations: 'lock:<id>', 'tx:begin', 'tx:end', 'revocation:check', 'revocation:write' */
+  const log: string[] = []
   const accounts: Row[] = []
   const grants: Row[] = []
   const revocations: Row[] = []
@@ -72,13 +74,36 @@ export function makeFakeAppleDb() {
       },
     },
     appleFamilyGrant,
-    appleRevocation: table(revocations, 'key'),
+    appleRevocation: (() => {
+      const t = table(revocations, 'key')
+      return {
+        ...t,
+        findFirst: async (args: { where: Row }) => (log.push('revocation:check'), t.findFirst(args)),
+        upsert: async (args: { where: Row; create: Row; update: Row }) => (log.push('revocation:write'), t.upsert(args)),
+      }
+    })(),
+    // Tagged template call: lockPurchase -> pg_advisory_xact_lock(hashtext(id))
+    $executeRaw: async (_strings: TemplateStringsArray, ...values: unknown[]) => {
+      log.push(`lock:${values[0]}`)
+      return 1
+    },
   }
   return {
     accounts,
     grants,
     revocations,
-    prisma: { ...db, $transaction: async (fn: (d: typeof db) => Promise<unknown>) => fn(db) },
+    log,
+    prisma: {
+      ...db,
+      $transaction: async (fn: (d: typeof db) => Promise<unknown>) => {
+        log.push('tx:begin')
+        try {
+          return await fn(db)
+        } finally {
+          log.push('tx:end')
+        }
+      },
+    },
     addAccount(row: Row) {
       const full = { plan: 'free', planSource: null, appleOriginalTransactionId: null, appleEnvironment: null, isFounder: false, ...row }
       accounts.push(full)
@@ -91,6 +116,7 @@ export function makeFakeAppleDb() {
       accounts.length = 0
       grants.length = 0
       revocations.length = 0
+      log.length = 0
     },
   }
 }

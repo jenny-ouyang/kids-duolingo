@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { APPLE_LIFETIME_PRODUCT_ID, isFamilyShared, verifyNotification, verifyTransaction } from '@/lib/apple-verify'
-import { dropAppleIfNoBasis, familyKey, purchasedKey } from '@/lib/apple-grants'
+import { dropAppleIfNoBasis, familyKey, lockPurchase, purchasedKey } from '@/lib/apple-grants'
 
 export const runtime = 'nodejs'
 
@@ -17,9 +17,11 @@ export const runtime = 'nodejs'
  *   binding, every family-shared copy of that purchase is ended, and each
  *   affected account goes back to free if its plan came from Apple and it has
  *   no other Apple basis. Stripe / manual plans are never touched.
- * - FAMILY_SHARED: only that family member's grant ends. The buyer's binding
- *   is never touched, because the notification may carry the buyer's
- *   originalTransactionId.
+ * - FAMILY_SHARED: only the grant with that notification's transactionId
+ *   ends. No fan-out by originalTransactionId and no 'purchased:' record:
+ *   the id may be the buyer's, and other family members keep their copies.
+ * Both routes take pg_advisory_xact_lock on the originalTransactionId first
+ * (lib/apple-grants.ts lockPurchase), so verify and a refund never interleave.
  * - TEST and every other type: acknowledged (200) and ignored.
  *
  * A DB failure returns 500 so Apple retries. Idempotent: a second delivery
@@ -72,29 +74,22 @@ export async function POST(req: Request) {
   try {
     const downgraded = await prisma.$transaction(async (db) => {
       const affected = new Set<string>()
+      // Same lock as /api/apple/verify, taken before anything is recorded.
+      await lockPurchase(db, otid)
       if (familyTxId) {
-        // A family member's copy. Never touch the buyer's binding: the
-        // notification may carry the buyer's originalTransactionId.
+        // One family member's copy: end ONLY the grant with this transactionId.
+        // Never fan out by originalTransactionId and never record it as
+        // revoked: it may be the buyer's, and other members keep their copies.
         await db.appleRevocation.upsert({
           where: { key: familyKey(familyTxId) },
           create: { key: familyKey(familyTxId), notificationType: type },
           update: {},
         })
-        const otidIsBuyers = (await db.account.count({ where: { appleOriginalTransactionId: otid } })) > 0
-        const grants = await db.appleFamilyGrant.findMany({
-          where: otidIsBuyers ? { transactionId: familyTxId } : { OR: [{ transactionId: familyTxId }, { originalTransactionId: otid }] },
-          select: { transactionId: true, accountId: true },
-        })
-        for (const g of grants) {
-          if (g.transactionId === familyTxId) continue
-          await db.appleRevocation.upsert({
-            where: { key: familyKey(g.transactionId) },
-            create: { key: familyKey(g.transactionId), notificationType: type },
-            update: {},
-          })
+        const grant = await db.appleFamilyGrant.findUnique({ where: { transactionId: familyTxId } })
+        if (grant) {
+          await db.appleFamilyGrant.deleteMany({ where: { transactionId: familyTxId } })
+          affected.add(grant.accountId)
         }
-        await db.appleFamilyGrant.deleteMany({ where: { transactionId: { in: grants.map((g) => g.transactionId) } } })
-        grants.forEach((g) => affected.add(g.accountId))
       } else {
         // The buyer's own purchase: record it so the old JWS cannot be
         // replayed, unbind the buyer, and end every family-shared copy of it.

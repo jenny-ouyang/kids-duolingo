@@ -30,3 +30,13 @@ export async function dropAppleIfNoBasis(db: Db, accountId: string): Promise<boo
   })
   return true
 }
+
+/**
+ * Serializes every grant and every revocation for one Apple purchase. Taken
+ * FIRST inside the $transaction, in both /api/apple/verify and
+ * /api/apple/notifications, so a refund cannot land between verify's
+ * revocation check and its write. Released at commit or rollback.
+ */
+export async function lockPurchase(db: Db, originalTransactionId: string): Promise<void> {
+  await db.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${originalTransactionId}))`
+}
