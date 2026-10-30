@@ -176,3 +176,5 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 - [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
 - [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
 - [x] (2026-10-30: per family for launch; change later if data says so) Jenny decides: price per family ($9.99 for all children, proposed) or per child ($9.99 for each child). Per child needs a consumable "child place" product on iPhone, server records for restore, no Family Sharing, and a change to the web Stripe price.
+- [ ] Check: on a 430 px wide headless screenshot of mandarineer.com, landing text is cut off at the right edge ("learn Chine…", "tablet & com…"). Confirm on a real iPhone or fix before App Store screenshots.
+- [ ] Jenny: upload `~/Downloads/mandarineer-review-placeholder.png` and the review notes on the purchase page, then Save.
