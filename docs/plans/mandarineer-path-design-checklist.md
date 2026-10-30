@@ -159,8 +159,18 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 ## Release path to the App Store (2026-10-29)
 
 - [x] 1. Jenny: update to build 9 in TestFlight and test the sign-in code (Parent Zone → "Already saved on another device?"). Expected: Julian and Amelie.
-- [ ] 2. (Agreement, bank and tax done 2026-10-29; Small Business Program and in-app purchase open) Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
+- [x] 2. (All done 2026-10-30: agreement, Small Business Program form, in-app purchase with Family Sharing on) Jenny: Apple steps in App Store Connect: Paid Applications Agreement (with bank and tax), Small Business Program, in-app purchase `com.mandarineer.app.lifetime` at $9.99.
 - [ ] 3. Claude: Phase C, StoreKit code for the iPhone purchase, then build 10 to TestFlight.
+  - [ ] Swift plugin `ios/App/App/LifetimePurchase.swift` (StoreKit 2: product, buy, restore).
+  - [ ] JS wrapper `lib/purchase-native.ts`.
+  - [ ] `POST /api/apple/verify` (Apple certificates, product id check, restore rule).
+  - [ ] `POST /api/apple/notifications` (refund and revoke).
+  - [ ] Tests for both routes.
+  - [ ] Parent Zone on iPhone: Apple price, Buy, Restore Purchases.
+  - [ ] Privacy manifest: purchase history.
+  - [ ] Build 10 (version 1.0) to TestFlight.
+  - [ ] Family Sharing is on (not in the spec): a shared family member gets lifetime without the "move on restore" rule. Open: what happens to shared family members when the buyer gets a refund.
+- [ ] Jenny: in App Store Connect, check that the Paid Apps agreement shows **Active**; make a sandbox tester; set the server notification URL; upload a placeholder review screenshot on the purchase page.
 - [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
 - [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
 - [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
