@@ -1,5 +1,11 @@
 {
+  "regions": [
+    "pdx1"
+  ],
   "crons": [
-    { "path": "/api/cron/cleanup-guests", "schedule": "0 9 * * *" }
+    {
+      "path": "/api/cron/cleanup-guests",
+      "schedule": "0 9 * * *"
+    }
   ]
 }

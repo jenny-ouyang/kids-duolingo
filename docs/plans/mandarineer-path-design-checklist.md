@@ -217,11 +217,18 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Cause (from code, not tested on device): `ios/App/App/LifetimePurchase.swift:61` falls back to "production" when it cannot read the environment, and with payments off that hides the card.
 - [x] Fix without a new build: 8bf98cf, `PAYMENTS_TESTER_EMAILS` (jenny@buildtolaunch.ai, bingjie.j.ouyang@gmail.com) in Vercel production; those accounts see the card. Pack access unchanged. Deploy READY.
 - [ ] Jenny: reopen Parent Zone signed in as jenny@buildtolaunch.ai; the card shows; Buy with the sandbox tester.
-- [ ] Next build: Swift fallback returns "unknown", not "production".
+- [x] Next build: Swift fallback returns "unknown", not "production" (build 13).
+- [ ] Build 13 uploaded, processed, attached to version 1.0; Jenny checks the home screen and the buy card.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
 
 - [ ] Flow: child plays a free lesson first, no sign-up; after the first finished lesson, a grown-ups check, then the founding-price offer with "Not now"; a locked pack opens the same offer; sign-in (email code) only when a parent buys or saves progress. Jenny's idea was sign-up first, then the offer, then the app.
-- [ ] Parent Zone: a small button at the top right of the home screen, behind the grown-ups check, in place of the text link at the bottom.
+- [x] Parent Zone at the top: Jenny asked for it earlier; Claude wrongly kept it as a proposal. Bug: the late "Play next" card pushed the bottom link down and her tap opened Play next. Fixed in build 13 (fixed button at the top right; a same-height block holds the Play next place while it loads).
 - [ ] Home loads slowly (Jenny, screenshot 27): measure the time of `/api/profile` and the pack lists; show the buttons at once and fill in "Play next" when it arrives. Not measured yet.
 - [ ] When: in 1.0 before submit (new build, new test) or in 1.1 after submit. Claude recommends 1.1.
+
+### Slow loading (Jenny 2026-10-30)
+
+- [x] Cause found: the server functions run in Washington DC (`x-vercel-id: sfo1::iad1`), the database is in Oregon (`aws-0-us-west-2`). Every database question crosses the USA and back, many in a row per screen.
+- [x] Fix: `vercel.json` `"regions": ["pdx1"]` (Oregon, next to the database). Server only, no app build.
+- [ ] Check after deploy: header shows `pdx1`; Jenny feels the home, packs and Parent Zone load faster. Not measured signed in (the test guest sign-up returned no token).
