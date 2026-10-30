@@ -612,15 +612,8 @@ function NativeUnlockCard({ status, onUnlocked }: { status: AccountStatus; onUnl
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-extrabold text-ink">Unlock everything</h2>
       <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
-        <p className="text-ink-mid text-base font-bold">
-          {status.freePackCount} of {status.totalPackCount} packs are free forever. One purchase opens the rest for every
-          child in your family — pay once, keep it always. No subscription.
-        </p>
-        {store && !product && (
-          <p className="text-ink text-base font-bold bg-chip-track rounded-2xl px-4 py-3">
-            The App Store isn&apos;t ready right now. Please try again later.
-          </p>
-        )}
+        <p className="text-ink-mid text-base font-bold">Every pack, every child. Pay once.</p>
+        {store && !product && <p className="text-ink text-base font-bold">Store not ready. Try again later.</p>}
         {message && <p className="text-ink text-base font-bold">{message}</p>}
         {!status.paymentsEnabled && (
           <p className="text-ink-mid text-sm font-bold">
@@ -710,15 +703,8 @@ function UnlockSection() {
     <section className="flex flex-col gap-4">
       <h2 className="text-lg font-extrabold text-ink">Unlock everything</h2>
       <div className="bg-white rounded-[22px] p-5 shadow-press-card flex flex-col gap-3">
-        <p className="text-ink-mid text-base font-bold">
-          {status.freePackCount} of {status.totalPackCount} packs are free forever. One purchase opens the rest for every
-          child in your family — pay once, keep it always. No subscription.
-        </p>
-        {status.isGuest && (
-          <p className="text-ink text-base font-bold bg-chip-track rounded-2xl px-4 py-3">
-            Add your email first (below, under Account) so your purchase is safe on every device.
-          </p>
-        )}
+        <p className="text-ink-mid text-base font-bold">Every pack, every child. Pay once.</p>
+        {status.isGuest && <p className="text-ink text-base font-bold">Add your email first (under Account).</p>}
         {error && <p className="text-ink text-base font-bold">{error}</p>}
         <button
           onClick={handleBuy}

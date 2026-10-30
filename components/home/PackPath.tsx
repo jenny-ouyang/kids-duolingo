@@ -92,6 +92,7 @@ export default function PackPath({ packs, nextId, onOpen }: { packs: PathPack[];
           >
             <button
               onClick={() => onOpen(pack)}
+              disabled={pack.locked}
               aria-label={`${pack.name}, ${pack.locked ? 'locked' : stateWords(pack, isNext)}${isNext ? ', start here' : ''}`}
               className={`pressable relative rounded-full flex items-center justify-center font-emoji leading-none ${
                 isNext

@@ -205,6 +205,7 @@ export default function PacksPage() {
                 >
                   <button
                     onClick={() => openPack(pack)}
+                    disabled={pack.locked}
                     aria-label={pack.locked ? `${pack.name}, locked` : undefined}
                     className={`pressable w-full min-h-[72px] bg-white rounded-[22px] px-4 py-3 flex items-center gap-4 text-left shadow-press-card ${
                       pack.locked ? 'opacity-70' : ''

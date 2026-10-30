@@ -155,6 +155,7 @@ export default function MathTopicsPage() {
               <li key={topic.id} className="relative flex items-center gap-4">
                 <button
                   onClick={() => (topic.locked ? setAsking(true) : router.push(`/math/practice/session?topic=${topic.id}`))}
+                  disabled={topic.locked}
                   aria-label={`${topic.name}, ${topic.locked ? 'locked' : stateLine(topic, isNext)}`}
                   className={`pressable shrink-0 w-16 h-16 rounded-full flex items-center justify-center font-emoji text-[30px] ${
                     isNext
