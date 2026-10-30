@@ -189,8 +189,10 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 
 - [x] Description: "Free to play" line replaced with the one-purchase line (API, 2026-10-30).
 - [ ] Jenny: build 11 test: card shows, sandbox Buy works. Then a real screenshot of the card replaces the purchase placeholder.
-- [ ] Jenny gives: App Review contact phone (open). Decided: email bingjie.j.ouyang@gmail.com, copyright "2026 Build to Launch" (set), third-party content: yes, with rights (set).
-- [ ] Claude: review contact, copyright, content rights, review notes (API).
+- [x] Jenny gives: App Review contact phone (given). Decided: email bingjie.j.ouyang@gmail.com, copyright "2026 Build to Launch" (set), third-party content: yes, with rights (set).
+- [x] Claude: review contact, copyright, content rights, review notes (API, 2026-10-30).
 - [x] Claude: attach build 11 to version 1.0 (done through the API, 2026-10-30).
 - [ ] Jenny (browser): App Privacy: add Purchases → Purchase History (linked to the user, not tracking, App Functionality), then Publish.
 - [ ] Jenny: "yes, submit". Claude submits version 1.0 with the purchase.
+- [x] Release type set to MANUAL: after approval, Jenny presses Release and Claude turns on payments in the same hour.
+- [ ] Jenny decides: payments during App Review. Off: the reviewer buys and sees only "Everything is unlocked" (all packs are open), which Apple can reject as a purchase that gives nothing (guideline 2.1/3.1.1). On: mandarineer.com and the app lock packs today, for every family.
