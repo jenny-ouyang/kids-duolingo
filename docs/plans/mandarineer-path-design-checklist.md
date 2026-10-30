@@ -197,3 +197,4 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Release type set to MANUAL: after approval, Jenny presses Release and Claude turns on payments in the same hour.
 - [x] (2026-10-30: turn payments ON when we submit; Jenny's account got a free manual unlock first, Julian and Amelie keep everything) Jenny decides: payments during App Review. Off: the reviewer buys and sees only "Everything is unlocked" (all packs are open), which Apple can reject as a purchase that gives nothing (guideline 2.1/3.1.1). On: mandarineer.com and the app lock packs today, for every family.
 - [ ] Claude, at submit: set `PAYMENTS_ENABLED=true` in Vercel production and redeploy; check a new guest sees locks and the web Buy card.
+- [ ] Unlock everything card moved to the top of Parent Zone (6597f84, Jenny's request). Build 12 carries it; attach build 12 to version 1.0 after Apple processes it. Test the purchase on build 12, not 11.
