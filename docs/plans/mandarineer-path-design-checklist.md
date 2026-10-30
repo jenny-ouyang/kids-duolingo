@@ -208,6 +208,6 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 
 - [x] Cause found: commit 54861d7 ran while `scripts/build-ios.sh` had moved `app/api` and `middleware.ts` aside, so git recorded every API route as deleted. Production served 404 for every `/api/...` call; Jenny's Parent Zone showed "Couldn't load your children" and no Unlock card.
 - [x] Fix: 660ee58 restores the files (diff against the state before 54861d7 is only the founding-price change); tsc clean, 70/70 tests pass; pushed to `main`.
-- [ ] Vercel production READY for 660ee58 and `/api/account` answers (not 404).
+- [x] Vercel production READY for 660ee58; `/api/account` and `/api/children` answer 401 without sign-in (not 404). Checked 2026-10-30.
 - [ ] Prevention: `scripts/build-ios.sh` must not leave the repo in a state that a commit can capture (for example, build from a copy, or refuse to start when a commit could run). Proposal; Jenny decides.
 - [ ] Security review (automated, on the restored code; old code, not new): a child can get words of a locked pack by sending crafted requests: sticker award in `app/api/profile/route.ts` has no pack check; `app/api/progress/route.ts` does not check that the word belongs to the pack; the report in `app/api/children/[childId]/report/route.ts` shows words from locked packs. Medium. Proposal: fix after submit, before the price goes up.
