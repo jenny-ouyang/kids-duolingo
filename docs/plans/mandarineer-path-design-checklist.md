@@ -218,7 +218,9 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Fix without a new build: 8bf98cf, `PAYMENTS_TESTER_EMAILS` (jenny@buildtolaunch.ai, bingjie.j.ouyang@gmail.com) in Vercel production; those accounts see the card. Pack access unchanged. Deploy READY.
 - [ ] Jenny: reopen Parent Zone signed in as jenny@buildtolaunch.ai; the card shows; Buy with the sandbox tester.
 - [x] Next build: Swift fallback returns "unknown", not "production" (build 13).
-- [ ] Build 13 uploaded, processed, attached to version 1.0; Jenny checks the home screen and the buy card.
+- [x] Build 13 uploaded (replaced by build 14).
+- [x] Locked pack: 🔒 and not tappable; buy card one line, no free-pack count (f9b1a87, Jenny's rule).
+- [ ] Build 14 uploaded (done 16:05); processed and attached to version 1.0; Jenny checks home, locks and buy card.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
 
@@ -231,4 +233,4 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 
 - [x] Cause found: the server functions run in Washington DC (`x-vercel-id: sfo1::iad1`), the database is in Oregon (`aws-0-us-west-2`). Every database question crosses the USA and back, many in a row per screen.
 - [x] Fix: `vercel.json` `"regions": ["pdx1"]` (Oregon, next to the database). Server only, no app build.
-- [ ] Check after deploy: header shows `pdx1`; Jenny feels the home, packs and Parent Zone load faster. Not measured signed in (the test guest sign-up returned no token).
+- [x] Deploy READY; header shows `sfo1::pdx1` (checked 2026-10-30). Open: Jenny feels the home, packs and Parent Zone load faster. Not measured signed in (the test guest sign-up returned no token).
