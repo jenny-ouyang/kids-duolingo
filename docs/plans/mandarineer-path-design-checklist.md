@@ -213,8 +213,8 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Cause found: commit 54861d7 ran while `scripts/build-ios.sh` had moved `app/api` and `middleware.ts` aside, so git recorded every API route as deleted. Production served 404 for every `/api/...` call; Jenny's Parent Zone showed "Couldn't load your children" and no Unlock card.
 - [x] Fix: 660ee58 restores the files (diff against the state before 54861d7 is only the founding-price change); tsc clean, 70/70 tests pass; pushed to `main`.
 - [x] Vercel production READY for 660ee58; `/api/account` and `/api/children` answer 401 without sign-in (not 404). Checked 2026-10-30.
-- [ ] Prevention: `scripts/build-ios.sh` must not leave the repo in a state that a commit can capture (for example, build from a copy, or refuse to start when a commit could run). Proposal; Jenny decides.
-- [ ] Security review (automated, on the restored code; old code, not new): a child can get words of a locked pack by sending crafted requests: sticker award in `app/api/profile/route.ts` has no pack check; `app/api/progress/route.ts` does not check that the word belongs to the pack; the report in `app/api/children/[childId]/report/route.ts` shows words from locked packs. Medium. Proposal: fix after submit, before the price goes up.
+- [x] Prevention: `scripts/build-ios.sh` must not leave the repo in a state that a commit can capture (for example, build from a copy, or refuse to start when a commit could run). Proposal; Jenny decides. Done 3b0da6c: CAP_BUILD uses pageExtensions [tsx, jsx]; no file moves; build tested (out/ has pages, no api).
+- [x] Security review (automated, on the restored code; old code, not new): a child can get words of a locked pack by sending crafted requests: sticker award in `app/api/profile/route.ts` has no pack check; `app/api/progress/route.ts` does not check that the word belongs to the pack; the report in `app/api/children/[childId]/report/route.ts` shows words from locked packs. Medium. Proposal: fix after submit, before the price goes up. Fixed da2296f: profile POST pack check (402), progress/answers reject a word not in the pack (400), stickers GET and report wobbly words skip locked packs. 94 tests; production check with a throwaway guest: 11/11 PASS.
 
 ### Buy card hidden on build 12 (2026-10-30)
 
@@ -255,8 +255,13 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Subtitle changed to "Chinese for kids" (Jenny, live via API).
 - [x] New screenshots made from the current app: `store/screenshots-v2/` (6 iPhone 1320x2868, 3 iPad 2064x2752), checked by Claude. Waiting for Jenny's ok before upload.
 - [x] Text draft: `store/listing-v2.md` (promo 158 chars, description 1,757 chars). Waiting for Jenny's ok.
-- [ ] Bug (1.1): the child report says "Animals 8 of 10 words learned" but its Packs part says "0 of 10 words"; "Not started · 35" counts math packs while the pack list says 33.
+- [x] Bug (1.1): the child report says "Animals 8 of 10 words learned" but its Packs part says "0 of 10 words"; "Not started · 35" counts math packs while the pack list says 33. Fixed da2296f: report uses "learned" like the rest of the app; Chinese and Math counted separately. Web live now; iPhone gets it in 1.1.
 - [x] Proposal (done above): make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once. (done)
 - [x] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above. (done)
 - [x] Purchase review screenshot: real Parent Zone "Buy — $9.99" card (simulator, sandbox product loaded; the test-only "Test store:" line hidden), uploaded, COMPLETE; purchase READY_TO_SUBMIT. File `store/iap-review.png`.
 - [x] Jenny approved ("ok, you do it"). Uploaded: 6 iPhone + 3 iPad screenshots (all COMPLETE, old ones removed), new promo text and description (API 200).
+
+- [ ] Decide (security follow-up): sticker pages of locked packs are now hidden (a child with stickers from before payments, or a refunded lifetime, does not see them). Other choice: show the page with only the collected words.
+- [ ] Decide: rows made by crafted requests before the fix can still be in the database (they leak nothing now, but can raise some counts). Clean-up only with Jenny's yes.
+- [ ] Report legend still says "nothing is locked"; wrong now that payments are on. Fix in 1.1 (short text).
+- [ ] Simple Sentences progress is never saved (SentenceProgress is not written), so the report cannot show it.
