@@ -193,12 +193,14 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Claude: review contact, copyright, content rights, review notes (API, 2026-10-30).
 - [x] Claude: attach build 11 to version 1.0 (done through the API, 2026-10-30).
 - [x] Jenny (browser): App Privacy: add Purchases → Purchase History (linked to the user, not tracking, App Functionality), then Publish.
-- [ ] Jenny: "yes, submit". Claude submits version 1.0 with the purchase.
+- [x] Jenny: "yes submit" (2026-10-30). Submitted.
 - [x] Release type set to MANUAL: after approval, Jenny presses Release and Claude turns on payments in the same hour.
 - [x] (2026-10-30: turn payments ON when we submit; Jenny's account got a free manual unlock first, Julian and Amelie keep everything) Jenny decides: payments during App Review. Off: the reviewer buys and sees only "Everything is unlocked" (all packs are open), which Apple can reject as a purchase that gives nothing (guideline 2.1/3.1.1). On: mandarineer.com and the app lock packs today, for every family.
 - [x] Claude, at submit (Jenny: "yes submit", 2026-10-30): `PAYMENTS_ENABLED=true` in Vercel production, redeployed (mandarineer.com aliased). Throwaway-guest check on production: paymentsEnabled true, 4 open, 29 of 33 locked, locked questions 402; guest deleted.
 - [x] Version 1.0 (build 15) added to the draft review submission (API 201).
-- [ ] The first purchase must be attached on the version page (API refuses: FIRST_NON_CONSUMABLE_MUST_BE_SUBMITTED_ON_VERSION). Needs the Playwriter extension on an App Store Connect tab. Then submit.
+- [x] First purchase added to the draft through the purchase page "Add for Review" → "Draft iOS Submission" (the version page has no purchase section any more; the API refuses the first non-consumable). Version added back (API 201).
+- [x] SUBMITTED 2026-10-31 05:44 UTC: version 1.0 (build 15) and Mandarineer Lifetime $9.99, both WAITING_FOR_REVIEW. Release MANUAL: Jenny picks the release day after approval.
+- [ ] Apple review result. If rejected, read the reason and fix.
 - [x] Unlock everything card moved to the top of Parent Zone (6597f84, Jenny's request). Build 12 is VALID and in TestFlight; Claude attached build 12 to version 1.0 (2026-10-30, checked through the API).
 - [ ] Jenny: test the purchase on build 12 (not 11) with a new guest and the sandbox tester; send a screenshot of the card.
 - [x] App Privacy form was never started (no answers on file). Answers from `app/privacy/page.tsx`: Email Address, Other User Content (child nickname and avatar), User ID, Purchase History, Product Interaction (practice history). Each: App Functionality only, linked to the user, not tracking. Jenny fills and publishes in the browser. Done 2026-10-30: Claude filled the 5 types through Jenny's Chrome (Other User Contact Info replaced with Other User Content) and clicked Publish; page shows "Published".
