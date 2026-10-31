@@ -75,7 +75,7 @@ Mock: https://claude.ai/artifact/EZ9aHZ9s6XCTFrH8tDtCMo
 - [x] Packs path and Play next suggest the same pack (`f1a0c8e`).
 - [x] Vercel env: `DATABASE_URL` added for Preview (same database as the live app). Before this, preview API calls failed.
 - [x] Branch pushed. Preview READY: https://kids-duolingo-git-feat-mandarineer-path-jenny-ouyangs-projects.vercel.app (behind Vercel login; mandarineer.com unchanged).
-- [ ] Jenny tests on her phone.
+- [x] Jenny tests on her phone. (superseded by later builds)
 
 ## Payments (Jenny, 2026-10-27: "let's also make it pay-able")
 
@@ -93,8 +93,8 @@ Spec: `docs/superpowers/specs/2026-10-13-payments-design.md`. Settings: `docs/pl
 - [x] Export compliance key is set, so TestFlight does not ask the encryption question.
 - [x] A preview bypass key was made and then revoked; the bypass code was removed (`c86da43`). No uploaded build has it.
 - [x] After the production deploy, auth users stay at 179: visits make no guest accounts.
-- [ ] Apple finishes processing build 7 (usually 5 to 30 minutes), then Jenny updates in the TestFlight app.
-- [ ] Jenny tests on her phone.
+- [x] Apple finishes processing build 7 (usually 5 to 30 minutes), then Jenny updates in the TestFlight app. (superseded by later builds)
+- [x] Jenny tests on her phone. (superseded by later builds)
 
 ## Calmer screens (Jenny, 2026-10-28: "lots of pages are very busy: especially the kid home")
 
@@ -108,7 +108,7 @@ Rule: one main thing to tap on each kid screen; parents' numbers live in the Par
 - [x] Math topics → `1a2e063`: no problem counts, no state lines, no legend.
 - [x] Lessons (Claude's call) → `31ea748`: one row for the panda and the pīn button; no pack-name line, no "question 4 of 8", no "Next: 5 more" line (the progress bar says it).
 - [x] mandarineer.com deployed (`67706c9`, READY). TestFlight build 8 uploaded (Upload succeeded). Second test family made and deleted; users 179.
-- [ ] Jenny updates to build 8 in TestFlight and checks the calmer screens.
+- [x] Jenny updates to build 8 in TestFlight and checks the calmer screens. (superseded by later builds)
 
 ## Entry pages (Jenny, 2026-10-28: "it's always only in welcome", "why it's not got direct enter at all?", "why it's not staying the mandarineer.com")
 
@@ -171,16 +171,16 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
   - [x] (2026-10-30, upload succeeded 00:36; archive 1.0 (10), app points to mandarineer.com, 0 vercel.app) Build 10 (version 1.0) to TestFlight. Apple still has to process it before it shows in TestFlight.
   - [x] (2026-10-30, security review fixes 430d18a, 576eca3) Family Sharing is on (not in the spec): a shared family member gets lifetime without the "move on restore" rule. Each shared copy is saved by its own transactionId, so one shared purchase unlocks only one account at a time. A buyer refund ends every shared copy. A refunded purchase cannot be sent again to get the unlock back.
   - [ ] Jenny decides: the iPhone buy card shows in the Apple sandbox (TestFlight and App Review) even while `PAYMENTS_ENABLED` is off, so you and Apple can test the purchase. Real App Store users see it only after go-live. Keep this, or change it?
-- [ ] (done 2026-10-30: agreement Active, sandbox tester, notification URLs; placeholder review screenshot not confirmed) Jenny: in App Store Connect, check that the Paid Apps agreement shows **Active**; make a sandbox tester; set the server notification URL; upload a placeholder review screenshot on the purchase page.
-- [ ] 4. Jenny: test the purchase on her phone with an Apple sandbox account.
-- [ ] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check.
-- [ ] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves.
+- [x] (done 2026-10-30: agreement Active, sandbox tester, notification URLs; placeholder review screenshot not confirmed) Jenny: in App Store Connect, check that the Paid Apps agreement shows **Active**; make a sandbox tester; set the server notification URL; upload a placeholder review screenshot on the purchase page. (superseded: done 2026-10-30)
+- [x] 4. Jenny: test the purchase on her phone with an Apple sandbox account. (done: build 15 sandbox purchase unlocked, 2026-10-30)
+- [x] 5. Claude: App Store listing (screenshots, text, privacy answers for a kids app) for Jenny to check. (done: listing v2 uploaded 2026-10-30)
+- [x] 6. Jenny: "yes, submit" for App Store review. Then Claude turns on `PAYMENTS_ENABLED` only after Apple approves. (superseded: Jenny decided payments on at submit; on since 2026-10-31)
 - [x] (2026-10-30: per family for launch; change later if data says so) Jenny decides: price per family ($9.99 for all children, proposed) or per child ($9.99 for each child). Per child needs a consumable "child place" product on iPhone, server records for restore, no Family Sharing, and a change to the web Stripe price.
 - [ ] Check: on a 430 px wide headless screenshot of mandarineer.com, landing text is cut off at the right edge ("learn Chine…", "tablet & com…"). Confirm on a real iPhone or fix before App Store screenshots.
 - [x] (saved 2026-10-30; Claude added the "Grown-ups only" sentence through the API; purchase state READY_TO_SUBMIT) Jenny: upload `~/Downloads/mandarineer-review-placeholder.png` and the review notes on the purchase page, then Save.
-- [ ] Before submit: replace the purchase review screenshot (now the landing page, a placeholder) with a real iPhone screenshot of the Unlock everything card from build 10.
+- [x] Before submit: replace the purchase review screenshot (now the landing page, a placeholder) with a real iPhone screenshot of the Unlock everything card from build 10. (done: real card uploaded 2026-10-30)
 - [x] App Store Connect API works from this Mac (key TT2YN4RP4G, issuer in `.env.local`). Claude edits listing text, review notes and screenshots; App Privacy answers stay in the browser.
-- [ ] Bug: build 10 showed no Unlock everything card in TestFlight (build 10 was VALID and in beta). Fix in 03a52e8: card hides only when the store says production, environment also read from AppTransaction, a "Test store" line shows. Build 11 uploads it; Jenny checks the card and the line.
+- [x] Bug: build 10 showed no Unlock everything card in TestFlight (build 10 was VALID and in beta). Fix in 03a52e8: card hides only when the store says production, environment also read from AppTransaction, a "Test store" line shows. Build 11 uploads it; Jenny checks the card and the line. (superseded: real cause was the plugin promise, fixed in build 15)
   - [x] Build 11 uploaded 2026-10-30 11:38 (manual signing, profile "Mandarineer AppStore"; automatic signing fails with "no devices").
 
 ## Submit 1.0 today (2026-10-30)
@@ -188,7 +188,7 @@ UI check notes: `docs/design/ui-check-entry/ui-design-notes.md` (Build to Launch
 Already set in App Store Connect (checked through the API): name, subtitle, description, keywords, promo text, support and marketing URL, privacy URL, category Education, age rating 4+, 6 iPhone and 3 iPad screenshots, purchase READY_TO_SUBMIT.
 
 - [x] Description: "Free to play" line replaced with the one-purchase line (API, 2026-10-30).
-- [ ] Jenny: build 11 test: card shows, sandbox Buy works. Then a real screenshot of the card replaces the purchase placeholder.
+- [x] Jenny: build 11 test: card shows, sandbox Buy works. Then a real screenshot of the card replaces the purchase placeholder. (superseded by build 15 test)
 - [x] Jenny gives: App Review contact phone (given). Decided: email bingjie.j.ouyang@gmail.com, copyright "2026 Build to Launch" (set), third-party content: yes, with rights (set).
 - [x] Claude: review contact, copyright, content rights, review notes (API, 2026-10-30).
 - [x] Claude: attach build 11 to version 1.0 (done through the API, 2026-10-30).
@@ -202,7 +202,7 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] SUBMITTED 2026-10-31 05:44 UTC: version 1.0 (build 15) and Mandarineer Lifetime $9.99, both WAITING_FOR_REVIEW. Release MANUAL: Jenny picks the release day after approval.
 - [ ] Apple review result. If rejected, read the reason and fix.
 - [x] Unlock everything card moved to the top of Parent Zone (6597f84, Jenny's request). Build 12 is VALID and in TestFlight; Claude attached build 12 to version 1.0 (2026-10-30, checked through the API).
-- [ ] Jenny: test the purchase on build 12 (not 11) with a new guest and the sandbox tester; send a screenshot of the card.
+- [x] Jenny: test the purchase on build 12 (not 11) with a new guest and the sandbox tester; send a screenshot of the card. (superseded by build 15 test)
 - [x] App Privacy form was never started (no answers on file). Answers from `app/privacy/page.tsx`: Email Address, Other User Content (child nickname and avatar), User ID, Purchase History, Product Interaction (practice history). Each: App Functionality only, linked to the user, not tracking. Jenny fills and publishes in the browser. Done 2026-10-30: Claude filled the 5 types through Jenny's Chrome (Other User Contact Info replaced with Other User Content) and clicked Publish; page shows "Published".
 - [x] mandarineer.com home page: "Play free" → "Start free", "Free to play" → "Free to start", and "Free while in early access… no payment details asked" → the one-payment line (web only; the iPhone app never shows this page).
 - [x] Home page line (Jenny, from John Rush's pricing chapter): "Founding price: $9.99, one time. Lifetime access for every child, with every future pack and upgrade included. The price goes up after the founding period." Every lifetime purchase now sets isFounder while `FOUNDING_PERIOD` (lib/plan.ts) is true, so the promise holds. Jenny's account is a Founder too.
@@ -220,7 +220,7 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 
 - [x] Cause (from code, not tested on device): `ios/App/App/LifetimePurchase.swift:61` falls back to "production" when it cannot read the environment, and with payments off that hides the card.
 - [x] Fix without a new build: 8bf98cf, `PAYMENTS_TESTER_EMAILS` (jenny@buildtolaunch.ai, bingjie.j.ouyang@gmail.com) in Vercel production; those accounts see the card. Pack access unchanged. Deploy READY.
-- [ ] Jenny: reopen Parent Zone signed in as jenny@buildtolaunch.ai; the card shows; Buy with the sandbox tester.
+- [x] Jenny: reopen Parent Zone signed in as jenny@buildtolaunch.ai; the card shows; Buy with the sandbox tester. (superseded by build 15 test)
 - [x] Next build: Swift fallback returns "unknown", not "production" (build 13).
 - [x] Build 13 uploaded (replaced by build 14).
 - [x] Locked pack: 🔒 and not tappable; buy card one line, no free-pack count (f9b1a87, Jenny's rule).
@@ -256,7 +256,7 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] New screenshots made from the current app: `store/screenshots-v2/` (6 iPhone 1320x2868, 3 iPad 2064x2752), checked by Claude. Waiting for Jenny's ok before upload.
 - [x] Text draft: `store/listing-v2.md` (promo 158 chars, description 1,757 chars). Waiting for Jenny's ok.
 - [ ] Bug (1.1): the child report says "Animals 8 of 10 words learned" but its Packs part says "0 of 10 words"; "Not started · 35" counts math packs while the pack list says 33.
-- [ ] Proposal (done above): make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once.
-- [ ] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above.
+- [x] Proposal (done above): make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once. (done)
+- [x] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above. (done)
 - [x] Purchase review screenshot: real Parent Zone "Buy — $9.99" card (simulator, sandbox product loaded; the test-only "Test store:" line hidden), uploaded, COMPLETE; purchase READY_TO_SUBMIT. File `store/iap-review.png`.
 - [x] Jenny approved ("ok, you do it"). Uploaded: 6 iPhone + 3 iPad screenshots (all COMPLETE, old ones removed), new promo text and description (API 200).
