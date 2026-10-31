@@ -7,6 +7,10 @@ const capBuild = process.env.CAP_BUILD === '1'
 const nextConfig = capBuild
   ? {
       output: 'export',
+      // Only .tsx files count as routes: app/api (route.ts), middleware.ts and the
+      // .ts metadata routes are server-only and drop out of the static export,
+      // without moving any file in the working tree.
+      pageExtensions: ['tsx', 'jsx'], // two entries: Next's app loader reads a one-item list as a string
       images: { unoptimized: true },
       env: {
         NEXT_PUBLIC_CAP_BUILD: '1',
