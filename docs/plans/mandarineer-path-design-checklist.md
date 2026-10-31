@@ -241,3 +241,14 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Cause found: the server functions run in Washington DC (`x-vercel-id: sfo1::iad1`), the database is in Oregon (`aws-0-us-west-2`). Every database question crosses the USA and back, many in a row per screen.
 - [x] Fix: `vercel.json` `"regions": ["pdx1"]` (Oregon, next to the database). Server only, no app build.
 - [x] Deploy READY; header shows `sfo1::pdx1` (checked 2026-10-30). Open: Jenny feels the home, packs and Parent Zone load faster. Not measured signed in (the test guest sign-up returned no token).
+
+### Store page before submit (Jenny 2026-10-30: "good screenshots, good persuasive description, everything")
+
+- [x] Audit of the live listing (API): name "Mandarineer", subtitle "Chinese for kids, ages 4-8", promo text, description, keywords, 6 iPhone and 3 iPad screenshots. Facts checked against the database: 33 Chinese packs (32 word packs + Simple Sentences), 360 words, 4 math topics. Correct.
+- [x] Problem found: screenshot 6 shows the old home screen (Chinese/Math buttons, "Parent Dashboard" link at the bottom). The app now has Play next, Packs/Math/Stickers and Parent Zone at the top.
+- [x] Problem found: in every screenshot the phone fills about 70% of the image; the bottom third is empty. The words are small on a phone screen.
+- [x] Problem found: no screenshot of the parent side (progress report, Parent Zone) or of stickers, which parents decide on.
+- [ ] Proposal: make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once.
+- [ ] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above.
+- [ ] Purchase review screenshot: real "Buy — $9.99" card from Jenny's phone.
+- [ ] Jenny approves screenshots and text; Claude uploads them.
