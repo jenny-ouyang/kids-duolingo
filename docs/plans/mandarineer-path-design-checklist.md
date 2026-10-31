@@ -221,7 +221,11 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Build 13 uploaded (replaced by build 14).
 - [x] Locked pack: 🔒 and not tappable; buy card one line, no free-pack count (f9b1a87, Jenny's rule).
 - [x] Build 14 uploaded, VALID, attached to version 1.0 (API check). Open: Jenny checks home, locks and buy card.
-- [ ] Buy is gray on build 14 (Jenny, 2026-10-30): the app gets no product from Apple. Checked: Paid Apps Agreement Active (Oct 29); price $9.99 set (API, manualPrices); availability AVAILABLE; product ID matches the code. Cause not known yet. Needs the "Test store:" line from Jenny.
+- [x] Buy is gray on builds 12-14 (Jenny, 2026-10-30). Cause found: `lib/purchase-native.ts` resolved a promise with the Capacitor plugin proxy; the proxy answers `then` too, so the promise never settled and getProduct, purchase and restore never reached the phone. Apple side was fine (agreement, $9.99, territories). Earlier guesses ("no price", "Apple delay") were wrong.
+- [x] Fix: wrap the proxy in an object. Simulator test: Parent Zone shows "Buy — $9.99" (product loaded from Apple sandbox in 1.4 s). 71 tests pass. Committed and pushed.
+- [x] Build 15 uploaded with the fix (checked inside the archive).
+- [ ] Build 15 VALID and attached to version 1.0.
+- [ ] On Jenny's phone (iPhone Mirroring): Buy shows $9.99, the Apple sheet opens, the sandbox purchase unlocks.
 - [ ] Buy card text: Jenny says Claude changed her agreed wording. Claude shows her the old text; no change until she picks.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
