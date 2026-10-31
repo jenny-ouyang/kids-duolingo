@@ -226,7 +226,7 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Build 15 uploaded with the fix (checked inside the archive).
 - [x] Build 15 VALID and attached to version 1.0 (API check).
 - [x] On Jenny's phone, build 15 (iPhone Mirroring): Buy shows "Buy — $9.99", tap opens the TestFlight sheet ($9.99, not charged).
-- [ ] Jenny types her Apple Account password in the sheet; the purchase unlocks the family ("Everything is unlocked").
+- [x] Jenny typed her Apple Account password; Parent Zone shows "Everything is unlocked ✓ Founder" (server verified the purchase). End-to-end purchase works on build 15.
 - [ ] Buy card text: Jenny says Claude changed her agreed wording. Claude shows her the old text; no change until she picks.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
