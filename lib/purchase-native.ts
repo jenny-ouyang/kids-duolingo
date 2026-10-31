@@ -41,14 +41,19 @@ interface LifetimePurchasePlugin {
   ): Promise<{ remove: () => Promise<void> }>
 }
 
-let pluginPromise: Promise<LifetimePurchasePlugin> | null = null
+let pluginPromise: Promise<{ native: LifetimePurchasePlugin }> | null = null
 
-/** Dynamic import keeps @capacitor/core's plugin proxy off the web hot path (same as lib/haptics.ts). */
-function plugin(): Promise<LifetimePurchasePlugin> {
+/**
+ * Dynamic import keeps @capacitor/core's plugin proxy off the web hot path (same as lib/haptics.ts).
+ * The proxy is wrapped in an object: the proxy answers every property, `then` too, so a promise
+ * resolved with the bare proxy treats it as a thenable and never settles (gray Buy, builds 12-14).
+ * Never return `.native` from an async function or a .then() for the same reason.
+ */
+function plugin(): Promise<{ native: LifetimePurchasePlugin }> {
   if (!pluginPromise) {
-    pluginPromise = import('@capacitor/core').then(({ registerPlugin }) =>
-      registerPlugin<LifetimePurchasePlugin>('LifetimePurchase')
-    )
+    pluginPromise = import('@capacitor/core').then(({ registerPlugin }) => ({
+      native: registerPlugin<LifetimePurchasePlugin>('LifetimePurchase'),
+    }))
   }
   return pluginPromise
 }
@@ -56,7 +61,7 @@ function plugin(): Promise<LifetimePurchasePlugin> {
 export async function getStoreInfo(): Promise<StoreInfo> {
   if (!isNativeApp()) return { product: null, environment: 'unknown' }
   try {
-    const res = await (await plugin()).getProduct()
+    const res = await (await plugin()).native.getProduct()
     return { product: res.product ?? null, environment: res.environment ?? 'unknown' }
   } catch {
     return { product: null, environment: 'unknown' }
@@ -85,7 +90,7 @@ export async function buyLifetime(): Promise<PurchaseOutcome> {
   if (!isNativeApp()) return 'store-error'
   let result: PluginPurchaseResult
   try {
-    result = await (await plugin()).purchase()
+    result = await (await plugin()).native.purchase()
   } catch {
     return 'store-error'
   }
@@ -99,7 +104,7 @@ export async function restoreLifetime(): Promise<PurchaseOutcome> {
   if (!isNativeApp()) return 'store-error'
   let jwsList: string[]
   try {
-    jwsList = (await (await plugin()).restore()).jws ?? []
+    jwsList = (await (await plugin()).native.restore()).jws ?? []
   } catch {
     return 'store-error'
   }
@@ -119,7 +124,7 @@ export function onPurchaseUpdated(cb: (jws: string) => void): () => void {
   let handle: { remove: () => Promise<void> } | null = null
   let stopped = false
   plugin()
-    .then((p) => p.addListener('purchaseUpdated', ({ jws }) => cb(jws)))
+    .then(({ native }) => native.addListener('purchaseUpdated', ({ jws }) => cb(jws)))
     .then((h) => {
       handle = h
       if (stopped) h.remove().catch(() => {})
