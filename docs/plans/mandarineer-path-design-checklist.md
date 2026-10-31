@@ -248,7 +248,11 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Problem found: screenshot 6 shows the old home screen (Chinese/Math buttons, "Parent Dashboard" link at the bottom). The app now has Play next, Packs/Math/Stickers and Parent Zone at the top.
 - [x] Problem found: in every screenshot the phone fills about 70% of the image; the bottom third is empty. The words are small on a phone screen.
 - [x] Problem found: no screenshot of the parent side (progress report, Parent Zone) or of stickers, which parents decide on.
-- [ ] Proposal: make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once.
+- [x] Subtitle changed to "Chinese for kids" (Jenny, live via API).
+- [x] New screenshots made from the current app: `store/screenshots-v2/` (6 iPhone 1320x2868, 3 iPad 2064x2752), checked by Claude. Waiting for Jenny's ok before upload.
+- [x] Text draft: `store/listing-v2.md` (promo 158 chars, description 1,757 chars). Waiting for Jenny's ok.
+- [ ] Bug (1.1): the child report says "Animals 8 of 10 words learned" but its Packs part says "0 of 10 words"; "Not started · 35" counts math packs while the pack list says 33.
+- [ ] Proposal (done above): make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once.
 - [ ] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above.
 - [ ] Purchase review screenshot: real "Buy — $9.99" card from Jenny's phone.
 - [ ] Jenny approves screenshots and text; Claude uploads them.
