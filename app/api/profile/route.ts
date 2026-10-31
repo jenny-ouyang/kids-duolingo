@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { assertPackAccess, packLockedResponse } from '@/lib/pack-gate'
 import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-path'
 
 /**
@@ -45,7 +46,7 @@ export async function GET(req: NextRequest) {
  */
 export async function POST(req: NextRequest) {
   try {
-    const { child } = await requireChild()
+    const { account, child } = await requireChild()
     const body = await req.json() as {
       heartsEarned: number
       tzOffsetMinutes?: number
@@ -53,6 +54,9 @@ export async function POST(req: NextRequest) {
       packId?: string
       firstTryWordIds?: string[]
     }
+    // A sticker shows a word of the pack, so a locked pack gets nothing (and no
+    // write happens). Math sessions send no packId and skip this.
+    if (typeof body.packId === 'string') assertPackAccess(account, body.packId)
 
     const now = new Date()
 
@@ -88,6 +92,8 @@ export async function POST(req: NextRequest) {
       sticker,
     })
   } catch (err) {
+    const locked = packLockedResponse(err)
+    if (locked) return locked
     const authErr = authErrorResponse(err)
     if (authErr) return authErr
     console.error('[profile POST]', err)

@@ -19,6 +19,16 @@ export async function POST(req: NextRequest) {
     }
     if (typeof body.packId !== 'string' || !body.packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
     assertPackAccess(account, body.packId)
+    if (typeof body.wordId !== 'string' || !body.wordId) return NextResponse.json({ error: 'wordId required' }, { status: 400 })
+    // The item (a word, or a math problem) must belong to the (accessible) pack. One query covers both.
+    const inPack = await prisma.pack.findFirst({
+      where: {
+        id: body.packId,
+        OR: [{ words: { some: { id: body.wordId } } }, { problems: { some: { id: body.wordId } } }],
+      },
+      select: { id: true },
+    })
+    if (!inPack) return NextResponse.json({ error: 'wordId not in pack' }, { status: 400 })
 
     await prisma.answerEvent.create({
       data: {

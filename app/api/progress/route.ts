@@ -77,6 +77,12 @@ export async function POST(req: NextRequest) {
     const { packId, wordId, easiness, interval, repetitions, nextReview, subject = 'chinese' } = body
     if (typeof packId !== 'string' || !packId) return NextResponse.json({ error: 'packId required' }, { status: 400 })
     assertPackAccess(account, packId)
+    if (typeof wordId !== 'string' || !wordId) return NextResponse.json({ error: 'wordId required' }, { status: 400 })
+    // The item must belong to the (accessible) pack, or a free packId could carry a locked pack's item
+    const item = subject === 'math'
+      ? await prisma.mathProblem.findUnique({ where: { id: wordId }, select: { packId: true } })
+      : await prisma.word.findUnique({ where: { id: wordId }, select: { packId: true } })
+    if (item?.packId !== packId) return NextResponse.json({ error: 'wordId not in pack' }, { status: 400 })
 
     if (subject === 'math') {
       await prisma.mathProgress.upsert({

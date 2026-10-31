@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireChild, authErrorResponse } from '@/lib/auth'
+import { canAccessPack } from '@/lib/plan'
 
 /**
  * GET /api/stickers
@@ -9,12 +10,15 @@ import { requireChild, authErrorResponse } from '@/lib/auth'
  */
 export async function GET() {
   try {
-    const { child } = await requireChild()
-    const stickers = await prisma.sticker.findMany({
-      where: { childId: child.id },
-      orderBy: { createdAt: 'desc' },
-      select: { wordId: true, packId: true },
-    })
+    const { account, child } = await requireChild()
+    // A page lists every word of its pack, so only packs this account can open get a page
+    const stickers = (
+      await prisma.sticker.findMany({
+        where: { childId: child.id },
+        orderBy: { createdAt: 'desc' },
+        select: { wordId: true, packId: true },
+      })
+    ).filter((s) => canAccessPack(account, s.packId))
     if (stickers.length === 0) return NextResponse.json({ newestWordId: null, pages: [] })
 
     const collected = new Set(stickers.map((s) => s.wordId))

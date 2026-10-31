@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { getWeekDays, getNextPacks, parseTz, todayIndex } from '@/lib/learning-path'
 import { getAuthContext, authErrorResponse } from '@/lib/auth'
+import { canAccessPack } from '@/lib/plan'
 
 const WOBBLY_LIMIT = 8
 const WOBBLY_EASINESS_THRESHOLD = 2.3
@@ -92,6 +93,7 @@ export async function GET(
           easiness: true,
           word: {
             select: {
+              packId: true,
               english: true,
               chinese: true,
               pinyin: true,
@@ -149,6 +151,8 @@ export async function GET(
     }
 
     const wobbly = chineseProgress
+      // The word's own pack (not the row's packId, which the client sent) decides access
+      .filter((row) => canAccessPack(account, row.word.packId))
       .map((row) => {
         const lastWrong = latestOutcome.get(row.wordId) === false
         return { row, lastWrong }
@@ -177,18 +181,40 @@ export async function GET(
       rows.reduce((acc, r) => acc + r._count._all, 0)
 
     const tz = parseTz(req.nextUrl.searchParams.get('tz'))
-    const [weekDays, nextPacks] = await Promise.all([getWeekDays([child.id], tz), getNextPacks([child.id], account)])
+    // "Learned" = answered right at least once (repetitions >= 1): the same
+    // rule as the pack list ring, the home path and Play next (lib/learning-path.ts).
+    const [weekDays, nextPacks, chineseLearned, mathLearned] = await Promise.all([
+      getWeekDays([child.id], tz),
+      getNextPacks([child.id], account),
+      prisma.chineseProgress.groupBy({
+        by: ['packId'],
+        where: { childId, repetitions: { gte: 1 } },
+        _count: { _all: true },
+      }),
+      prisma.mathProgress.groupBy({
+        by: ['packId'],
+        where: { childId, repetitions: { gte: 1 } },
+        _count: { _all: true },
+      }),
+    ])
+    const chineseLearnedBy = toCountMap(chineseLearned)
+    const mathLearnedBy = toCountMap(mathLearned)
 
     return NextResponse.json({
       child,
       weekDays: weekDays[child.id],
       today: todayIndex(tz),
       nextPack: nextPacks[child.id],
-      packs: packRows,
+      // `learned` is added; `started` and `mastered` stay for the iOS build in review
+      packs: packRows.map((p) => ({
+        ...p,
+        learned: (p.subject === 'math' ? mathLearnedBy : chineseLearnedBy).get(p.packId) ?? 0,
+      })),
       wobbly,
       totals: {
         wordsStarted: sum(chineseStarted),
         wordsMastered: sum(chineseMastered),
+        wordsLearned: sum(chineseLearned),
         answers7d,
         correct7d,
       },

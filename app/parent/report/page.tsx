@@ -6,6 +6,7 @@ import { motion } from 'framer-motion'
 import { fetchJsonWithAuthRetry } from '@/lib/api-fetch'
 import { speakChinese } from '@/lib/tts'
 import WeekDots from '@/components/progress/WeekDots'
+import { groupPacksBySubject, type SubjectGroups } from '@/lib/report-packs'
 
 /* Calm variant of Sunrise Playground: same palette, warm ink, press physics —
    no mascot, no hills, no sparkles (per DESIGN.md, parent zone rule). */
@@ -30,6 +31,8 @@ interface ReportPack {
   totalWords: number
   started: number
   mastered: number
+  /** Answered right at least once: the app-wide "learned" */
+  learned: number
 }
 
 interface WobblyWord {
@@ -50,6 +53,7 @@ interface Report {
   totals: {
     wordsStarted: number
     wordsMastered: number
+    wordsLearned: number
     answers7d: number
     correct7d: number
   }
@@ -71,16 +75,9 @@ function weekProse(daysPlayed: number, answers7d: number, correct7d: number): st
   return `Played ${daysPlayed} ${days}. ${answers7d} ${questions}, ${pct}% right on the first try.`
 }
 
-/** A pack's state, in words: Learning, Done, or Not started */
-function packState(p: ReportPack): 'learning' | 'done' | 'notStarted' {
-  if (p.totalWords > 0 && p.mastered === p.totalWords) return 'done'
-  if (p.started > 0 || p.mastered > 0) return 'learning'
-  return 'notStarted'
-}
-
 function PackRow({ pack }: { pack: ReportPack }) {
   const fillPct =
-    pack.totalWords > 0 ? Math.round((pack.mastered / pack.totalWords) * 100) : 0
+    pack.totalWords > 0 ? Math.round((pack.learned / pack.totalWords) * 100) : 0
   const unit = pack.subject === 'math' ? 'problems' : 'words'
   return (
     <div className="flex items-center gap-4">
@@ -99,10 +96,10 @@ function PackRow({ pack }: { pack: ReportPack }) {
         <div
           className="mt-1.5 h-3 rounded-full bg-chip-track overflow-hidden"
           role="progressbar"
-          aria-valuenow={pack.mastered}
+          aria-valuenow={pack.learned}
           aria-valuemin={0}
           aria-valuemax={pack.totalWords}
-          aria-label={`${pack.name}: ${pack.mastered} of ${pack.totalWords} ${unit} mastered`}
+          aria-label={`${pack.name}: ${pack.learned} of ${pack.totalWords} ${unit} learned`}
         >
           <div
             className="h-full rounded-full bg-success"
@@ -111,9 +108,51 @@ function PackRow({ pack }: { pack: ReportPack }) {
         </div>
       </div>
       <p className="text-ink-mid text-base font-bold flex-shrink-0">
-        {pack.mastered} of {pack.totalWords} {unit}
+        {pack.learned} of {pack.totalWords} {unit}
       </p>
     </div>
+  )
+}
+
+/** One subject's packs: Learning, Done, Not started, each with its own count */
+function SubjectPacks({ groups }: { groups: SubjectGroups<ReportPack> }) {
+  const isMath = groups.subject === 'math'
+  const { learning, done, notStarted } = groups
+  return (
+    <>
+      <h3 className="text-lg font-extrabold text-ink mt-2">{isMath ? 'Math' : 'Chinese'}</h3>
+
+      <h4 className="text-base font-extrabold text-ink">Learning · {learning.length}</h4>
+      {learning.map((pack) => (
+        <PackRow key={pack.packId} pack={pack} />
+      ))}
+      {learning.length === 0 && (
+        <p className="text-ink-mid text-base font-bold">{isMath ? 'No topic started yet.' : 'No pack started yet.'}</p>
+      )}
+
+      <h4 className="text-base font-extrabold text-ink">Done · {done.length}</h4>
+      {done.map((pack) => (
+        <PackRow key={pack.packId} pack={pack} />
+      ))}
+      {done.length === 0 && (
+        <p className="text-ink-mid text-base font-bold">
+          {isMath ? 'A topic is done when every problem is learned.' : 'A pack is done when every word is learned.'}
+        </p>
+      )}
+
+      {notStarted.length > 0 && (
+        <details className="group">
+          <summary className="min-h-[44px] flex items-center cursor-pointer text-base font-extrabold text-ink">
+            Not started, open any time · {notStarted.length}
+          </summary>
+          <div className="flex flex-col gap-4 mt-3">
+            {notStarted.map((pack) => (
+              <PackRow key={pack.packId} pack={pack} />
+            ))}
+          </div>
+        </details>
+      )}
+    </>
   )
 }
 
@@ -161,10 +200,7 @@ function ChildReport() {
     fetchReport()
   }, [fetchReport])
 
-  const allPacks = report ? [...report.packs.filter((p) => p.subject !== 'math'), ...report.packs.filter((p) => p.subject === 'math')] : []
-  const learning = allPacks.filter((p) => packState(p) === 'learning')
-  const done = allPacks.filter((p) => packState(p) === 'done')
-  const notStarted = allPacks.filter((p) => packState(p) === 'notStarted')
+  const subjects = report ? groupPacksBySubject(report.packs) : []
 
   return (
     <div className="min-h-screen bg-canvas-top">
@@ -242,7 +278,7 @@ function ChildReport() {
               </p>
               <p className="text-ink-mid text-base font-bold mt-1">A missed day leaves a gap; nothing resets.</p>
               <p className="text-ink-mid text-base font-bold mt-1">
-                {report.totals.wordsStarted} words started · {report.totals.wordsMastered} mastered so far
+                {report.totals.wordsLearned} words learned so far
               </p>
             </motion.section>
 
@@ -319,35 +355,12 @@ function ChildReport() {
               <h2 className="text-lg font-extrabold text-ink">Packs</h2>
               <p className="text-ink-mid text-base font-bold">
                 <b className="text-ink">Learning</b>: started. <b className="text-ink">Done</b>: every word or problem
-                mastered. <b className="text-ink">Not started</b>: open any time; nothing is locked.
+                learned. <b className="text-ink">Not started</b>: open any time; nothing is locked.
               </p>
 
-              <h3 className="text-base font-extrabold text-ink">Learning · {learning.length}</h3>
-              {learning.map((pack) => (
-                <PackRow key={pack.packId} pack={pack} />
+              {subjects.map((groups) => (
+                <SubjectPacks key={groups.subject} groups={groups} />
               ))}
-              {learning.length === 0 && <p className="text-ink-mid text-base font-bold">No pack started yet.</p>}
-
-              <h3 className="text-base font-extrabold text-ink">Done · {done.length}</h3>
-              {done.map((pack) => (
-                <PackRow key={pack.packId} pack={pack} />
-              ))}
-              {done.length === 0 && (
-                <p className="text-ink-mid text-base font-bold">A pack is done when every word in it is mastered.</p>
-              )}
-
-              {notStarted.length > 0 && (
-                <details className="group">
-                  <summary className="min-h-[44px] flex items-center cursor-pointer text-base font-extrabold text-ink">
-                    Not started, open any time · {notStarted.length}
-                  </summary>
-                  <div className="flex flex-col gap-4 mt-3">
-                    {notStarted.map((pack) => (
-                      <PackRow key={pack.packId} pack={pack} />
-                    ))}
-                  </div>
-                </details>
-              )}
             </motion.section>
           </>
         )}
