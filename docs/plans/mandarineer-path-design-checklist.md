@@ -224,8 +224,9 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [x] Buy is gray on builds 12-14 (Jenny, 2026-10-30). Cause found: `lib/purchase-native.ts` resolved a promise with the Capacitor plugin proxy; the proxy answers `then` too, so the promise never settled and getProduct, purchase and restore never reached the phone. Apple side was fine (agreement, $9.99, territories). Earlier guesses ("no price", "Apple delay") were wrong.
 - [x] Fix: wrap the proxy in an object. Simulator test: Parent Zone shows "Buy — $9.99" (product loaded from Apple sandbox in 1.4 s). 71 tests pass. Committed and pushed.
 - [x] Build 15 uploaded with the fix (checked inside the archive).
-- [ ] Build 15 VALID and attached to version 1.0.
-- [ ] On Jenny's phone (iPhone Mirroring): Buy shows $9.99, the Apple sheet opens, the sandbox purchase unlocks.
+- [x] Build 15 VALID and attached to version 1.0 (API check).
+- [x] On Jenny's phone, build 15 (iPhone Mirroring): Buy shows "Buy — $9.99", tap opens the TestFlight sheet ($9.99, not charged).
+- [ ] Jenny types her Apple Account password in the sheet; the purchase unlocks the family ("Everything is unlocked").
 - [ ] Buy card text: Jenny says Claude changed her agreed wording. Claude shows her the old text; no change until she picks.
 
 ### App flow proposals (Jenny asked 2026-10-30; Jenny decides)
