@@ -254,5 +254,5 @@ Already set in App Store Connect (checked through the API): name, subtitle, desc
 - [ ] Bug (1.1): the child report says "Animals 8 of 10 words learned" but its Packs part says "0 of 10 words"; "Not started · 35" counts math packs while the pack list says 33.
 - [ ] Proposal (done above): make 6 new iPhone 6.9" and 3 iPad 13" screenshots from the current app, with bigger screens and short captions. Order: 1 hear and tap, 2 celebration, 3 33 packs, 4 sentences, 5 parent report, 6 no ads, pay once.
 - [ ] Proposal: rewrite promo text and description (jenny-voice) to lead with the parent's problem and the "pay once, every child" offer; keep the facts above.
-- [ ] Purchase review screenshot: real "Buy — $9.99" card from Jenny's phone.
-- [ ] Jenny approves screenshots and text; Claude uploads them.
+- [x] Purchase review screenshot: real Parent Zone "Buy — $9.99" card (simulator, sandbox product loaded; the test-only "Test store:" line hidden), uploaded, COMPLETE; purchase READY_TO_SUBMIT. File `store/iap-review.png`.
+- [x] Jenny approved ("ok, you do it"). Uploaded: 6 iPhone + 3 iPad screenshots (all COMPLETE, old ones removed), new promo text and description (API 200).
